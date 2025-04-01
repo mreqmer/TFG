@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class AuthRepository @Inject constructor(
@@ -16,12 +18,17 @@ class AuthRepository @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    fun signIn(email: String, password: String) {
-        authWrapper.signIn(email, password) { success, errorMessage ->
-            if (success) {
-                _user.value = authWrapper.getCurrentUser()
-            } else {
-                _error.value = errorMessage
+    suspend fun signIn(email: String, password: String): Boolean {
+        return suspendCoroutine { continuation ->
+            authWrapper.signIn(email, password) { success, errorMessage ->
+                if (success) {
+                    _user.value = authWrapper.getCurrentUser()
+                    _error.value = null
+                    continuation.resume(true)
+                } else {
+                    _error.value = errorMessage
+                    continuation.resume(false)
+                }
             }
         }
     }

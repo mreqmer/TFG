@@ -1,9 +1,6 @@
 package com.example.myapprecetas.views
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,43 +19,50 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import com.example.myapprecetas.R
 import com.example.myapprecetas.vm.VMLogin
-import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
-import com.example.myapprecetas.ui.theme.VerdeOscuro
+import androidx.lifecycle.ViewModel
+import coil.compose.AsyncImagePainter.State.Empty.painter
+
+import com.example.myapprecetas.ui.theme.Colores
+import com.google.android.play.integrity.internal.s
+import com.google.firebase.auth.FirebaseUser
+
+
+/*TODO GORDO
+ los botones no van
+ Que javi me verifique el padding del mensaje de error
+ */
 
 
 @Composable
@@ -68,14 +73,18 @@ fun ViewLogin(vm: VMLogin, navController: NavHostController){
     }
 }
 
+
+
 @Composable
 fun LoginScreen(vm: VMLogin, navController: NavHostController) {
     val context = LocalContext.current
     val user by vm.user.collectAsState()
     val error by vm.error.collectAsState()
-    val email by vm.Email.observeAsState("")
-    val password by vm.Password.observeAsState("")
-    var isPasswordVisible = vm.EsPasswordVisible.observeAsState().value ?: false
+    val email by vm.Email.collectAsState("")
+    val password by vm.Password.collectAsState("")
+    val isPasswordVisible = vm.EsPasswordVisible.collectAsState().value
+    val errorMostrado by vm.ErrorMostrado.collectAsState(null)
+    val cargando by vm.Cargando.collectAsState(false)
 
     Column(
         modifier = Modifier
@@ -110,11 +119,15 @@ fun LoginScreen(vm: VMLogin, navController: NavHostController) {
                 .padding(top = 40.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            EmailField(email, {vm.OnLoginChanged(it, password)})
 
-            PasswordField(password, {vm.OnLoginChanged(email, it)}, isPasswordVisible)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
 
-            PasswordOlvidada()
+                MensajeError(errorMostrado, cargando)
+                EmailField(email, { vm.OnLoginChanged(it, password) })
+                Spacer(modifier = Modifier.height(20.dp))
+                PasswordField(vm, password, {vm.OnLoginChanged(email, it)}, isPasswordVisible)
+                PasswordOlvidada()
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -123,68 +136,75 @@ fun LoginScreen(vm: VMLogin, navController: NavHostController) {
             LoginOtherOptions()
         }
 
-        // Botón de login (posición estable)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 32.dp)
         ) {
-            Button(
-                onClick = { vm.signIn(email, password) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),  // Más alto (antes 52.dp)
-                shape = RoundedCornerShape(10.dp),  // Más cuadrado (antes 12.dp por defecto)
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = VerdeOscuro,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Text(
-                    text = "Iniciar sesión",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.SemiBold  // Texto más grueso
-                    ),
-                    fontSize = 18.sp  // Tamaño aumentado
-                )
-            }
+
+            BtnLogin(vm, email, password, user, cargando, navController);
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            user?.let {
-                Text(
-                    text = "Bienvenido, ${it.email}",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Normal
-                    )
-                )
-            }
-
-            error?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium
-                    )
-                )
-            }
         }}}
 
 
 @Composable
-fun BtnLogin(vm: VMLogin, email: String, password: String, navController: NavHostController) {
-    Button(
-        onClick = { vm.signIn(email, password) },
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = VerdeOscuro, // Color de fondo
-            contentColor = Color.White // Color del texto (contraste)
-        )
-    ) {
-        Text("Login")
+fun cargaLogin(vm: ViewModel, cargando : Boolean){
+    if (cargando) {
+        CircularProgressIndicator(modifier = Modifier.height(20.dp).width(20.dp), color = Colores.RojoError)
+    }else{
+
     }
 }
+
+
+@Composable
+fun MensajeError(mensajeError : String?, cargando : Boolean) {
+    var mensaje = if(cargando) "" else mensajeError
+    Text(
+        modifier = Modifier.padding(start = 2.dp,),
+        color =  Colores.RojoError,
+        text = mensaje ?: "",
+        )
+
+}
+
+@Composable
+fun BtnLogin(vm: VMLogin, email: String, password: String, user: FirebaseUser?, cargando : Boolean, navController: NavHostController) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(user) {
+        if (user != null) {
+            navController.navigate("construccion") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
+    Button(
+        onClick = { vm.signInViewModel(email, password); keyboardController?.hide() },
+        modifier = Modifier
+            .imePadding()
+            .fillMaxWidth()
+            .height(56.dp)
+        ,
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Colores.VerdeOscuro,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        )
+    ) {
+        if (cargando) CircularProgressIndicator()
+        else Text(
+            text = "Iniciar sesión",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.SemiBold  // Texto más grueso
+            ),
+            fontSize = 18.sp  // Tamaño aumentado
+        )
+
+    }
+}
+
 @Composable
 fun EmailField(email: String, onTextChanged: (String) -> Unit){
 
@@ -193,43 +213,62 @@ fun EmailField(email: String, onTextChanged: (String) -> Unit){
         onValueChange = {onTextChanged(it)},
         //label = { Text("Username") },
         placeholder = {Text("Usuario")},
-        modifier = Modifier.fillMaxWidth().border(2.dp, Color.Black, MaterialTheme.shapes.medium),
+        modifier = Modifier.fillMaxWidth().border(2.dp, Colores.Gris, MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
-
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next
+        ),
+        textStyle = TextStyle(color = Color.Black),
         leadingIcon = {
             Icon(
                 painter = painterResource(R.drawable.usero),
-                contentDescription = "pw",
-                modifier = Modifier.width(24.dp).height(24.dp)
+                contentDescription = "usuario",
+                modifier = Modifier.width(24.dp).height(24.dp),
+                tint = Colores.Gris
             )
         }
     )
 }
+
 @Composable
-fun PasswordField(password: String, onTextChanged: (String) -> Unit, isPasswordVisible: Boolean){
+fun PasswordField(vm:VMLogin, password: String, onTextChanged: (String) -> Unit, isPasswordVisible: Boolean){
+    var iconoPassword = if(!isPasswordVisible) R.drawable.eye else R.drawable.eyecrossedo
+
     OutlinedTextField(
         value = password,
         onValueChange =  {onTextChanged(it)},
         //label = { Text("Password") },
         placeholder = {Text("Password")},
         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions.Default,
-        modifier = Modifier.fillMaxWidth().border(2.dp, Color.Black, MaterialTheme.shapes.medium),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Done
+        ),
+        modifier = Modifier.fillMaxWidth().border(2.dp, Colores.Gris, MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
-        trailingIcon = {
-            Icon(
-                painter = painterResource(R.drawable.eye),
-                contentDescription = "pwVisible",
-                modifier = Modifier.width(24.dp).height(24.dp)
-            )
-        },
+        textStyle = TextStyle(color = Color.Black),
+        maxLines = 1,
         leadingIcon = {
             Icon(
                 painter = painterResource(R.drawable.lock),
-                contentDescription = "pw",
-                modifier = Modifier.width(24.dp).height(24.dp)
+                contentDescription = "password",
+                modifier = Modifier.width(24.dp).height(24.dp),
+                tint = Colores.Gris
             )
-        }
+        },
+        trailingIcon = {
+            Icon(
+                painter = painterResource(id = iconoPassword),
+                contentDescription = "mostrar password",
+                modifier = Modifier
+                                .width(24.dp)
+                                .height(24.dp)
+                                .clickable { vm.OnPasswordVisibleChanged() },
+                tint = Colores.Gris
+            )
+        },
     )
 }
 
@@ -237,13 +276,14 @@ fun PasswordField(password: String, onTextChanged: (String) -> Unit, isPasswordV
 private fun PasswordOlvidada(){
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.End
     ) {
         Text(
             text = "¿Has olvidado tu contraseña?",
-            color =  VerdeOscuro,
+            fontSize = 14.sp,
+            color =  Colores.VerdeOscuro,
+            textDecoration = TextDecoration.Underline,
             modifier = Modifier.clickable { /* TODO */ },
         )
     }
@@ -259,26 +299,24 @@ private fun TextOtherOptions() {
         HorizontalDivider(
             modifier = Modifier.width(40.dp),
             thickness = 1.dp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+            color = Colores.Gris
         )
         Text(
             text = "Otras opciones de verificación",
+            fontSize = 16.sp,
             modifier = Modifier.padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = Colores.Gris
         )
         HorizontalDivider(
             modifier = Modifier.width(40.dp),
             thickness = 1.dp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+            color = Colores.Gris
         )
     }
 }
 
 @Composable
-private fun LoginOtherOptions(
-    iconPadding: Dp = 16.dp
-) {
+private fun LoginOtherOptions() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -299,9 +337,9 @@ private fun LoginOtherOptions(
                     painter = painterResource(id = R.drawable.google),
                     contentDescription = "Google",
                     modifier = Modifier
-                        .size(34.dp)
+                        .size(45.dp)
                         .align(Alignment.CenterStart)
-                        .padding(start = iconPadding),
+                        .padding(start = 20.dp),
                     tint = Color.Unspecified
                 )
 
@@ -310,7 +348,7 @@ private fun LoginOtherOptions(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.align(Alignment.Center),
-                    color = Color.Black,
+                    color = Color.Black.copy(alpha = 0.7f)
                 )
             }
         }
