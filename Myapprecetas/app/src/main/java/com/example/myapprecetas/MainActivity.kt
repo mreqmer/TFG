@@ -26,9 +26,8 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     startDestination = "login"
                 ) {
-                    // Pantalla Login (con Hilt)
                     composable(route = "login") {
-                        val vm: VMLogin = hiltViewModel() // ViewModel con inyección
+                        val vm: VMLogin = hiltViewModel()
                         ViewLogin(vm, navController)
                     }
                     composable("construccion") {

@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,11 +52,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.R
 import com.example.myapprecetas.ui.theme.Colores
+import com.example.myapprecetas.ui.theme.FamilyBaloo
+import com.example.myapprecetas.ui.theme.FamilyQuicksand
+
+import com.example.myapprecetas.ui.theme.Typography
 import com.example.myapprecetas.vm.VMLogin
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
+
+object myfuente {
+    var font = FamilyQuicksand.quicksand
+}
 
 @Composable
 fun MensajeError(mensajeError : String?, cargando : Boolean) {
@@ -64,6 +73,7 @@ fun MensajeError(mensajeError : String?, cargando : Boolean) {
         modifier = Modifier.padding(start = 2.dp,),
         color =  Colores.RojoError,
         text = mensaje ?: "",
+        fontFamily = myfuente.font
     )
 }
 
@@ -85,7 +95,8 @@ fun IrAtrasInicioSesion(navController: NavHostController) {
             text = "Inicia sesión",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.headlineMedium,
-            color = Color.Black
+            color = Color.Black,
+            fontFamily = myfuente.font
         )
     }
 }
@@ -190,7 +201,8 @@ fun TextOtherOptions() {
             text = "Otras opciones de verificación",
             fontSize = 16.sp,
             modifier = Modifier.padding(horizontal = 8.dp),
-            color = Colores.Gris
+            color = Colores.Gris,
+            fontFamily = myfuente.font
         )
         HorizontalDivider(
             modifier = Modifier.width(40.dp),
@@ -267,7 +279,8 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.align(Alignment.Center),
-                    color = Color.Black.copy(alpha = 0.7f)
+                    color = Color.Black.copy(alpha = 0.7f),
+                    fontFamily = myfuente.font
                 )
             }
         }
@@ -304,7 +317,8 @@ fun BtnLogin(vm: VMLogin, email: String, password: String, user: FirebaseUser?, 
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.SemiBold  // Texto más grueso
             ),
-            fontSize = 18.sp  // Tamaño aumentado
+            fontSize = 18.sp,  // Tamaño aumentado
+            fontFamily = myfuente.font
         )
 
     }
