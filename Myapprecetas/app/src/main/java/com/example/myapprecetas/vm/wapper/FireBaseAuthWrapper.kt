@@ -2,6 +2,8 @@ package com.example.myapprecetas.vm.wapper
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,6 +30,14 @@ class FirebaseAuth @Inject constructor(
                     onResult(false, task.exception?.message ?: "Error desconocido")
                 }
             }
+    }
+    suspend fun signInWithGoogle(idToken: String): FirebaseUser? {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        return try {
+            auth.signInWithCredential(credential).await().user
+        } catch (e: Exception) {
+            null
+        }
     }
     /**
      * Obtiene el usuario actualmente autenticado.

@@ -1,6 +1,7 @@
 package com.example.myapprecetas.repositories
 
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -30,6 +31,24 @@ class AuthRepository @Inject constructor(
                     continuation.resume(false)
                 }
             }
+        }
+    }
+
+    suspend fun signInWithGoogle(idToken: String): Boolean {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val authResult = authWrapper.signInWithGoogle(idToken)
+            if (authResult != null) {
+                _user.value = authResult
+                _error.value = null
+                true
+            } else {
+                _error.value = "Error al autenticar con Google"
+                false
+            }
+        } catch (e: Exception) {
+            _error.value = "Error: ${e.localizedMessage}"
+            false
         }
     }
 

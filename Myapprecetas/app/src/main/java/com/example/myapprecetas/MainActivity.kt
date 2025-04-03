@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapprecetas.ui.theme.MyapprecetasTheme
 import com.example.myapprecetas.views.PaginaEnConstruccionConBotonAtras
-import com.example.myapprecetas.views.ViewLogin
+import com.example.myapprecetas.views.viewlogin.ViewLogin
 import com.example.myapprecetas.vm.VMLogin
 import dagger.hilt.android.AndroidEntryPoint
 

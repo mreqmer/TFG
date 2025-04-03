@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.credentials.play.services.auth)
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -66,9 +67,10 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.play.services.auth)
 
     // Utilidades
     implementation(libs.coil.kt.coil.compose)

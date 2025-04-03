@@ -59,6 +59,26 @@ class VMLogin @Inject constructor(
        }
     }
 
+    private val LoginSuccess = MutableStateFlow(false)
+    val loginSuccess: StateFlow<Boolean> = LoginSuccess
+
+    fun signInWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            try {
+                cargando.value = true
+                val success = authRepository.signInWithGoogle(idToken)
+                LoginSuccess.value = success
+                if (!success) {
+                    errorMostrado.value = authRepository.error.value ?: "Error al autenticar con Google"
+                }
+            } catch (e: Exception) {
+                errorMostrado.value = "Error: ${e.localizedMessage}"
+            } finally {
+                cargando.value = false
+            }
+        }
+    }
+
     fun signInViewModel(email: String, password: String) {
         viewModelScope.launch {
             try {
