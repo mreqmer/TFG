@@ -9,31 +9,39 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapprecetas.ui.theme.MyapprecetasTheme
+import com.example.myapprecetas.views.InicioView
 import com.example.myapprecetas.views.PaginaEnConstruccionConBotonAtras
 import com.example.myapprecetas.views.viewlogin.ViewLogin
 import com.example.myapprecetas.vm.VMLogin
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
+            val user = FirebaseAuth.getInstance().currentUser
+            val startDestination = if (user != null) "construccion" else "inicio"
+
             MyapprecetasTheme {
                 NavHost(
                     navController = navController,
-                    startDestination = "login"
+                    startDestination = startDestination
                 ) {
-                    composable(route = "login") {
+                    composable("inicio") {
+                        InicioView(navController)
+                    }
+                    composable("login") {
                         val vm: VMLogin = hiltViewModel()
                         ViewLogin(vm, navController)
                     }
                     composable("construccion") {
                         PaginaEnConstruccionConBotonAtras(navController)
                     }
-
                 }
             }
         }

@@ -17,4 +17,6 @@ object Colores{
     val MarronOscuro = Color(0xFFaa8976)
     val Gris = Color(0xFF757780)
     val RojoError = Color(0xFFB00020)
+    val Blanco = Color(0xFFFFFFFF)
+    val Negro = Color(0xFF000000)
 }
