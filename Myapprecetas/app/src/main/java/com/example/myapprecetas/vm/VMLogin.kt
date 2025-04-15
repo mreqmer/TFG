@@ -1,8 +1,10 @@
 package com.example.myapprecetas.vm
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.repositories.AuthRepository
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -35,8 +37,17 @@ class VMLogin @Inject constructor(
     private val cargando = MutableStateFlow(false)
     val Cargando: StateFlow<Boolean> = cargando
 
-    val user: StateFlow<FirebaseUser?> = authRepository.user
+    // 🔥 Usuario actual observado desde AuthManager
+    val user: StateFlow<FirebaseUser?> = AuthManager.currentUser
+
+    // 🔥 Acceso al estado del login
+    val isLoggedIn: Boolean
+        get() = AuthManager.isLoggedIn()
+
     val error: StateFlow<String?> = authRepository.error
+
+    private val LoginSuccess = MutableStateFlow(false)
+    val loginSuccess: StateFlow<Boolean> = LoginSuccess
 
     fun onLoginChanged(email: String, password: String) {
         this.email.value = email
@@ -46,21 +57,15 @@ class VMLogin @Inject constructor(
     fun togglePasswordVisibility() {
         esPasswordVisible.value = !esPasswordVisible.value
     }
+
     fun OnLoginChanged(email: String, password: String) {
         this.email.value = email
         this.password.value = password
     }
 
-    fun OnPasswordVisibleChanged(){
-       if(esPasswordVisible.value){
-           esPasswordVisible.value = false
-       }else{
-           esPasswordVisible.value = true
-       }
+    fun OnPasswordVisibleChanged() {
+        esPasswordVisible.value = !esPasswordVisible.value
     }
-
-    private val LoginSuccess = MutableStateFlow(false)
-    val loginSuccess: StateFlow<Boolean> = LoginSuccess
 
     fun signInWithGoogle(idToken: String) {
         viewModelScope.launch {
@@ -82,7 +87,6 @@ class VMLogin @Inject constructor(
     fun signInViewModel(email: String, password: String) {
         viewModelScope.launch {
             try {
-                // Validaciones básicas
                 if (email.isBlank() || password.isBlank()) {
                     errorMostrado.value = "Por favor completa todos los campos"
                     return@launch
@@ -109,6 +113,7 @@ class VMLogin @Inject constructor(
             }
         }
     }
+
 
     private fun traducirErrorFirebase() {
         val errorMessage = error.value

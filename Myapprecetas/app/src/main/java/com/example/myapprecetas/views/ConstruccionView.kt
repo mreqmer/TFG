@@ -1,20 +1,21 @@
 package com.example.myapprecetas.views
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.google.firebase.auth.FirebaseAuth
 import androidx.navigation.NavHostController
 
 @Composable
 fun PaginaEnConstruccionConBotonAtras(
     onBackClick: NavHostController
 ) {
+    val user by AuthManager.currentUser.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -24,13 +25,21 @@ fun PaginaEnConstruccionConBotonAtras(
     ) {
         Text("En construcción", style = MaterialTheme.typography.headlineMedium)
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        user?.let {
+            Text("Usuario: ${it.displayName ?: "Nombre no disponible"}")
+            Text("Correo: ${it.email ?: "Correo no disponible"}")
+        }
+
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
             onClick = {
-                FirebaseAuth.getInstance().signOut()
-                onBackClick.navigate("inicio") {
-                    popUpTo("construccion") { inclusive = true }
+                AuthManager.logoutWithRevokeAccess(onBackClick.context) {
+                    onBackClick.navigate("inicio") {
+                        popUpTo("construccion") { inclusive = true }
+                    }
                 }
             }
         ) {

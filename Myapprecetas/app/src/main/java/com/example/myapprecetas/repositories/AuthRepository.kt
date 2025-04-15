@@ -1,5 +1,6 @@
 package com.example.myapprecetas.repositories
 
+import com.example.myapprecetas.vm.wapper.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,7 @@ import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val authWrapper: com.example.myapprecetas.vm.wapper.FirebaseAuth
+    private val authWrapper: FirebaseAuth
 ) {
     private val _user = MutableStateFlow<FirebaseUser?>(null)
     val user: StateFlow<FirebaseUser?> = _user
@@ -53,4 +54,5 @@ class AuthRepository @Inject constructor(
     }
 
     fun getCurrentUser() = authWrapper.getCurrentUser()
+
 }
