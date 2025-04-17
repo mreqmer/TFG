@@ -1,3 +1,5 @@
+package com.example.myapprecetas.userauth
+
 import android.content.Context
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

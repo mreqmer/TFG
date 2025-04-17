@@ -1,7 +1,6 @@
 package com.example.myapprecetas.views.inicioview
 
 import androidx.compose.runtime.Composable
-import com.example.myapprecetas.views.InicioScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

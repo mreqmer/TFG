@@ -12,7 +12,7 @@ import androidx.navigation.NavHostController
 import com.example.myapprecetas.userauth.AuthManager
 
 @Composable
-fun PaginaEnConstruccionConBotonAtras(
+fun PaginaEnConstrucciondosConBotonAtras(
     onBackClick: NavHostController
 ) {
     val user by AuthManager.currentUser.collectAsState()
@@ -24,7 +24,7 @@ fun PaginaEnConstruccionConBotonAtras(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("En construcción", style = MaterialTheme.typography.headlineMedium)
+        Text("En construcción2", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(16.dp))
 

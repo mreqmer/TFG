@@ -1,10 +1,9 @@
 package com.example.myapprecetas.vm
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.repositories.AuthRepository
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.example.myapprecetas.userauth.AuthManager
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -21,21 +20,24 @@ class VMLogin @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    // Estados
-    private val email = MutableStateFlow("")
-    val Email: StateFlow<String> = email
+    // Estados privados
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
 
-    private val password = MutableStateFlow("")
-    val Password: StateFlow<String> = password
+    private val _password = MutableStateFlow("")
+    val password: StateFlow<String> = _password
 
-    private var esPasswordVisible = MutableStateFlow(false)
-    var EsPasswordVisible: StateFlow<Boolean> = esPasswordVisible
+    private var _esPasswordVisible = MutableStateFlow(false)
+    var esPasswordVisible: StateFlow<Boolean> = _esPasswordVisible
 
-    private val errorMostrado = MutableStateFlow("")
-    val ErrorMostrado: StateFlow<String> = errorMostrado
+    private val _errorMostrado = MutableStateFlow("")
+    val errorMostrado: StateFlow<String> = _errorMostrado
 
-    private val cargando = MutableStateFlow(false)
-    val Cargando: StateFlow<Boolean> = cargando
+    private val _cargando = MutableStateFlow(false)
+    val cargando: StateFlow<Boolean> = _cargando
+
+    private val _loginSuccess = MutableStateFlow(false)
+    val loginSuccess: StateFlow<Boolean> = _loginSuccess
 
     // 🔥 Usuario actual observado desde AuthManager
     val user: StateFlow<FirebaseUser?> = AuthManager.currentUser
@@ -46,40 +48,32 @@ class VMLogin @Inject constructor(
 
     val error: StateFlow<String?> = authRepository.error
 
-    private val LoginSuccess = MutableStateFlow(false)
-    val loginSuccess: StateFlow<Boolean> = LoginSuccess
-
     fun onLoginChanged(email: String, password: String) {
-        this.email.value = email
-        this.password.value = password
+        _email.value = email
+        _password.value = password
     }
 
     fun togglePasswordVisibility() {
-        esPasswordVisible.value = !esPasswordVisible.value
+        _esPasswordVisible.value = !_esPasswordVisible.value
     }
 
-    fun OnLoginChanged(email: String, password: String) {
-        this.email.value = email
-        this.password.value = password
-    }
-
-    fun OnPasswordVisibleChanged() {
-        esPasswordVisible.value = !esPasswordVisible.value
+    fun onPasswordVisibleChanged() {
+        _esPasswordVisible.value = !_esPasswordVisible.value
     }
 
     fun signInWithGoogle(idToken: String) {
         viewModelScope.launch {
             try {
-                cargando.value = true
+                _cargando.value = true
                 val success = authRepository.signInWithGoogle(idToken)
-                LoginSuccess.value = success
+                _loginSuccess.value = success
                 if (!success) {
-                    errorMostrado.value = authRepository.error.value ?: "Error al autenticar con Google"
+                    _errorMostrado.value = authRepository.error.value ?: "Error al autenticar con Google"
                 }
             } catch (e: Exception) {
-                errorMostrado.value = "Error: ${e.localizedMessage}"
+                _errorMostrado.value = "Error: ${e.localizedMessage}"
             } finally {
-                cargando.value = false
+                _cargando.value = false
             }
         }
     }
@@ -88,12 +82,12 @@ class VMLogin @Inject constructor(
         viewModelScope.launch {
             try {
                 if (email.isBlank() || password.isBlank()) {
-                    errorMostrado.value = "Por favor completa todos los campos"
+                    _errorMostrado.value = "Por favor completa todos los campos"
                     return@launch
                 }
 
-                cargando.value = true
-                errorMostrado.value = ""
+                _cargando.value = true
+                _errorMostrado.value = ""
 
                 val success = authRepository.signIn(email, password)
 
@@ -101,7 +95,7 @@ class VMLogin @Inject constructor(
                     traducirErrorFirebase()
                 }
             } catch (e: Exception) {
-                errorMostrado.value = when (e) {
+                _errorMostrado.value = when (e) {
                     is FirebaseAuthInvalidCredentialsException -> "Credenciales inválidas"
                     is FirebaseAuthInvalidUserException -> "Usuario no encontrado"
                     is FirebaseNetworkException -> "Error de red"
@@ -109,15 +103,14 @@ class VMLogin @Inject constructor(
                     else -> "Error al iniciar sesión: ${e.localizedMessage}"
                 }
             } finally {
-                cargando.value = false
+                _cargando.value = false
             }
         }
     }
 
-
     private fun traducirErrorFirebase() {
         val errorMessage = error.value
-        errorMostrado.value = when (errorMessage) {
+        _errorMostrado.value = when (errorMessage) {
             "The email address is badly formatted." -> "Correo electrónico inválido"
             "The password is invalid or the user does not have a password." -> "Cuenta o contraseña no válidas."
             "There is no user record corresponding to this identifier." -> "Cuenta no encontrada. ¿Quieres registrarte?"
@@ -130,3 +123,4 @@ class VMLogin @Inject constructor(
         }
     }
 }
+

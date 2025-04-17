@@ -62,6 +62,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
 
+//TODO mirar quitar la fuente de global
+//TODO mirar lo del teclado y el boton que se va muy arriba
 object myfuente {
     var font = FamilyQuicksand.quicksand
 }
@@ -161,7 +163,7 @@ fun PasswordField(vm: VMLogin, password: String, onTextChanged: (String) -> Unit
                 modifier = Modifier
                     .width(24.dp)
                     .height(24.dp)
-                    .clickable { vm.OnPasswordVisibleChanged() },
+                    .clickable { vm.onPasswordVisibleChanged() },
                 tint = Colores.Gris
             )
         },
@@ -235,10 +237,10 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
     }
     val loginSuccess by vm.loginSuccess.collectAsState()
 
-    // Efecto para navegar cuando el login es exitoso
+
     LaunchedEffect(loginSuccess) {
         if (loginSuccess) {
-            navController.navigate("construccion") {
+            navController.navigate("lista_recetas") {
                 popUpTo("login") { inclusive = true }
             }
         }
@@ -250,6 +252,7 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
     ) {
         OutlinedButton(
             onClick = {
+
                 val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken("181983126111-1jlv71ep88fv50pbkisj9el1ak734kje.apps.googleusercontent.com")
                     .requestEmail()
@@ -293,7 +296,7 @@ fun BtnLogin(vm: VMLogin, email: String, password: String, user: FirebaseUser?, 
 
     LaunchedEffect(user) {
         if (user != null) {
-            navController.navigate("construccion") {
+            navController.navigate("lista_recetas") {
                 popUpTo("login") { inclusive = true }
             }
         }
@@ -314,11 +317,9 @@ fun BtnLogin(vm: VMLogin, email: String, password: String, user: FirebaseUser?, 
         if (cargando) CircularProgressIndicator()
         else Text(
             text = "Iniciar sesión",
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.SemiBold  // Texto más grueso
-            ),
             fontSize = 18.sp,  // Tamaño aumentado
-            fontFamily = myfuente.font
+            fontFamily = myfuente.font,
+            fontWeight = FontWeight.SemiBold
         )
 
     }
