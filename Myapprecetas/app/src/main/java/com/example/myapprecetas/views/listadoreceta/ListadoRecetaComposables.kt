@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,9 +32,14 @@ import com.example.myapprecetas.R
 import com.example.myapprecetas.dto.DTORecetaSimplificada
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
+import com.example.myapprecetas.ui.theme.common.CargandoElementos
+import com.example.myapprecetas.ui.theme.common.ConstanteIcono
+import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.vm.VMListadoReceta
+import kotlin.random.Random
 
 val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -42,53 +48,70 @@ fun ListadoRecetaScreen(vm: VMListadoReceta, navController: NavHostController, i
     val listaPrueba = if (listaReceta.isNotEmpty()) List(10) { listaReceta[0] } else emptyList()
     val nombreUsuario by vm.nombreUsuario.collectAsState()
     val textBienvenida = "¡Bienvenido, ${nombreUsuario?.substringBefore(" ")}!"
+    val cargando = vm.cargando.collectAsState().value
+    if(cargando){
+        CargandoElementos()
+    }else{
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = insets.calculateBottomPadding() + 12.dp)
+        ) {
+            // Texto de bienvenida
+            item {
+                HeaderBienvenida(textBienvenida)
+            }
 
-    LazyColumn(
+            // Buscador (sticky)
+            stickyHeader {
+                Box(
+                    modifier = Modifier
+                        .background(Color.White)
+                        .padding(vertical = 8.dp)
+                ) {
+                    SearchBar(vm)
+                }
+            }
+
+            // Lista de recetas
+            items(
+                items = listaPrueba,
+                key = { "${Random.nextInt(1, 1001)}" } //TODO esto hay que cambiarlo
+            ) { receta ->
+                ItemReceta(receta = receta, navController)
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
+    }
+
+}
+
+@Composable
+fun HeaderBienvenida(text: String) {
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = insets.calculateBottomPadding() + 12.dp)
+            .fillMaxWidth()
+            .padding(top = 18.dp, bottom = 10.dp)
     ) {
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 18.dp, bottom = 10.dp)
-            ) {
-                Text(
-                    text = textBienvenida,
-                    fontSize = 26.sp,
-                    fontFamily = fuenteTexto,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-        }
-
-        stickyHeader {
-            Box(
-                modifier = Modifier
-                    .background(Color.White)
-                    .padding(vertical = 8.dp)
-            ) {
-                SearchBar(vm)
-            }
-        }
-
-        items(listaPrueba) { receta ->
-            ItemReceta(receta = receta)
-            Spacer(modifier = Modifier.height(12.dp))
-        }
+        Text(
+            text = text,
+            fontSize = ConstanteTexto.TextoExtraGrande,
+            fontFamily = fuenteTexto,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 
 @Composable
-fun ItemReceta(receta: DTORecetaSimplificada) {
+fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
             .background(Color.White)
+            .clickable { navController.navigate("detalles_receta") }
             .padding(top = 12.dp, bottom = 2.dp)
             .padding(start = 12.dp, end = 12.dp)
             .height(130.dp)
@@ -100,7 +123,7 @@ fun ItemReceta(receta: DTORecetaSimplificada) {
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(4.dp)
-                .size(20.dp)
+                .size(ConstanteIcono.IconoPequeno)
         )
 
         Row(modifier = Modifier.fillMaxSize()) {
@@ -110,7 +133,7 @@ fun ItemReceta(receta: DTORecetaSimplificada) {
                     .clip(RoundedCornerShape(8.dp))
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.fondo),
+                    painter = painterResource(id = R.drawable.ic_launcher_background),
                     contentDescription = "Imagen de la receta",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -128,12 +151,12 @@ fun ItemReceta(receta: DTORecetaSimplificada) {
                             painter = painterResource(R.drawable.temporizador2),
                             contentDescription = "Tiempo",
                             tint = Color.DarkGray,
-                            modifier = Modifier.size(12.dp)
+                            modifier = Modifier.size(ConstanteIcono.IconoMuyPequeno)
                         )
                         Spacer(modifier = Modifier.width(2.dp))
                         Text(
                             text = "30'",
-                            fontSize = 12.sp,
+                            fontSize = ConstanteTexto.TextoMuyPequeno,
                             fontFamily = fuenteTexto,
                             fontWeight = FontWeight.Bold
                         )
@@ -171,7 +194,7 @@ fun ItemReceta(receta: DTORecetaSimplificada) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "Por usuCreador",
-                    fontSize = 12.sp,
+                    fontSize = ConstanteTexto.TextoMuyPequeno,
                     color = Color.Gray,
                     fontFamily = fuenteTexto,
                     modifier = Modifier.padding(bottom = 5.dp)
@@ -220,7 +243,7 @@ fun SearchBar(vm: VMListadoReceta) {
                 Icon(
                     painter = painterResource(R.drawable.search),
                     contentDescription = "Buscar",
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(ConstanteIcono.IconoPequeno),
                     tint = Colores.Gris
                 )
             }
@@ -232,7 +255,7 @@ fun SearchBar(vm: VMListadoReceta) {
             painter = painterResource(R.drawable.filtro2),
             contentDescription = "Filtrar",
             modifier = Modifier
-                .size(42.dp)
+                .size(ConstanteIcono.IconoGrande)
                 .clip(RoundedCornerShape(12.dp))
                 .background(Colores.Gris.copy(alpha = 0.1f))
                 .padding(10.dp),
@@ -240,3 +263,4 @@ fun SearchBar(vm: VMListadoReceta) {
         )
     }
 }
+

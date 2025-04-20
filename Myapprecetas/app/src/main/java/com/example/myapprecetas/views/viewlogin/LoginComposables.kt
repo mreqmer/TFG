@@ -40,7 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,14 +47,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.R
 import com.example.myapprecetas.ui.theme.Colores
-import com.example.myapprecetas.ui.theme.FamilyBaloo
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
 
-import com.example.myapprecetas.ui.theme.Typography
+import com.example.myapprecetas.ui.theme.common.ConstanteTexto
+import com.example.myapprecetas.ui.theme.common.BotonAtras
 import com.example.myapprecetas.vm.VMLogin
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -87,11 +85,7 @@ fun IrAtrasInicioSesion(navController: NavHostController) {
             .padding(top = 40.dp, bottom = 90.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.left),
-            contentDescription = "Login icon",
-            modifier = Modifier.size(24.dp),
-        )
+        BotonAtras(24.dp, navController)
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "Inicia sesión",
@@ -179,7 +173,7 @@ fun PasswordOlvidada(){
     ) {
         Text(
             text = "¿Has olvidado tu contraseña?",
-            fontSize = 14.sp,
+            fontSize = ConstanteTexto.TextoPequeno,
             color =  Colores.VerdeOscuro,
             textDecoration = TextDecoration.Underline,
             modifier = Modifier.clickable { /* TODO */ },
@@ -201,7 +195,7 @@ fun TextOtherOptions() {
         )
         Text(
             text = "Otras opciones de verificación",
-            fontSize = 16.sp,
+            fontSize = ConstanteTexto.TextoNormal,
             modifier = Modifier.padding(horizontal = 8.dp),
             color = Colores.Gris,
             fontFamily = myfuente.font
@@ -279,7 +273,7 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
                 )
                 Text(
                     text = "Continuar con Google",
-                    fontSize = 18.sp,
+                    fontSize = ConstanteTexto.TextoSemigrande,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.align(Alignment.Center),
                     color = Color.Black.copy(alpha = 0.7f),
@@ -317,7 +311,7 @@ fun BtnLogin(vm: VMLogin, email: String, password: String, user: FirebaseUser?, 
         if (cargando) CircularProgressIndicator()
         else Text(
             text = "Iniciar sesión",
-            fontSize = 18.sp,  // Tamaño aumentado
+            fontSize = ConstanteTexto.TextoSemigrande,
             fontFamily = myfuente.font,
             fontWeight = FontWeight.SemiBold
         )

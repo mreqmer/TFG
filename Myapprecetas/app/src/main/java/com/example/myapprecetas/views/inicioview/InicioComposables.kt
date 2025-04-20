@@ -27,6 +27,7 @@ import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.R
+import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 
 @Composable
 fun BackgroundImage() {
@@ -46,13 +47,13 @@ fun LogoInicio() {
     ) {
         Text(
             text = "RECETAS",
-            fontSize = 48.sp,
+            fontSize = ConstanteTexto.TextoLogo,
             fontFamily = FamilyQuicksand.quicksand,
             fontWeight = FontWeight.Bold,
             color = Colores.Negro,
             modifier = Modifier
                 .alpha(0.9f)
-                .padding(bottom = 200.dp) // Ajusta este valor para moverlo verticalmente
+                .padding(bottom = 200.dp)
         )
     }
 }
@@ -66,44 +67,49 @@ fun InicioScreen(navController: NavHostController) {
             .systemBarsPadding(),
         verticalArrangement = Arrangement.Bottom
     ) {
-        Button(
-            onClick = { navController.navigate("login") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(bottom = 16.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Colores.VerdeOscuro,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) {
-            Text(
-                text = "Inicia Sesión",
-                fontSize = 18.sp,
-                fontFamily = FamilyQuicksand.quicksand,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
+       Botones(navController)
+    }
+}
 
-        Button(
-            onClick = { navController.navigate("register") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(bottom = 16.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Colores.MarronOscuro,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) {
-            Text(
-                text = "Registrarse",
-                fontSize = 18.sp,
-                fontFamily = FamilyQuicksand.quicksand,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
+@Composable
+fun Botones(navController: NavHostController) {
+    Button(
+        onClick = { navController.navigate("login") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .padding(bottom = 16.dp),
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Colores.VerdeOscuro,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        )
+    ) {
+        Text(
+            text = "Inicia Sesión",
+            fontSize = ConstanteTexto.TextoNormal,
+            fontFamily = FamilyQuicksand.quicksand,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+
+    Button(
+        onClick = { navController.navigate("register") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .padding(bottom = 16.dp),
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Colores.MarronOscuro,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        )
+    ) {
+        Text(
+            text = "Registrarse",
+            fontSize = ConstanteTexto.TextoNormal,
+            fontFamily = FamilyQuicksand.quicksand,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }

@@ -4,7 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.api.Endpoints
-import com.example.myapprecetas.dto.DTORecetaDetallada
+import com.example.myapprecetas.dto.DTORecetaSimplificada
+import com.example.myapprecetas.userauth.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,30 +13,33 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VMDetallesReceta @Inject constructor(
+class VMPerfil @Inject constructor(
     private val endpoints: Endpoints
 ) : ViewModel() {
 
-    private var _recetaDetalles = MutableStateFlow<DTORecetaDetallada?>(null)
-    var recetaDetalles: StateFlow<DTORecetaDetallada?> = _recetaDetalles
+    private val _listaRecetas = MutableStateFlow<List<DTORecetaSimplificada>>(emptyList())
+    val listaRecetas: StateFlow<List<DTORecetaSimplificada>> = _listaRecetas
+
+    private val _nombreUsuario = MutableStateFlow<String?>("Usuario")
+    val nombreUsuario: StateFlow<String?> = _nombreUsuario
+
 
     private var _cargando = MutableStateFlow<Boolean>(false)
     var cargando: StateFlow<Boolean> = _cargando
 
-
-    init {
+    init{
+        _nombreUsuario.value = AuthManager.currentUser.value?.displayName ?: "Usuario"
         cargaRecetas()
     }
-
 
     private fun cargaRecetas() {
         viewModelScope.launch {
             _cargando.value = true
             try {
-                val response = endpoints.getRecetaPorId(1)//TODO
+                val response = endpoints.getRecetas()
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        _recetaDetalles.value = it
+                        _listaRecetas.value = it
                         Log.i("OKAY", response.body().toString())
                         _cargando.value = false
                     } ?: run {
@@ -52,4 +56,5 @@ class VMDetallesReceta @Inject constructor(
             }
         }
     }
+
 }

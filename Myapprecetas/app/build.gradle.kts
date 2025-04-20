@@ -56,8 +56,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    implementation (libs.androidx.material3.v110)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
+
 
     // Hilt
     implementation(libs.hilt.android)
@@ -88,7 +91,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
-
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.32.0")
 }
 
 hilt {

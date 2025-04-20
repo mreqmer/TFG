@@ -27,15 +27,7 @@ fun ListadoRecetaView(vm: VMListadoReceta, navController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        if (cargando) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .height(50.dp)
-                    .width(50.dp),
-                color = Color.Red
-            )
-        } else {
             ListadoRecetaScreen(vm, navController, insets)
-        }
+
     }
 }

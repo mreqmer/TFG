@@ -4,18 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -23,16 +18,18 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.MyapprecetasTheme
 import com.example.myapprecetas.ui.theme.common.BottomBar
+import com.example.myapprecetas.views.*
+import com.example.myapprecetas.views.detallesreceta.DetallesRecetaView
 import com.example.myapprecetas.views.inicioview.InicioView
-import com.example.myapprecetas.views.PaginaEnConstruccionConBotonAtras
-import com.example.myapprecetas.views.PaginaEnConstrucciondosConBotonAtras
 import com.example.myapprecetas.views.listadoreceta.ListadoRecetaView
+import com.example.myapprecetas.views.perfil.PerfilView
 import com.example.myapprecetas.views.viewlogin.ViewLogin
+import com.example.myapprecetas.vm.VMDetallesReceta
 import com.example.myapprecetas.vm.VMListadoReceta
 import com.example.myapprecetas.vm.VMLogin
+import com.example.myapprecetas.vm.VMPerfil
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import okhttp3.Route
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -47,9 +44,9 @@ class MainActivity : ComponentActivity() {
             val currentRoute = navBackStackEntry?.destination?.route
 
             val user = FirebaseAuth.getInstance().currentUser
-            val startDestination = if (user != null) "lista_recetas" else "detalles_receta"
+            val startDestination = if (user != null) "lista_recetas" else "perfil"
             window.navigationBarColor = Color.Transparent.hashCode()
-            val isScaffoldNeeded = currentRoute != "inicio" && currentRoute != "login"
+            val isScaffoldNeeded = currentRoute != "inicio" && currentRoute != "login" && currentRoute != "detalles_receta"
             if (isScaffoldNeeded) {
 
                 window.navigationBarColor = Color.Black.hashCode()
@@ -82,7 +79,11 @@ class MainActivity : ComponentActivity() {
                             }
                             composable("detalles_receta") {
                                 val vm: VMDetallesReceta = hiltViewModel()
-                                ListadoRecetaView(vm, navController)
+                                DetallesRecetaView(vm, navController)
+                            }
+                            composable("perfil") {
+                                val vm: VMPerfil = hiltViewModel()
+                                PerfilView(vm, navController)
                             }
                             composable("construccion") {
                                 PaginaEnConstruccionConBotonAtras(navController)
@@ -114,6 +115,14 @@ class MainActivity : ComponentActivity() {
                         composable("lista_recetas") {
                             val vm: VMListadoReceta = hiltViewModel()
                             ListadoRecetaView(vm, navController)
+                        }
+                        composable("detalles_receta") {
+                            val vm: VMDetallesReceta = hiltViewModel()
+                            DetallesRecetaView(vm, navController)
+                        }
+                        composable("perfil") {
+                            val vm: VMPerfil = hiltViewModel()
+                            PerfilView(vm, navController)
                         }
                         composable("construccion") {
                             PaginaEnConstruccionConBotonAtras(navController)

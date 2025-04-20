@@ -11,7 +11,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
+//TODO, cuando está mal la url, es decir, no hace conexión, ni entra, peta
     private const val BASE_URL = "https://myrecetasapi.azurewebsites.net/api/"  // Ajusta la URL
 
     @Provides
