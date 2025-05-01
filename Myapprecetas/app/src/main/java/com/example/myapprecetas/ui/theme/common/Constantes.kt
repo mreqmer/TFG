@@ -6,6 +6,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 object ConstanteIcono {
+    /** icon 45.dp */
+    val IconoExtraGrande: Dp = 45.dp
     /** icon 42.dp */
     val IconoGrande: Dp = 42.dp
     /** icon 24.dp */

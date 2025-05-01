@@ -1,6 +1,7 @@
 package com.example.myapprecetas.userauth
 
 import android.content.Context
+import com.example.myapprecetas.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -26,7 +27,8 @@ object AuthManager {
 
     fun logoutWithRevokeAccess(context: Context, onComplete: () -> Unit) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("181983126111-1jlv71ep88fv50pbkisj9el1ak734kje.apps.googleusercontent.com") // 👈 usa tu client ID de google-services.json
+//            .requestIdToken("181983126111-1jlv71ep88fv50pbkisj9el1ak734kje.apps.googleusercontent.com") // 👈 usa tu client ID de google-services.json
+            .requestIdToken(context.getString(R.string.string_server_client_id))
             .requestEmail()
             .build()
 

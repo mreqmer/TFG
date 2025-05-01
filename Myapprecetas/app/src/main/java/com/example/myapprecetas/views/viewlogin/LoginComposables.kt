@@ -51,73 +51,55 @@ import androidx.navigation.NavHostController
 import com.example.myapprecetas.R
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
-
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.ui.theme.common.BotonAtras
+import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.vm.VMLogin
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
 
-//TODO mirar quitar la fuente de global
-//TODO mirar lo del teclado y el boton que se va muy arriba
-object myfuente {
-    var font = FamilyQuicksand.quicksand
-}
+// Variable para controlar la fuente desde un solo lugar
+private val currentFont = FamilyQuicksand.quicksand // Cambia aquí la fuente si necesitas probar otra
 
 @Composable
-fun MensajeError(mensajeError : String?, cargando : Boolean) {
-    var mensaje = if(cargando) "" else mensajeError
+fun MensajeError(mensajeError: String?, cargando: Boolean) {
+    val mensaje = if (cargando) "" else mensajeError
     Text(
-        modifier = Modifier.padding(start = 2.dp,),
-        color =  Colores.RojoError,
+        modifier = Modifier.padding(start = 2.dp),
+        color = Colores.RojoError,
         text = mensaje ?: "",
-        fontFamily = myfuente.font
+        fontFamily = currentFont
     )
 }
 
 @Composable
-fun IrAtrasInicioSesion(navController: NavHostController) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 40.dp, bottom = 90.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        BotonAtras(24.dp, navController)
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = "Inicia sesión",
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.Black,
-            fontFamily = myfuente.font
-        )
-    }
-}
-
-@Composable
-fun EmailField(email: String, onTextChanged: (String) -> Unit){
-
+fun EmailField(email: String, onTextChanged: (String) -> Unit) {
     OutlinedTextField(
         value = email,
-        onValueChange = {onTextChanged(it)},
-        //label = { Text("Username") },
-        placeholder = { Text("Usuario") },
-        modifier = Modifier.fillMaxWidth().border(2.dp, Colores.Gris, MaterialTheme.shapes.medium),
+        onValueChange = { onTextChanged(it) },
+        placeholder = {
+            Text(
+                text = "Usuario",
+                fontFamily = currentFont
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(2.dp, Colores.Gris, MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
         maxLines = 1,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Next
         ),
-        textStyle = TextStyle(color = Color.Black),
+        textStyle = TextStyle(color = Color.Black, fontFamily = currentFont),
         leadingIcon = {
             Icon(
                 painter = painterResource(R.drawable.usero),
                 contentDescription = "usuario",
-                modifier = Modifier.width(24.dp).height(24.dp),
+                modifier = Modifier.size(24.dp),
                 tint = Colores.Gris
             )
         }
@@ -125,28 +107,39 @@ fun EmailField(email: String, onTextChanged: (String) -> Unit){
 }
 
 @Composable
-fun PasswordField(vm: VMLogin, password: String, onTextChanged: (String) -> Unit, isPasswordVisible: Boolean){
-    var iconoPassword = if(!isPasswordVisible) R.drawable.eye else R.drawable.eyecrossedo
+fun PasswordField(
+    vm: VMLogin,
+    password: String,
+    onTextChanged: (String) -> Unit,
+    isPasswordVisible: Boolean
+) {
+    val iconoPassword = if (!isPasswordVisible) R.drawable.eye else R.drawable.eyecrossedo
 
     OutlinedTextField(
         value = password,
-        onValueChange =  {onTextChanged(it)},
-        //label = { Text("Password") },
-        placeholder = { Text("Password") },
+        onValueChange = { onTextChanged(it) },
+        placeholder = {
+            Text(
+                text = "Password",
+                fontFamily = currentFont
+            )
+        },
         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
         ),
-        modifier = Modifier.fillMaxWidth().border(2.dp, Colores.Gris, MaterialTheme.shapes.medium),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(2.dp, Colores.Gris, MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
-        textStyle = TextStyle(color = Color.Black),
+        textStyle = TextStyle(color = Color.Black, fontFamily = currentFont),
         maxLines = 1,
         leadingIcon = {
             Icon(
                 painter = painterResource(R.drawable.lock),
                 contentDescription = "password",
-                modifier = Modifier.width(24.dp).height(24.dp),
+                modifier = Modifier.size(24.dp),
                 tint = Colores.Gris
             )
         },
@@ -155,28 +148,27 @@ fun PasswordField(vm: VMLogin, password: String, onTextChanged: (String) -> Unit
                 painter = painterResource(id = iconoPassword),
                 contentDescription = "mostrar password",
                 modifier = Modifier
-                    .width(24.dp)
-                    .height(24.dp)
+                    .size(24.dp)
                     .clickable { vm.onPasswordVisibleChanged() },
                 tint = Colores.Gris
             )
-        },
+        }
     )
 }
 
 @Composable
-fun PasswordOlvidada(){
+fun PasswordOlvidada() {
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End
     ) {
         Text(
             text = "¿Has olvidado tu contraseña?",
             fontSize = ConstanteTexto.TextoPequeno,
-            color =  Colores.VerdeOscuro,
+            color = Colores.VerdeOscuro,
             textDecoration = TextDecoration.Underline,
             modifier = Modifier.clickable { /* TODO */ },
+            fontFamily = currentFont
         )
     }
 }
@@ -198,7 +190,7 @@ fun TextOtherOptions() {
             fontSize = ConstanteTexto.TextoNormal,
             modifier = Modifier.padding(horizontal = 8.dp),
             color = Colores.Gris,
-            fontFamily = myfuente.font
+            fontFamily = currentFont
         )
         HorizontalDivider(
             modifier = Modifier.width(40.dp),
@@ -209,11 +201,11 @@ fun TextOtherOptions() {
 }
 
 @Composable
-fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
+fun LoginOtherOptions(vm: VMLogin, navController: NavHostController) {
     val context = LocalContext.current
 
     val googleSignInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult() // Cambiado a StartActivityForResult
+        contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data = result.data
@@ -221,16 +213,14 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
                 val task = GoogleSignIn.getSignedInAccountFromIntent(data)
                 val account = task.getResult(ApiException::class.java)
                 account.idToken?.let { token ->
-                    vm.signInWithGoogle(token) // Pasa el token directamente
+                    vm.signInWithGoogle(token)
                 }
             } catch (e: Exception) {
                 Log.e("GoogleSignIn", "Error: ${e.message}")
-                // Maneja el error (puedes mostrar un Snackbar)
             }
         }
     }
     val loginSuccess by vm.loginSuccess.collectAsState()
-
 
     LaunchedEffect(loginSuccess) {
         if (loginSuccess) {
@@ -239,6 +229,7 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
             }
         }
     }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -246,12 +237,10 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
     ) {
         OutlinedButton(
             onClick = {
-
                 val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken("181983126111-1jlv71ep88fv50pbkisj9el1ak734kje.apps.googleusercontent.com")
                     .requestEmail()
                     .build()
-
                 val googleSignInClient = GoogleSignIn.getClient(context, gso)
                 googleSignInLauncher.launch(googleSignInClient.signInIntent)
             },
@@ -266,7 +255,7 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
                     painter = painterResource(id = R.drawable.google),
                     contentDescription = "Google",
                     modifier = Modifier
-                        .size(45.dp)
+                        .size(ConstanteIcono.IconoExtraGrande)
                         .align(Alignment.CenterStart)
                         .padding(start = 20.dp),
                     tint = Color.Unspecified
@@ -277,7 +266,7 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.align(Alignment.Center),
                     color = Color.Black.copy(alpha = 0.7f),
-                    fontFamily = myfuente.font
+                    fontFamily = currentFont
                 )
             }
         }
@@ -285,7 +274,14 @@ fun LoginOtherOptions(vm : VMLogin, navController: NavHostController) {
 }
 
 @Composable
-fun BtnLogin(vm: VMLogin, email: String, password: String, user: FirebaseUser?, cargando : Boolean, navController: NavHostController) {
+fun BtnLogin(
+    vm: VMLogin,
+    email: String,
+    password: String,
+    user: FirebaseUser?,
+    cargando: Boolean,
+    navController: NavHostController
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(user) {
@@ -295,13 +291,16 @@ fun BtnLogin(vm: VMLogin, email: String, password: String, user: FirebaseUser?, 
             }
         }
     }
+
     Button(
-        onClick = { vm.signInViewModel(email, password); keyboardController?.hide() },
+        onClick = {
+            vm.signInViewModel(email, password)
+            keyboardController?.hide()
+        },
         modifier = Modifier
             .imePadding()
             .fillMaxWidth()
-            .height(56.dp)
-        ,
+            .height(56.dp),
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Colores.VerdeOscuro,
@@ -312,9 +311,8 @@ fun BtnLogin(vm: VMLogin, email: String, password: String, user: FirebaseUser?, 
         else Text(
             text = "Iniciar sesión",
             fontSize = ConstanteTexto.TextoSemigrande,
-            fontFamily = myfuente.font,
+            fontFamily = currentFont,
             fontWeight = FontWeight.SemiBold
         )
-
     }
 }

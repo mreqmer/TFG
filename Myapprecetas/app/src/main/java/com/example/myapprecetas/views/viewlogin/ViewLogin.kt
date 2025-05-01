@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.myapprecetas.ui.theme.common.HeaderAtras
 import com.example.myapprecetas.vm.VMLogin
 
 /*TODO GORDO
@@ -43,7 +44,8 @@ fun LoginScreen(vm: VMLogin, navController: NavHostController) {
             .padding(16.dp)
     ) {
         // Título con icono para volver atrás
-        IrAtrasInicioSesion(navController)
+//        IrAtrasInicioSesion(navController)
+        HeaderAtras("Inicia Sesión", navController)
 
         // Contenido principal
         Column(
@@ -55,7 +57,7 @@ fun LoginScreen(vm: VMLogin, navController: NavHostController) {
             // Elementos de login con email
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 MensajeError(errorMostrado, cargando)
-                EmailField(email, { vm.onLoginChanged(it, password) })
+                EmailField(email) { vm.onLoginChanged(it, password) }
                 Spacer(modifier = Modifier.height(20.dp))
                 PasswordField(vm, password, { vm.onLoginChanged(email, it) }, isPasswordVisible)
                 PasswordOlvidada()

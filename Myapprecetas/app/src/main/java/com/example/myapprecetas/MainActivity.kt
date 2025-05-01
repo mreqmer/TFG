@@ -23,11 +23,14 @@ import com.example.myapprecetas.views.detallesreceta.DetallesRecetaView
 import com.example.myapprecetas.views.inicioview.InicioView
 import com.example.myapprecetas.views.listadoreceta.ListadoRecetaView
 import com.example.myapprecetas.views.perfil.PerfilView
+import com.example.myapprecetas.views.registro.registro.RegistroView
+import com.example.myapprecetas.views.registro.selector.SelectorRegistroView
 import com.example.myapprecetas.views.viewlogin.ViewLogin
 import com.example.myapprecetas.vm.VMDetallesReceta
 import com.example.myapprecetas.vm.VMListadoReceta
 import com.example.myapprecetas.vm.VMLogin
 import com.example.myapprecetas.vm.VMPerfil
+import com.example.myapprecetas.vm.VMRegistro
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,9 +47,9 @@ class MainActivity : ComponentActivity() {
             val currentRoute = navBackStackEntry?.destination?.route
 
             val user = FirebaseAuth.getInstance().currentUser
-            val startDestination = if (user != null) "lista_recetas" else "perfil"
+            val startDestination = if (user != null) "lista_recetas" else "inicio"
             window.navigationBarColor = Color.Transparent.hashCode()
-            val isScaffoldNeeded = currentRoute != "inicio" && currentRoute != "login" && currentRoute != "detalles_receta"
+            val isScaffoldNeeded = currentRoute != "inicio" && currentRoute != "login" && currentRoute != "detalles_receta" && currentRoute != "selector_registro" && currentRoute != "registro"
             if (isScaffoldNeeded) {
 
                 window.navigationBarColor = Color.Black.hashCode()
@@ -72,6 +75,13 @@ class MainActivity : ComponentActivity() {
                             composable("login") {
                                 val vm: VMLogin = hiltViewModel()
                                 ViewLogin(vm, navController)
+                            }
+                            composable("selector_registro") {
+                                SelectorRegistroView(navController)
+                            }
+                            composable("registro") {
+                                val vm: VMRegistro = hiltViewModel()
+                                RegistroView(vm, navController)
                             }
                             composable("lista_recetas") {
                                 val vm: VMListadoReceta = hiltViewModel()
@@ -111,6 +121,13 @@ class MainActivity : ComponentActivity() {
                         composable("login") {
                             val vm: VMLogin = hiltViewModel()
                             ViewLogin(vm, navController)
+                        }
+                        composable("selector_registro") {
+                            SelectorRegistroView(navController)
+                        }
+                        composable("registro") {
+                            val vm: VMRegistro = hiltViewModel()
+                            RegistroView(vm, navController)
                         }
                         composable("lista_recetas") {
                             val vm: VMListadoReceta = hiltViewModel()

@@ -94,7 +94,7 @@ fun Botones(navController: NavHostController) {
     }
 
     Button(
-        onClick = { navController.navigate("register") },
+        onClick = { navController.navigate("selector_registro") },
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
