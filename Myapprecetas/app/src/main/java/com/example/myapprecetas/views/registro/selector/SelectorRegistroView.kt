@@ -1,5 +1,9 @@
 package com.example.myapprecetas.views.registro.selector
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -33,12 +38,16 @@ import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
+import com.example.myapprecetas.vm.VMSelectorRegistro
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 
 // Variable centralizada para la fuente
 val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
 
 @Composable
-fun SelectorRegistroView(navController: NavHostController) {
+fun SelectorRegistroView(vm: VMSelectorRegistro, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,7 +70,7 @@ fun SelectorRegistroView(navController: NavHostController) {
             ) {
                 HeaderMetodoRegistro()
                 Spacer(modifier = Modifier.height(32.dp))
-                MetodosAutenticacion(navController)
+                MetodosAutenticacion(navController, vm)
             }
         }
     }
@@ -105,7 +114,29 @@ private fun HeaderMetodoRegistro() {
 }
 
 @Composable
-private fun MetodosAutenticacion(navController: NavHostController) {
+private fun MetodosAutenticacion(navController: NavHostController, vm: VMSelectorRegistro) {
+    // Guardamos el contexto en una variable para mayor claridad
+    val context = LocalContext.current
+
+    // Launcher para iniciar la actividad de Google Sign-In
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            try {
+                val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+                val account = task.getResult(ApiException::class.java)
+                account.idToken?.let { idToken ->
+                    // Pasar el idToken al ViewModel para manejar el inicio de sesión o registro
+                    vm.signInWithGoogle(idToken)
+                }
+            } catch (e: ApiException) {
+                Log.e("GoogleSignIn", "Error: ${e.localizedMessage}")
+            }
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -122,10 +153,43 @@ private fun MetodosAutenticacion(navController: NavHostController) {
             icon = R.drawable.google,
             text = "Continuar con Google",
             containerColor = Colores.Blanco,
-            onClick = { /* TODO */ },
+            onClick = {
+                // Usamos la variable context para crear el cliente de Google Sign-In
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(context.getString(R.string.string_server_client_id))
+                    .requestEmail()
+                    .build()
+
+                val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                googleSignInLauncher.launch(googleSignInClient.signInIntent)
+            },
         )
     }
 }
+
+
+//@Composable
+//private fun MetodosAutenticacion(navController: NavHostController) {
+//    Column(
+//        verticalArrangement = Arrangement.spacedBy(16.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        modifier = Modifier.fillMaxWidth()
+//    ) {
+//        AuthButton(
+//            icon = R.drawable.mail,
+//            text = "Continuar con Email",
+//            containerColor = Colores.VerdeClaro,
+//            onClick = { navController.navigate("registro") },
+//        )
+//
+//        AuthButton(
+//            icon = R.drawable.google,
+//            text = "Continuar con Google",
+//            containerColor = Colores.Blanco,
+//            onClick = { /* TODO */ },
+//        )
+//    }
+//}
 
 @Composable
 private fun AuthButton(
@@ -168,3 +232,4 @@ private fun AuthButton(
         }
     }
 }
+

@@ -10,35 +10,59 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * Gestor de autenticación de Firebase y Google Sign-In.
+ * Maneja el inicio y cierre de sesión de usuarios.
+ */
 object AuthManager {
 
+    //Firebase
     private val firebaseAuth = FirebaseAuth.getInstance()
 
+    // Usuario actual
     private val _currentUser = MutableStateFlow(firebaseAuth.currentUser)
     val currentUser: StateFlow<FirebaseUser?> = _currentUser.asStateFlow()
 
+    // Escucha los cambios en el estado de autenticación
     private val authListener = FirebaseAuth.AuthStateListener { auth ->
         _currentUser.value = auth.currentUser
     }
 
     init {
+        // Inicializa el listener para cambios en el estado de autenticación
         firebaseAuth.addAuthStateListener(authListener)
     }
 
+    /**
+     * Cierra sesión del usuario.
+     */
+    fun logout() {
+        firebaseAuth.signOut()
+    }
+
+    /**
+     * Cierra sesión y revoca el acceso de Google Sign-In.
+     * @param context El contexto de la aplicación.
+     * @param onComplete Función que se ejecuta al completar el proceso de cierre de sesión.
+     */
     fun logoutWithRevokeAccess(context: Context, onComplete: () -> Unit) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//            .requestIdToken("181983126111-1jlv71ep88fv50pbkisj9el1ak734kje.apps.googleusercontent.com") // 👈 usa tu client ID de google-services.json
             .requestIdToken(context.getString(R.string.string_server_client_id))
             .requestEmail()
             .build()
 
         val googleSignInClient = GoogleSignIn.getClient(context, gso)
 
+        // Revoca el acceso y luego cierra sesión
         googleSignInClient.revokeAccess().addOnCompleteListener {
             firebaseAuth.signOut()
             onComplete()
         }
     }
 
-    fun isLoggedIn(): Boolean = _currentUser.value != null
+//    /**
+//     * Verifica si hay un usuario autenticado.
+//     * @return true si el usuario está autenticado, false en caso contrario.
+//     */
+//    fun isLoggedIn(): Boolean = _currentUser.value != null
 }

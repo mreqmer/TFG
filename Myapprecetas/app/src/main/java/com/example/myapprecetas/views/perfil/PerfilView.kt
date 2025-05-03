@@ -42,6 +42,7 @@ fun PerfilView(vm: VMPerfil, navController: NavHostController) {
     val listaRecetas by vm.listaRecetas.collectAsState()
     val listaPrueba = if (listaRecetas.isNotEmpty()) List(10) { listaRecetas[0] } else emptyList()
     val nombreUsuario by vm.nombreUsuario.collectAsState()
+    val email by vm.email.collectAsState()
 
     Scaffold(
         containerColor = Colores.Blanco,
@@ -128,17 +129,21 @@ fun PerfilView(vm: VMPerfil, navController: NavHostController) {
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Nombre Usuario",
-                            fontSize = ConstanteTexto.TextoGrande,
-                            fontFamily = FamilyQuicksand.quicksand
-                        )
-                        Text(
-                            text = "usuario@email.com",
-                            fontSize = ConstanteTexto.TextoPequeno,
-                            fontFamily = FamilyQuicksand.quicksand,
-                            color = Colores.Gris
-                        )
+                        nombreUsuario?.let {
+                            Text(
+                                text = it,
+                                fontSize = ConstanteTexto.TextoGrande,
+                                fontFamily = FamilyQuicksand.quicksand
+                            )
+                        }
+                        email?.let {
+                            Text(
+                                text = it,
+                                fontSize = ConstanteTexto.TextoPequeno,
+                                fontFamily = FamilyQuicksand.quicksand,
+                                color = Colores.Gris
+                            )
+                        }
                         Text(
                             text = "Miembro desde: diciembre 2024",
                             fontSize = ConstanteTexto.TextoMuyPequeno,

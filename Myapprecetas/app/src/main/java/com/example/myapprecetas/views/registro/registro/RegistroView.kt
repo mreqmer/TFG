@@ -1,5 +1,6 @@
 package com.example.myapprecetas.views.registro.registro
 
+import android.widget.Toast
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -41,9 +43,10 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
     val email by vm.email.collectAsState()
     val password by vm.password.collectAsState()
     val repetirPassword by vm.repetirPassword.collectAsState()
-    val error by vm.error.collectAsState()
-
-    val scrollState = rememberScrollState() // Estado del scroll
+    val error by vm.errorMostrado.collectAsState()
+    val cargando by vm.cargando.collectAsState(false)
+    val scrollState = rememberScrollState()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -104,30 +107,20 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
                 TextoCuenta(navController)
             }
         }
-
-        // Botón fijo en la parte inferior
-        Button(
-            onClick = {
-                /* TODO */
-            },
+        BotonRegistro(
             modifier = Modifier
                 .imePadding()
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Colores.VerdeOscuro,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) {
-            Text(
-                text = "Crear cuenta",
-                fontSize = ConstanteTexto.TextoSemigrande,
-                fontFamily = fuenteTexto,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
+                .align(Alignment.BottomCenter),
+            onClick = {
+                vm.register(
+                    onSuccess = {
+                        navController.navigate("construcciondos")
+                    }
+                )
+                keyboardController?.hide()
+            },
+            cargando = cargando
+        )
     }
 }
 

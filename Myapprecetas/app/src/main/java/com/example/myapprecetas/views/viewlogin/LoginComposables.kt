@@ -238,7 +238,7 @@ fun LoginOtherOptions(vm: VMLogin, navController: NavHostController) {
         OutlinedButton(
             onClick = {
                 val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken("181983126111-1jlv71ep88fv50pbkisj9el1ak734kje.apps.googleusercontent.com")
+                    .requestIdToken(context.getString(R.string.string_server_client_id))
                     .requestEmail()
                     .build()
                 val googleSignInClient = GoogleSignIn.getClient(context, gso)
@@ -307,12 +307,16 @@ fun BtnLogin(
             contentColor = MaterialTheme.colorScheme.onPrimary
         )
     ) {
-        if (cargando) CircularProgressIndicator()
-        else Text(
-            text = "Iniciar sesión",
-            fontSize = ConstanteTexto.TextoSemigrande,
-            fontFamily = currentFont,
-            fontWeight = FontWeight.SemiBold
-        )
+        if (cargando) {
+            CircularProgressIndicator()
+        }else {
+            Text(
+                text = "Iniciar sesión",
+                fontSize = ConstanteTexto.TextoSemigrande,
+                fontFamily = currentFont,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }
+

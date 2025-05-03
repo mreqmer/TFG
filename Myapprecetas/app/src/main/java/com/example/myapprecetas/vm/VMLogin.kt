@@ -39,22 +39,17 @@ class VMLogin @Inject constructor(
     private val _loginSuccess = MutableStateFlow(false)
     val loginSuccess: StateFlow<Boolean> = _loginSuccess
 
-    // 🔥 Usuario actual observado desde AuthManager
     val user: StateFlow<FirebaseUser?> = AuthManager.currentUser
 
     // 🔥 Acceso al estado del login
-    val isLoggedIn: Boolean
-        get() = AuthManager.isLoggedIn()
+//    val isLoggedIn: Boolean
+//        get() = AuthManager.isLoggedIn()
 
     val error: StateFlow<String?> = authRepository.error
 
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
         _password.value = password
-    }
-
-    fun togglePasswordVisibility() {
-        _esPasswordVisible.value = !_esPasswordVisible.value
     }
 
     fun onPasswordVisibleChanged() {

@@ -18,17 +18,18 @@ class VMPerfil @Inject constructor(
 ) : ViewModel() {
 
     private val _listaRecetas = MutableStateFlow<List<DTORecetaSimplificada>>(emptyList())
-    val listaRecetas: StateFlow<List<DTORecetaSimplificada>> = _listaRecetas
-
     private val _nombreUsuario = MutableStateFlow<String?>("Usuario")
-    val nombreUsuario: StateFlow<String?> = _nombreUsuario
-
-
     private var _cargando = MutableStateFlow<Boolean>(false)
+    private var _email = MutableStateFlow<String?>("")
+
+    val listaRecetas: StateFlow<List<DTORecetaSimplificada>> = _listaRecetas
+    val nombreUsuario: StateFlow<String?> = _nombreUsuario
     var cargando: StateFlow<Boolean> = _cargando
+    val email: StateFlow<String?> = _email
 
     init{
         _nombreUsuario.value = AuthManager.currentUser.value?.displayName ?: "Usuario"
+        _email.value = AuthManager.currentUser.value?.email ?: ""
         cargaRecetas()
     }
 
