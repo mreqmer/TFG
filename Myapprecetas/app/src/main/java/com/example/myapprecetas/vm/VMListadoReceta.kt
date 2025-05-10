@@ -7,6 +7,7 @@ import com.example.myapprecetas.api.Endpoints
 import com.example.myapprecetas.dto.DTORecetaSimplificada
 import com.example.myapprecetas.userauth.AuthManager
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +37,7 @@ class VMListadoReceta @Inject constructor(
         cargaRecetas()
     }
 
+
     private fun cargaRecetas() {
         viewModelScope.launch {
             _cargando.value = true
@@ -44,6 +46,7 @@ class VMListadoReceta @Inject constructor(
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _listaRecetas.value = it
+
                         Log.i("OKAY", response.body().toString())
                         _cargando.value = false
                     } ?: run {

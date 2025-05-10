@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.myapprecetas"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -37,6 +37,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.11"
@@ -92,6 +93,13 @@ dependencies {
     implementation(libs.converter.gson)
 
     implementation("com.google.accompanist:accompanist-placeholder-material:0.32.0")
+
+    //Cloudinary
+    implementation("com.cloudinary:cloudinary-android:3.0.2")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.navigation:navigation-fragment:2.7.7")
+    implementation("androidx.navigation:navigation-ui:2.7.7")
 }
 
 hilt {

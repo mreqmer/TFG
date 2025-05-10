@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Myapprecetas</string>
     <string name="string_server_client_id">181983126111-1jlv71ep88fv50pbkisj9el1ak734kje.apps.googleusercontent.com</string>
+    <string name="cloud_name">dckzmg9c1</string>
+    <string name="apikey">846569937545751</string>
+    <string name="apisecret">BCYIfpDpOb7-nFtqM0Kzj2yCDX4</string>
+
 </resources>

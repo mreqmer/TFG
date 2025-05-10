@@ -18,7 +18,7 @@ import com.example.myapprecetas.vm.VMListadoReceta
 
 @Composable
 fun ListadoRecetaView(vm: VMListadoReceta, navController: NavHostController) {
-    val cargando = vm.cargando.collectAsState().value
+
     val insets = androidx.compose.foundation.layout.WindowInsets.systemBars
         .only(androidx.compose.foundation.layout.WindowInsetsSides.Top + androidx.compose.foundation.layout.WindowInsetsSides.Bottom)
         .asPaddingValues()

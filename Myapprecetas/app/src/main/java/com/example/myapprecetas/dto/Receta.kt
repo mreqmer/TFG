@@ -6,5 +6,7 @@ data class Receta(
     val fechaCreacion: String,
     val idReceta: Int,
     val nombreReceta: String,
-    val tiempoPreparacion: Int
+    val tiempoPreparacion: Int,
+    val fotoReceta: String,
+    val nombreUsuario: String
 )

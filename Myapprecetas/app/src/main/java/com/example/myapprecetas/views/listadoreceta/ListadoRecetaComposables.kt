@@ -25,9 +25,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImagePainter.State.Empty.painter
+import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
 import com.example.myapprecetas.dto.DTORecetaSimplificada
 import com.example.myapprecetas.ui.theme.Colores
@@ -36,6 +39,7 @@ import com.example.myapprecetas.ui.theme.common.CargandoElementos
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.vm.VMListadoReceta
+import com.google.android.play.integrity.internal.f
 import kotlin.random.Random
 
 val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
@@ -75,8 +79,8 @@ fun ListadoRecetaScreen(vm: VMListadoReceta, navController: NavHostController, i
 
             // Lista de recetas
             items(
-                items = listaPrueba,
-                key = { "${Random.nextInt(1, 1001)}" } //TODO esto hay que cambiarlo
+                items = listaReceta,
+                key = { receta -> receta.idReceta }
             ) { receta ->
                 ItemReceta(receta = receta, navController)
                 Spacer(modifier = Modifier.height(12.dp))
@@ -111,51 +115,46 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
             .padding(horizontal = 20.dp)
             .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
             .background(Color.White)
-            .clickable { navController.navigate("detalles_receta") }
+            .clickable {  navController.navigate("detalles_receta/${receta.idReceta}")}
             .padding(top = 12.dp, bottom = 2.dp)
             .padding(start = 12.dp, end = 12.dp)
             .height(130.dp)
     ) {
-        Icon(
-            painter = painterResource(R.drawable.heart),
-            contentDescription = "favoritos",
-            tint = Colores.RojoError,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(4.dp)
-                .size(ConstanteIcono.IconoPequeno)
-        )
-
         Row(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
                     .size(120.dp)
                     .clip(RoundedCornerShape(8.dp))
             ) {
+
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
-                    contentDescription = "Imagen de la receta",
+                    painter = rememberAsyncImagePainter(
+                        model = receta.fotoReceta, // URL de la foto
+                        placeholder = painterResource(R.drawable.ic_launcher_background),
+                        error = painterResource(R.drawable.ic_launcher_background)
+                    ),
+                    contentDescription = "Imagen de ${receta.nombreReceta}",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .size(120.dp)
                 )
 
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(4.dp)
-                        .background(Color.White.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
                         .padding(horizontal = 4.dp, vertical = 2.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(R.drawable.temporizador2),
                             contentDescription = "Tiempo",
-                            tint = Color.DarkGray,
                             modifier = Modifier.size(ConstanteIcono.IconoMuyPequeno)
                         )
                         Spacer(modifier = Modifier.width(2.dp))
                         Text(
-                            text = "30'",
+                            text = "${receta.tiempoPreparacion}'",
                             fontSize = ConstanteTexto.TextoMuyPequeno,
                             fontFamily = fuenteTexto,
                             fontWeight = FontWeight.Bold
@@ -171,13 +170,18 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
                     .weight(1f)
                     .fillMaxHeight()
             ) {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
                     Text(
                         text = receta.nombreReceta,
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontFamily = fuenteTexto
-                        )
+                        ),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -187,22 +191,44 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = fuenteTexto
                         ),
-                        maxLines = 3
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "Por usuCreador",
-                    fontSize = ConstanteTexto.TextoMuyPequeno,
-                    color = Color.Gray,
-                    fontFamily = fuenteTexto,
-                    modifier = Modifier.padding(bottom = 5.dp)
-                )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 4.dp) // Ajustar el espacio inferior
+                ) {
+                    Text(
+                        text = "Por ${receta.nombreUsuario}",
+                        fontSize = ConstanteTexto.TextoMuyPequeno,
+                        color = Color.Gray,
+                        fontFamily = fuenteTexto,
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(end = 48.dp)
+                    )
+
+                    Icon(
+                        painter = painterResource(R.drawable.heart),
+                        contentDescription = "favoritos",
+                        tint = Colores.RojoError,
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .offset(y = (-3).dp)
+                            .size(ConstanteIcono.IconoPequeno)
+                    )
+                }
             }
         }
     }
 }
+
+
 
 @Composable
 fun SearchBar(vm: VMListadoReceta) {

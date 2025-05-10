@@ -22,6 +22,7 @@ import com.example.myapprecetas.ui.theme.MyapprecetasTheme
 import com.example.myapprecetas.ui.theme.common.BottomBar
 import com.example.myapprecetas.userauth.AuthManager
 import com.example.myapprecetas.views.*
+import com.example.myapprecetas.views.creacionreceta.CrearRecetaView
 import com.example.myapprecetas.views.detallesreceta.DetallesRecetaView
 import com.example.myapprecetas.views.inicioview.InicioView
 import com.example.myapprecetas.views.listadoreceta.ListadoRecetaView
@@ -31,6 +32,7 @@ import com.example.myapprecetas.views.registro.selector.SelectorRegistroView
 import com.example.myapprecetas.views.viewlogin.ViewLogin
 import com.example.myapprecetas.vm.*
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -99,14 +101,20 @@ class MainActivity : ComponentActivity() {
                             ListadoRecetaView(vm, navController)
                         }
 
-                        composable("detalles_receta") {
+                        composable("detalles_receta/{idReceta}") { backStackEntry ->
+                            val idReceta = backStackEntry.arguments?.getString("idReceta")?.toIntOrNull() ?: -1
                             val vm: VMDetallesReceta = hiltViewModel()
                             DetallesRecetaView(vm, navController)
+                            vm.setRecetaId(idReceta)
                         }
-
                         composable("perfil") {
                             val vm: VMPerfil = hiltViewModel()
                             PerfilView(vm, navController)
+                        }
+
+                        composable("creacionReceta") {
+                            val vm: VMCreacionReceta = hiltViewModel()
+                            CrearRecetaView(vm, navController)
                         }
 
                         composable("construccion") {
@@ -114,7 +122,8 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("construcciondos") {
-                            PaginaEnConstrucciondosConBotonAtras(navController)
+                            val vm: VMConstrucciondos = hiltViewModel()
+                            PaginaEnConstrucciondosConBotonAtras(vm,navController)
                         }
                     }
                 }

@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
 import com.example.myapprecetas.dto.Categoria
 import com.example.myapprecetas.dto.DTORecetaDetallada
@@ -34,6 +36,7 @@ import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.ui.theme.common.BotonAtras
+import com.example.myapprecetas.vm.VMDetallesReceta
 
 val fuenteTexto = FamilyQuicksand.quicksand
 
@@ -41,7 +44,9 @@ val fuenteTexto = FamilyQuicksand.quicksand
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetallesRecetaScreen(
+    vm: VMDetallesReceta,
     receta: DTORecetaDetallada?,
+    porciones: Int,
     navController: NavHostController,
 ) {
 
@@ -53,13 +58,26 @@ fun DetallesRecetaScreen(
     val imageHeight by animateDpAsState(targetValue = targetHeight, animationSpec = tween(300), label = "")
 
     receta?.let { data ->
+//        Image(
+//            painter = painterResource(id = R.drawable.ic_launcher_background),
+//            contentDescription = "Imagen de la receta",
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(imageHeight),
+//            contentScale = ContentScale.Crop
+//        )
+
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background),
-            contentDescription = "Imagen de la receta",
+            painter = rememberAsyncImagePainter(
+                model = receta.receta.fotoReceta,
+                placeholder = painterResource(R.drawable.ic_launcher_background),
+                error = painterResource(R.drawable.ic_launcher_background)
+            ),
+            contentDescription = "Imagen de ${receta.receta.nombreReceta}",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(imageHeight),
-            contentScale = ContentScale.Crop
+                .height(imageHeight)
         )
 
         Scaffold(
@@ -79,7 +97,7 @@ fun DetallesRecetaScreen(
             },
             containerColor = Color.Transparent
         ) { innerPadding ->
-            DetallesRecetaContenido(innerPadding,data,imageHeight
+            DetallesRecetaContenido(vm, innerPadding,data,imageHeight, porciones
             )
         }
     } ?: run {
@@ -91,9 +109,11 @@ fun DetallesRecetaScreen(
 
 @Composable
 fun DetallesRecetaContenido(
+    vm: VMDetallesReceta,
     innerPadding: PaddingValues,
     data: DTORecetaDetallada,
-    imageHeight: Dp
+    imageHeight: Dp,
+    porciones: Int
 ) {
     LazyColumn(
         modifier = Modifier
@@ -103,7 +123,7 @@ fun DetallesRecetaContenido(
         contentPadding = PaddingValues(top = imageHeight / 2.5f)
     ) {
         item { CabeceraReceta(data) }
-        item { SelectorRaciones() }
+        item { SelectorRaciones(porciones, { vm.AumentaPorciones() }, {vm.DisminuyePorciones()}) }
         item { TituloSeccion("Ingredientes") }
         items(data.ingredientes) { IngredienteItem(it) }
         item { TituloSeccion("Pasos") }
@@ -123,7 +143,7 @@ fun CabeceraReceta(data: DTORecetaDetallada) {
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            "Por usuCreador",
+            "Por ${data.receta.nombreUsuario}",
             fontFamily = fuenteTexto,
             fontSize = ConstanteTexto.TextoPequeno,
             fontWeight = FontWeight.SemiBold,
@@ -170,7 +190,11 @@ fun IconoTexto(iconRes: Int, text: String) {
 }
 
 @Composable
-fun SelectorRaciones() {
+fun SelectorRaciones(
+    porciones: Int,
+    IncrementaPorciones: () -> Unit,
+    DisminuyePorciones: () -> Unit
+) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -191,10 +215,15 @@ fun SelectorRaciones() {
                 fontFamily = fuenteTexto,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 10.dp)
+                modifier =
+                Modifier
+                    .padding(horizontal = 10.dp)
+                    .clickable {
+                        DisminuyePorciones()
+                    }
             )
             Text(
-                " 2 ",
+                text = porciones.toString(),
                 fontFamily = fuenteTexto,
                 fontSize = ConstanteTexto.TextoNormal,
                 fontWeight = FontWeight.SemiBold
@@ -207,10 +236,17 @@ fun SelectorRaciones() {
             )
             Text(
                 "+",
+
                 fontFamily = fuenteTexto,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 10.dp)
+                modifier =
+                    Modifier
+                        .padding(horizontal = 10.dp)
+                        .clickable {
+                            IncrementaPorciones()
+                        }
+
             )
         }
         Spacer(Modifier.height(16.dp))

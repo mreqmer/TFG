@@ -18,11 +18,13 @@ class VMPerfil @Inject constructor(
 ) : ViewModel() {
 
     private val _listaRecetas = MutableStateFlow<List<DTORecetaSimplificada>>(emptyList())
+    private val _idUsuario = MutableStateFlow<Int>(0)
     private val _nombreUsuario = MutableStateFlow<String?>("Usuario")
     private var _cargando = MutableStateFlow<Boolean>(false)
     private var _email = MutableStateFlow<String?>("")
 
     val listaRecetas: StateFlow<List<DTORecetaSimplificada>> = _listaRecetas
+    private val idUsuario: StateFlow<Int?> = _idUsuario
     val nombreUsuario: StateFlow<String?> = _nombreUsuario
     var cargando: StateFlow<Boolean> = _cargando
     val email: StateFlow<String?> = _email
@@ -37,7 +39,8 @@ class VMPerfil @Inject constructor(
         viewModelScope.launch {
             _cargando.value = true
             try {
-                val response = endpoints.getRecetas()
+//                val response = endpoints.getRecetasPorIdUsuario(_idUsuario.value)
+                val response = endpoints.getRecetasPorIdUsuario(1)
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _listaRecetas.value = it
