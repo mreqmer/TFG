@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
-import com.example.myapprecetas.dto.DTORecetaSimplificada
+import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.BotonAtras
@@ -34,7 +34,6 @@ import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.userauth.AuthManager
 import com.example.myapprecetas.vm.VMPerfil
-import kotlin.random.Random
 
 val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
 

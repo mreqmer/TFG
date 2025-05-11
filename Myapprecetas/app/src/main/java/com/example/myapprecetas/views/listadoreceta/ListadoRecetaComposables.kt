@@ -27,20 +27,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
-import com.example.myapprecetas.dto.DTORecetaSimplificada
+import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.CargandoElementos
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.vm.VMListadoReceta
-import com.google.android.play.integrity.internal.f
-import kotlin.random.Random
 
 val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
 

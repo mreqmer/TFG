@@ -4,10 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.api.Endpoints
-import com.example.myapprecetas.dto.DTORecetaSimplificada
+import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.userauth.AuthManager
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

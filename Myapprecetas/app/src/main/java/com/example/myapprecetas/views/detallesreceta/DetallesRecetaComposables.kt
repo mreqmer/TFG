@@ -27,10 +27,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
-import com.example.myapprecetas.dto.Categoria
-import com.example.myapprecetas.dto.DTORecetaDetallada
-import com.example.myapprecetas.dto.Ingrediente
-import com.example.myapprecetas.dto.Paso
+import com.example.myapprecetas.objetos.dto.Categoria
+import com.example.myapprecetas.objetos.dto.DTORecetaDetallada
+import com.example.myapprecetas.objetos.dto.Ingrediente
+import com.example.myapprecetas.objetos.dto.Paso
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono

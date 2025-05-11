@@ -1,4 +1,4 @@
-package com.example.myapprecetas.dto.creacion
+package com.example.myapprecetas.objetos.dto.creacion
 
 data class DTOPasoSimplificado(
     val descripcion: String,

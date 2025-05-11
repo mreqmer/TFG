@@ -1,4 +1,4 @@
-package com.example.myapprecetas.dto
+package com.example.myapprecetas.objetos.dto
 
 data class Ingrediente(
     val cantidad: Int,

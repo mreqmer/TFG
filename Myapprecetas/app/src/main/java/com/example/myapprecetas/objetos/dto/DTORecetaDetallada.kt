@@ -1,4 +1,4 @@
-package com.example.myapprecetas.dto
+package com.example.myapprecetas.objetos.dto
 
 data class DTORecetaDetallada(
     val categorias: List<Categoria>,

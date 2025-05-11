@@ -1,4 +1,4 @@
-package com.example.myapprecetas.dto.constantesobjetos
+package com.example.myapprecetas.objetos.dto.constantesobjetos
 
 class ConstantesObjetos {
 

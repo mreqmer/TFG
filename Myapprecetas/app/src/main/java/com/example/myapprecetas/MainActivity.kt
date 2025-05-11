@@ -22,6 +22,8 @@ import com.example.myapprecetas.ui.theme.MyapprecetasTheme
 import com.example.myapprecetas.ui.theme.common.BottomBar
 import com.example.myapprecetas.userauth.AuthManager
 import com.example.myapprecetas.views.*
+import com.example.myapprecetas.views.creacionreceta.AddRecetaScreen
+import com.example.myapprecetas.views.creacionreceta.AddRecetaView
 import com.example.myapprecetas.views.creacionreceta.CrearRecetaView
 import com.example.myapprecetas.views.detallesreceta.DetallesRecetaView
 import com.example.myapprecetas.views.inicioview.InicioView
@@ -115,6 +117,10 @@ class MainActivity : ComponentActivity() {
                         composable("creacionReceta") {
                             val vm: VMCreacionReceta = hiltViewModel()
                             CrearRecetaView(vm, navController)
+                        }
+                        composable("addIngrediente") {
+                            val vm: VMCreacionReceta = hiltViewModel()
+                            AddRecetaView(vm, navController)
                         }
 
                         composable("construccion") {
