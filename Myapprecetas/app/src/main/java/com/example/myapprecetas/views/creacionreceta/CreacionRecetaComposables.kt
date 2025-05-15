@@ -1,6 +1,7 @@
 package com.example.myapprecetas.views.creacionreceta
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -22,7 +23,10 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +38,9 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -42,6 +49,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,13 +71,18 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
 import com.example.myapprecetas.objetos.ClsIngrediente
+import com.example.myapprecetas.objetos.dto.Categoria
+import com.example.myapprecetas.objetos.dto.Ingrediente
 import com.example.myapprecetas.objetos.dto.constantesobjetos.ConstantesObjetos
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
+import com.example.myapprecetas.ui.theme.Typography
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
+import com.example.myapprecetas.views.detallesreceta.IngredienteItem
 import com.example.myapprecetas.vm.VMCreacionReceta
 
+//Titulo de cada seccion de la vista
 @Composable
 fun SeccionTitulo(texto: String) {
     Text(
@@ -82,6 +95,7 @@ fun SeccionTitulo(texto: String) {
     )
 }
 
+//Campo para introducir texto con un tamaño máximo
 @Composable
 fun InputField(
     value: String,
@@ -126,35 +140,7 @@ fun InputField(
     }
 }
 
-@Composable
-fun InputFielddddd(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = placeholder,
-                fontFamily = FamilyQuicksand.quicksand,
-                color = Colores.Gris
-            )
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White, shape = MaterialTheme.shapes.medium)
-            .border(1.dp, Colores.Gris, MaterialTheme.shapes.medium),
-        shape = MaterialTheme.shapes.medium,
-        maxLines = 1,
-        textStyle = LocalTextStyle.current.copy(
-            color = Color.Black,
-            fontFamily = FamilyQuicksand.quicksand
-        )
-    )
-}
-
+//Botón que navega a la vista AddIngrediente
 @Composable
 fun BotonAddIngrediente(onClick: () -> Unit) {
     OutlinedButton(
@@ -175,24 +161,112 @@ fun BotonAddIngrediente(onClick: () -> Unit) {
             painter = painterResource(R.drawable.mas),
             contentDescription = "Añadir ingrediente")
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = "Añadir ingrediente")
+        Text(text = "Añadir ingrediente",fontFamily = FamilyQuicksand.quicksand,)
     }
 }
 
+//Aquí aparecen los ingredientes que se usan en la receta
 @Composable
-fun ListaIngredientesSeleccionados(ingredientes: List<ClsIngrediente>) {
-    Column {
-        ingredientes.forEach { ingrediente ->
+fun ListaIngredientesSeleccionados(
+    ingredientesSeleccionados: List<Ingrediente>,
+    onEliminarIngrediente: (Ingrediente) -> Unit,
+) {
+    if (ingredientesSeleccionados.isEmpty()) {
+        Text("No hay ingredientes seleccionados.", fontFamily = FamilyQuicksand.quicksand,)
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .heightIn(min = 50.dp, max = 2000.dp)
+                    .padding(bottom = 8.dp)
+            ) {
+                items(ingredientesSeleccionados) { ingrediente ->
+                    IngredienteItem(
+                        ingrediente = ingrediente,
+                        onEliminarIngrediente = onEliminarIngrediente
+                    )
+                }
+            }
+        }
+    }
+}
+
+//Cada Item con su card correspondiente (ingrediente)
+@Composable
+fun IngredienteItem(
+    ingrediente: Ingrediente,
+    onEliminarIngrediente: (Ingrediente) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .border(
+                width = 1.dp,
+                color = Colores.Gris.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(12.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Nombre, cantidad y medida
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = ingrediente.nombreIngrediente,
+                        fontSize = ConstanteTexto.TextoNormal,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = FamilyQuicksand.quicksand,
+                        color = Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = "Cantidad: ${ingrediente.cantidad}${ingrediente.medida}",
+                        fontSize = ConstanteTexto.TextoPequeno,
+                        fontFamily = FamilyQuicksand.quicksand,
+                        color = Color.Gray
+                    )
+                }
+
+                IconButton(
+                    onClick = { onEliminarIngrediente(ingrediente) },
+                    modifier = Modifier.size(ConstanteIcono.IconoPequeno)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.papelera),
+                        contentDescription = "Eliminar ingrediente",
+                        tint = Color.Gray
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                text = "${ingrediente.nombre}: ${ingrediente.cantidad} ${ingrediente.unidad}" +
-                        ingrediente.notas,
-                fontSize = 16.sp,
-                color = Colores.Negro
+                text = "Notas: ${ingrediente.notas}",
+                fontSize = ConstanteTexto.TextoPequeno,
+                fontFamily = FamilyQuicksand.quicksand,
+                color = Color.Gray
             )
         }
     }
 }
 
+//Cada Item paso de la lista
 @Composable
 fun PasoItem(index: Int, paso: String, onValueChange: (String) -> Unit, onDelete: () -> Unit) {
     Row(
@@ -217,6 +291,7 @@ fun PasoItem(index: Int, paso: String, onValueChange: (String) -> Unit, onDelete
                     text = "${index + 1}",
                     color = Colores.Blanco,
                     fontWeight = FontWeight.SemiBold,
+                    fontFamily = FamilyQuicksand.quicksand,
                     textAlign = TextAlign.Center
                 )
             }
@@ -260,6 +335,7 @@ fun PasoItem(index: Int, paso: String, onValueChange: (String) -> Unit, onDelete
     }
 }
 
+//Boton para añadir un nuevo paso
 @Composable
 fun AddPaso(onClick: () -> Unit) {
     Row(
@@ -287,6 +363,7 @@ fun AddPaso(onClick: () -> Unit) {
     }
 }
 
+//Campo para introducir el tiempo de preparacion
 @Composable
 fun TiempoPreparacionField(
     value: Int,
@@ -323,6 +400,7 @@ fun TiempoPreparacionField(
                 onClick = {
                     val newValue = (value + saltoTiempo).coerceAtMost(valorMaximo)
                     onValueChange(newValue)
+
                 },
                 modifier = Modifier.size(32.dp)
             ) {
@@ -350,6 +428,7 @@ fun TiempoPreparacionField(
     }
 }
 
+//Chips para elegir la dificultad de la receta
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DificultadChips(
@@ -370,7 +449,7 @@ fun DificultadChips(
                     )
                 },
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = if (dificultad.label == dificultadSeleccionada) Colores.VerdeOscuro.copy(alpha = 0.9f) else Colores.VerdeOscuro.copy(alpha = 0.2f)
+                    containerColor = if (dificultad.label == dificultadSeleccionada) Colores.MarronOscuro.copy(alpha = 0.9f) else Colores.MarronOscuro.copy(alpha = 0.2f)
                 ),
                 modifier = Modifier
                     .padding(vertical = 6.dp, horizontal = 4.dp)
@@ -382,8 +461,48 @@ fun DificultadChips(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun CategoriasSelector(vm: VMCreacionReceta) {
+    val categorias by vm.categorias.collectAsState()
+    val seleccionadas by vm.categoriasSeleccionadas.collectAsState()
+
+    Column {
+        Text("Categorías (${seleccionadas.size}/5)",
+            style = MaterialTheme.typography.titleSmall)
+
+        FlowRow(
+
+            verticalArrangement = Arrangement.Center
+        ) {
+            categorias.forEach { categoria ->
+                val estaSeleccionada = seleccionadas.any { it.idCategoria == categoria.idCategoria }
+
+                AssistChip(
+                    onClick = { vm.toggleCategoria(categoria) },
+                    label = { Text(categoria.nombreCategoria) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = if (estaSeleccionada)
+                            Colores.VerdeOscuro.copy(alpha = 0.9f)
+                        else
+                            Colores.VerdeOscuro.copy(alpha = 0.2f)
+                    ),
+                    modifier = Modifier
+                        .padding(vertical = 3.dp, horizontal = 2.dp)
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                        .height(40.dp),
+                    shape = MaterialTheme.shapes.medium.copy(CornerSize(20.dp))
+                )
+            }
+        }
+    }
+}
+
+//Botón para guardar y crear una nueva receta
+//TODO No hace nada
 @Composable
 fun BtnGuardarReceta(
+    isLoading: Boolean,
     onClick: () -> Unit,
 ) {
     Button(
@@ -398,31 +517,37 @@ fun BtnGuardarReceta(
             contentColor = MaterialTheme.colorScheme.onPrimary
         )
     ) {
-        Text(
-            text = "Guardar receta",
-            fontSize = ConstanteTexto.TextoSemigrande,
-            fontWeight = FontWeight.SemiBold,
-        )
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            Text(
+                text = "Guardar receta",
+                fontSize = ConstanteTexto.TextoSemigrande,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
     }
 }
 
+//Función para mostrar una foto que se selecciona
 //TODO cuando esté terminado todo hacer que esta funcion sea un poo mas pequeña
-
 @Composable
-fun FotoSelector(vm: VMCreacionReceta) {
-    var imagenUri by remember { mutableStateOf<Uri?>(null) }
-
+fun FotoSelector(
+    imagenUri: Uri?,
+    onUpdateFoto: (Uri?) -> Unit
+) {
     val galeriaLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
-            imagenUri = uri
-            uri?.let { vm.actualizarFoto(it.toString()) }
+            onUpdateFoto(uri)
         }
     )
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -433,7 +558,7 @@ fun FotoSelector(vm: VMCreacionReceta) {
                     .width(100.dp)
                     .height(100.dp)
                     .border(1.dp, Colores.Gris, RoundedCornerShape(10.dp))
-                    .background(Colores.MarronClaro.copy(alpha = (0.6f)), shape = RoundedCornerShape(10.dp))
+                    .background(Colores.MarronClaro.copy(alpha = 0.6f), shape = RoundedCornerShape(10.dp))
                     .clickable { galeriaLauncher.launch("image/*") },
                 contentAlignment = Alignment.Center
             ) {
@@ -464,22 +589,14 @@ fun FotoSelector(vm: VMCreacionReceta) {
                     modifier = Modifier
                         .size(38.dp)
                         .padding(start = 16.dp)
-                        .clickable { imagenUri = null }
+                        .clickable { onUpdateFoto(null) }
                 )
             }
-        }
-
-
-        if (imagenUri != null) {
-            Text(
-                text = "Error",
-                color = Colores.RojoError,
-                modifier = Modifier.padding(top = 8.dp)
-            )
         }
     }
 }
 
+//Muestra los carácteres restantes para introducir texto
 @Composable
 fun TextoCaracteresRestantes(
     caracteresRestantes: Int,

@@ -1,5 +1,6 @@
 package com.example.myapprecetas.views.creacionreceta
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -7,12 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.navigation.NavHostController
-import com.example.myapprecetas.objetos.ClsIngrediente
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
 import com.example.myapprecetas.vm.VMCreacionReceta
+import kotlinx.coroutines.launch
 
 @Composable
 fun CrearRecetaView(vm: VMCreacionReceta, navController: NavHostController) {
@@ -32,15 +32,23 @@ fun CreacionRecetaScreen(
     navController: NavHostController,
     innerPadding: PaddingValues
 ) {
-    // Declaración de las variables al inicio
-    var titulo by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
-    var tiempoPreparacion by remember { mutableIntStateOf(10) }
-    var pasos = remember { mutableStateListOf("") }
-    var dificultadSeleccionada by remember { mutableStateOf("") }
-    var ingredientesBusqueda by remember { mutableStateOf("") }
-    var categoriasBusqueda by remember { mutableStateOf("") }
-    var ingredientesSeleccionados = remember { mutableStateListOf<ClsIngrediente>() }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    vm.obtieneTodo()
+
+    // estados del ViewModel
+    val titulo by vm.nombreReceta.collectAsState()
+    val descripcion by vm.descripcion.collectAsState()
+    val tiempoPreparacion by vm.tiempoPreparacion.collectAsState()
+    val dificultadSeleccionada by vm.dificultad.collectAsState()
+    val ingredientesSeleccionados by vm.ingredientesSeleccionados.collectAsState()
+    val categorias by vm.categorias.collectAsState()
+    val categoriasSeleccionadas by vm.categoriasSeleccionadas.collectAsState()
+    val pasos by vm.pasos.collectAsState()
+    val imagenUri by vm.imagenUri.collectAsState()
+    val cargando by vm.cargando.collectAsState()
+    val cargandoImagen by vm.cargandoImagen.collectAsState()
 
     LazyColumn(
         modifier = Modifier
@@ -50,13 +58,12 @@ fun CreacionRecetaScreen(
         horizontalAlignment = Alignment.Start
     ) {
         item {
-            // Espaciado y Título
             Spacer(modifier = Modifier.height(32.dp))
 
             SeccionTitulo("Título")
             InputField(
                 value = titulo,
-                onValueChange = { titulo = it },
+                onValueChange = { vm.actualizarNombre(it) },
                 placeholder = "Escribe el título",
                 maxLength = 80,
                 maxLines = 4,
@@ -65,11 +72,10 @@ fun CreacionRecetaScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Descripción
             SeccionTitulo("Descripción")
             InputField(
                 value = descripcion,
-                onValueChange = { descripcion = it },
+                onValueChange = { vm.actualizarDescripcion(it) },
                 placeholder = "Escribe la descripción",
                 maxLength = 300,
                 maxLines = 5,
@@ -78,13 +84,14 @@ fun CreacionRecetaScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Foto
             SeccionTitulo("Foto")
-            FotoSelector(vm)
+            FotoSelector(
+                imagenUri = imagenUri,
+                onUpdateFoto = { uri -> vm.actualizarFoto(uri) }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Ingredientes
             SeccionTitulo("Ingredientes")
             BotonAddIngrediente(
                 onClick = { navController.navigate("addIngrediente") }
@@ -92,69 +99,77 @@ fun CreacionRecetaScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            ListaIngredientesSeleccionados(ingredientesSeleccionados)
+            ListaIngredientesSeleccionados(
+                ingredientesSeleccionados = ingredientesSeleccionados,
+                onEliminarIngrediente = { ingrediente ->
+                    vm.deleteIngredienteSeleccionado(ingrediente.idIngrediente)
+                    vm.removeIngrediente(ingrediente.idIngrediente)
+                }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Pasos
             SeccionTitulo("Pasos")
             pasos.forEachIndexed { index, paso ->
-                PasoItem(index, paso, onValueChange = { pasos[index] = it }) {
-                    pasos.removeAt(index) // Eliminamos el paso de la lista
-                }
+                PasoItem(
+                    index = index,
+                    paso = paso.descripcion,
+                    onValueChange = { nuevaDescripcion ->
+                        val listaActualizada = pasos.toMutableList()
+                        listaActualizada[index] = paso.copy(descripcion = nuevaDescripcion)
+                        vm.actualizarPasos(listaActualizada)
+                    },
+                    onDelete = {
+                        val listaActualizada = pasos.toMutableList()
+                        listaActualizada.removeAt(index)
+                        vm.actualizarPasos(listaActualizada)
+                    }
+                )
             }
 
             AddPaso(
-                onClick = { pasos.add("") }
+                onClick = { vm.addPaso() }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Dificultad
+            SeccionTitulo("Tiempo de preparación")
+            TiempoPreparacionField(
+                value = tiempoPreparacion.toIntOrNull() ?: 10,
+                onValueChange = { vm.actualizarTiempo(it.toString()) }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             SeccionTitulo("Dificultad")
             DificultadChips(
                 dificultadSeleccionada = dificultadSeleccionada,
-                onDificultadSeleccionada = { nuevaDificultad ->
-                    dificultadSeleccionada = nuevaDificultad
+                onDificultadSeleccionada = { vm.actualizarDificultad(it) }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            SeccionTitulo("Categorías")
+
+            CategoriasSelector(vm = vm)
+
+            Spacer(modifier = Modifier.height(32.dp))
+            var cosa by remember { mutableStateOf("") }
+            BtnGuardarReceta(
+                isLoading = cargando,
+                onClick = {
+                    coroutineScope.launch {
+                        cosa = vm.crearRecetaPrueba(1).toString()
+                    }
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Tiempo de preparación
-            SeccionTitulo("Tiempo de preparación")
-
-
-            TiempoPreparacionField(
-                value = tiempoPreparacion,
-                onValueChange = { nuevoTiempo -> tiempoPreparacion = nuevoTiempo }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Categorías
-            SeccionTitulo("Categorías")
-            InputFielddddd(
-                value = categoriasBusqueda,
-                onValueChange = { categoriasBusqueda = it },
-                placeholder = "Buscar categorías..."
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Botón para guardar receta
-            BtnGuardarReceta(
-                onClick = { /* Implementar acción al guardar la receta */ },
-            )
+            Text(text = cosa)
 
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
-
-
-
-
 
 
 

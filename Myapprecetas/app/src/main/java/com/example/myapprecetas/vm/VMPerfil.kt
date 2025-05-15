@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.api.Endpoints
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
+import com.example.myapprecetas.repositories.IngredienteRepository
 import com.example.myapprecetas.userauth.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VMPerfil @Inject constructor(
-    private val endpoints: Endpoints
+    private val endpoints: Endpoints,
+    private val repository: IngredienteRepository
 ) : ViewModel() {
 
     private val _listaRecetas = MutableStateFlow<List<DTORecetaSimplificada>>(emptyList())
@@ -33,6 +35,10 @@ class VMPerfil @Inject constructor(
         _nombreUsuario.value = AuthManager.currentUser.value?.displayName ?: "Usuario"
         _email.value = AuthManager.currentUser.value?.email ?: ""
         cargaRecetas()
+    }
+
+    fun clearIngredientes() {
+        repository.clearIngredientes()
     }
 
     private fun cargaRecetas() {

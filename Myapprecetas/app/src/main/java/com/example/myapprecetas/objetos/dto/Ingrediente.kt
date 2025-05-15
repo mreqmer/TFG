@@ -1,7 +1,7 @@
 package com.example.myapprecetas.objetos.dto
 
 data class Ingrediente(
-    val cantidad: Int,
+    var cantidad: Int,
     val categoria: String,
     val idIngrediente: Int,
     val medida: String,

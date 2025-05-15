@@ -188,7 +188,12 @@ fun PerfilView(vm: VMPerfil, navController: NavHostController) {
 
             // Carta "Crea una receta" ajustada
             Card(
-                onClick = { navController.navigate("creacionReceta") },
+                onClick = {
+                    vm.clearIngredientes()
+                    navController.navigate("creacionReceta") {
+                        popUpTo("creacionReceta") { inclusive = true }
+                    }
+                },
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 colors = CardDefaults.cardColors(containerColor = Colores.VerdeOscuro.copy(alpha = 0.05f)),

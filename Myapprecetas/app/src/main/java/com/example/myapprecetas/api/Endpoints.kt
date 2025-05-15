@@ -1,5 +1,6 @@
 package com.example.myapprecetas.api
 
+import com.example.myapprecetas.objetos.dto.Categoria
 import com.example.myapprecetas.objetos.dto.DTORecetaDetallada
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.objetos.dto.Ingrediente
@@ -10,7 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-
+import com.example.myapprecetas.objetos.dto.creacion.RecetaResponse
 interface Endpoints {
 
 //    @GET("personas")
@@ -35,4 +36,11 @@ interface Endpoints {
     suspend fun buscarIngredientes(
         @Query("busquedaNombre") busquedaNombre: String
     ): Response<List<Ingrediente>>
+    @GET("Categorias/listado")
+    suspend fun getCategorias(): Response<List<Categoria>>
+
+
+    @POST("recetas/add")
+    suspend fun subirNuevaReceta(@Body receta: DTONuevaReceta): Response<RecetaResponse>
+
 }

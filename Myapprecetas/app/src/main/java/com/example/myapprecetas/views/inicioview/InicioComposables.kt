@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
@@ -22,7 +24,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
@@ -40,7 +41,7 @@ fun BackgroundImage() {
 }
 
 @Composable
-fun LogoInicio() {
+fun LogoInicioPlceholder() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -54,6 +55,21 @@ fun LogoInicio() {
             modifier = Modifier
                 .alpha(0.9f)
                 .padding(bottom = 200.dp)
+        )
+    }
+}
+
+@Composable
+fun LogoInicio(modifier: Modifier = Modifier) { // Añade parámetro modifier
+    Box(
+        modifier = modifier, // Usa el modifier recibido
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            modifier = Modifier.size(300.dp),
+            painter = painterResource(R.drawable.logochupchup),
+            contentDescription = "Logo ChupChup",
+            tint = Colores.Negro.copy(alpha = 0.7f)
         )
     }
 }

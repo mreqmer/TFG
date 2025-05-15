@@ -22,6 +22,9 @@ class VMConstrucciondos @Inject constructor(
     var imageUrl by mutableStateOf<String?>(null)
         private set
 
+    var publicId by mutableStateOf<String?>(null)
+        private set
+
     var uploadError by mutableStateOf<String?>(null)
         private set
 
@@ -29,14 +32,42 @@ class VMConstrucciondos @Inject constructor(
         isLoading = true
         uploadError = null
         imageUrl = null
+        publicId = null
 
         repo.uploadImage(
             imageUri = uri,
             onLoading = {
                 isLoading = true
             },
-            onSuccess = { url ->
+            onSuccess = { url, publicIdResult ->
                 imageUrl = url
+                publicId = publicIdResult
+                isLoading = false
+            },
+            onError = { error ->
+                uploadError = error
+                isLoading = false
+            }
+        )
+    }
+
+
+    suspend fun borrarImagen() {
+        val publicIdValue = publicId
+
+        if (publicIdValue.isNullOrEmpty()) {
+            uploadError = "No hay una imagen para borrar"
+            return
+        }
+
+        isLoading = true
+        uploadError = null
+
+        repo.deleteImage(
+            publicId = publicIdValue,
+            onSuccess = {
+                imageUrl = null
+                publicId = null
                 isLoading = false
             },
             onError = { error ->

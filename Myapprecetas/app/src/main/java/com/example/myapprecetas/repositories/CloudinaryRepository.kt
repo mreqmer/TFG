@@ -7,6 +7,8 @@ import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 import com.example.myapprecetas.R
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CloudinaryRepository @Inject constructor(
@@ -28,7 +30,7 @@ class CloudinaryRepository @Inject constructor(
     fun uploadImage(
         imageUri: Uri,
         onLoading: () -> Unit,
-        onSuccess: (String) -> Unit,
+        onSuccess: (String, String) -> Unit,
         onError: (String) -> Unit
     ) {
         try {
@@ -54,8 +56,13 @@ class CloudinaryRepository @Inject constructor(
                     resultData: MutableMap<Any?, Any?>?
                 ) {
                     val url = resultData?.get("secure_url") as? String
-                    if (url != null) onSuccess(url)
-                    else onError("URL vacía")
+                    val publicId = resultData?.get("public_id") as? String
+
+                    if (url != null && publicId != null) {
+                        onSuccess(url, publicId)
+                    } else {
+                        onError("No se pudo obtener la URL o el publicId")
+                    }
                 }
 
                 override fun onError(requestId: String?, error: ErrorInfo?) {
@@ -65,6 +72,38 @@ class CloudinaryRepository @Inject constructor(
                 override fun onReschedule(requestId: String?, error: ErrorInfo?) {}
             })
             .dispatch()
+    }
+
+    suspend fun deleteImage(
+        publicId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        try {
+            MediaManager.get()
+        } catch (e: IllegalStateException) {
+            val config = mapOf(
+                "cloud_name" to context.getString(R.string.cloud_name),
+                "api_key" to context.getString(R.string.apikey),
+                "api_secret" to context.getString(R.string.apisecret)
+            )
+            MediaManager.init(context, config)
+        }
+
+        val options = mapOf("invalidate" to true)
+
+        try {
+            withContext(Dispatchers.IO) {
+                val result = MediaManager.get().cloudinary.uploader().destroy(publicId, options)
+                if (result["result"] == "ok") {
+                    onSuccess()
+                } else {
+                    onError("Error al borrar la imagen: ${result["result"]}")
+                }
+            }
+        } catch (e: Exception) {
+            onError(e.message ?: "Error desconocido al borrar la imagen")
+        }
     }
 
 }
