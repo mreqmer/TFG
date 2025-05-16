@@ -45,13 +45,13 @@ class VMCreacionReceta @Inject constructor(
     private val _cargando = MutableStateFlow(false)
     private val _cargandoImagen = MutableStateFlow(false)
     private val _cargandoIngredientes = MutableStateFlow(false)
-    private val _uploadError = MutableStateFlow<String?>(null)
+    private val _uploadError = MutableStateFlow<String?>("")
     private var _urlImagen: Uri? = null
     private val _listadoIngredientes = MutableStateFlow<List<Ingrediente>>(emptyList())
     private val _imagenUri = MutableStateFlow<Uri?>(null)
     private val _busqueda = MutableStateFlow("")
     private val _errorImagen = MutableStateFlow("")
-    private val _publicId = MutableStateFlow<String?>(null)
+    private val _publicId = MutableStateFlow<String?>("")
 
     val publicId: StateFlow<String?> = _publicId
     val nombreReceta: StateFlow<String> = _nombreReceta
