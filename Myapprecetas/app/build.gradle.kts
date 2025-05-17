@@ -40,7 +40,8 @@ android {
         viewBinding = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
+//        kotlinCompilerExtensionVersion = "1.5.11"
+        kotlinCompilerExtensionVersion = "1.5.12"
     }
 }
 
@@ -58,7 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    implementation (libs.androidx.material3.v110)
+//    implementation (libs.androidx.material3.v110)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
 
@@ -100,6 +101,10 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-fragment:2.7.7")
     implementation("androidx.navigation:navigation-ui:2.7.7")
+
+    implementation(libs.pullrefresh)
+
+//    implementation ("com.google.accompanist:accompanist-swiperefresh:0.30.1")
 }
 
 hilt {

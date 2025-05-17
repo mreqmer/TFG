@@ -1,6 +1,7 @@
 package com.example.myapprecetas.vm
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.api.Endpoints
@@ -36,7 +37,7 @@ class VMListadoReceta @Inject constructor(
     }
 
 
-    private fun cargaRecetas() {
+    fun cargaRecetas() {
         viewModelScope.launch {
             _cargando.value = true
             try {
@@ -58,6 +59,22 @@ class VMListadoReceta @Inject constructor(
             } catch (e: Exception) {
                 Log.i("EXCEPTION", e.toString())
                 _cargando.value = false
+            }
+        }
+    }
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
+
+    fun refreshData() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            // Ejemplo: Recargar datos desde tu fuente (API, base de datos, etc.)
+            try {
+                cargaRecetas() // Tu función existente para cargar datos
+            } finally {
+                _isRefreshing.value = false
             }
         }
     }

@@ -7,11 +7,10 @@ composeBom = "2024.04.01"
 firebaseBom = "33.0.0"
 hiltNavigationCompose = "1.2.0"
 coil = "2.6.0"
-material3Version = "1.1.0"
 playServicesAuth = "21.1.0"
 retrofit = "2.9.0"
 converterGson = "2.9.0"
-
+pullRefresh = "1.0.0"
 
 [libraries]
 # AndroidX
@@ -22,7 +21,9 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 
 # Compose
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-androidx-material3-v110 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+
+pullrefresh = { module = "eu.bambooapps:compose-material3-pullrefresh", version.ref = "pullRefresh" }
+
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }

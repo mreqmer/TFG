@@ -14,6 +14,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,54 +40,103 @@ import com.example.myapprecetas.ui.theme.common.CargandoElementos
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.vm.VMListadoReceta
+import eu.bambooapps.material3.pullrefresh.PullRefreshIndicator
+import eu.bambooapps.material3.pullrefresh.PullRefreshIndicatorDefaults
+import eu.bambooapps.material3.pullrefresh.pullRefresh
+import eu.bambooapps.material3.pullrefresh.rememberPullRefreshState
 
 val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ListadoRecetaScreen(vm: VMListadoReceta, navController: NavHostController, insets: PaddingValues) {
+fun ListadoRecetaScreen(
+    vm: VMListadoReceta,
+    navController: NavHostController,
+    insets: PaddingValues
+) {
     val listaReceta by vm.listaRecetas.collectAsState()
-    val listaPrueba = if (listaReceta.isNotEmpty()) List(10) { listaReceta[0] } else emptyList()
     val nombreUsuario by vm.nombreUsuario.collectAsState()
     val textBienvenida = "¡Bienvenido, ${nombreUsuario?.substringBefore(" ")}!"
     val cargando = vm.cargando.collectAsState().value
-    if(cargando){
-        CargandoElementos()
-    }else{
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = insets.calculateBottomPadding() + 12.dp)
-        ) {
-            // Texto de bienvenida
-            item {
-                HeaderBienvenida(textBienvenida)
-            }
 
-            // Buscador (sticky)
-            stickyHeader {
-                Box(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .padding(vertical = 8.dp)
-                ) {
-                    SearchBar(vm)
-                }
-            }
+    var isRefreshing by remember { mutableStateOf(false) }
 
-            // Lista de recetas
-            items(
-                items = listaReceta,
-                key = { receta -> receta.idReceta }
-            ) { receta ->
-                ItemReceta(receta = receta, navController)
-                Spacer(modifier = Modifier.height(12.dp))
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = {
+            isRefreshing = true
+            vm.cargaRecetas()
+            isRefreshing = false
+        }
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pullRefresh(pullRefreshState)
+    ) {
+        if (cargando) {
+            CargandoElementos()
+        } else {
+            ListadoRecetas(
+                listaReceta = listaReceta,
+                navController = navController,
+                insets = insets,
+                textBienvenida = textBienvenida,
+                vm = vm
+            )
+        }
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+            colors = PullRefreshIndicatorDefaults.colors(
+                contentColor = Colores.RojoError,
+            )
+        )
+    }
+}
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ListadoRecetas(
+    listaReceta: List<DTORecetaSimplificada>,
+    navController: NavHostController,
+    insets: PaddingValues,
+    textBienvenida: String,
+    vm: VMListadoReceta
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = insets.calculateBottomPadding() + 12.dp)
+    ) {
+        // Texto de bienvenida
+        item {
+            HeaderBienvenida(textBienvenida)
+        }
+
+        // Buscador (sticky)
+        stickyHeader {
+            Box(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(vertical = 8.dp)
+            ) {
+                SearchBar(vm)
             }
         }
-    }
 
+        // Lista de recetas
+        items(
+            items = listaReceta,
+            key = { receta -> receta.idReceta }
+        ) { receta ->
+            ItemReceta(receta = receta, navController)
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
 }
+
 
 @Composable
 fun HeaderBienvenida(text: String) {

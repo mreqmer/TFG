@@ -499,7 +499,7 @@ fun CategoriasSelector(vm: VMCreacionReceta) {
 }
 
 //Botón para guardar y crear una nueva receta
-//TODO No hace nada
+//TODO Funciona, pero no se va de pantalla
 @Composable
 fun BtnGuardarReceta(
     isLoading: Boolean,
@@ -533,7 +533,6 @@ fun BtnGuardarReceta(
 }
 
 //Función para mostrar una foto que se selecciona
-//TODO cuando esté terminado todo hacer que esta funcion sea un poo mas pequeña
 @Composable
 fun FotoSelector(
     imagenUri: Uri?,
