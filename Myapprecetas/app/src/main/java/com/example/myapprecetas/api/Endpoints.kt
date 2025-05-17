@@ -3,6 +3,7 @@ package com.example.myapprecetas.api
 import com.example.myapprecetas.objetos.dto.Categoria
 import com.example.myapprecetas.objetos.dto.DTORecetaDetallada
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
+import com.example.myapprecetas.objetos.dto.DTOUsuario
 import com.example.myapprecetas.objetos.dto.Ingrediente
 import com.example.myapprecetas.objetos.dto.creacion.DTONuevaReceta
 import retrofit2.Response
@@ -36,9 +37,12 @@ interface Endpoints {
     suspend fun buscarIngredientes(
         @Query("busquedaNombre") busquedaNombre: String
     ): Response<List<Ingrediente>>
+
     @GET("Categorias/listado")
     suspend fun getCategorias(): Response<List<Categoria>>
 
+    @GET("Usuarios/{FirebaseUID}")
+    suspend fun getUsuarioUID(@Path("FirebaseUID") firebaseUID: String): Response<DTOUsuario>
 
     @POST("recetas/add")
     suspend fun subirNuevaReceta(@Body receta: DTONuevaReceta): Response<RecetaResponse>

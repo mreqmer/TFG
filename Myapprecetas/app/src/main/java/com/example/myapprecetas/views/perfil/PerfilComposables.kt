@@ -28,6 +28,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -211,7 +213,9 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
 @Composable
 fun PerfilInfo(
     nombreUsuario: String?,
-    email: String?
+    email: String?,
+    imagenPerfil: String?,
+    fechaRegistro: String?
 ) {
     Box(
         modifier = Modifier
@@ -224,14 +228,26 @@ fun PerfilInfo(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "Imagen de perfil",
-                modifier = Modifier
-                    .size(ConstanteIcono.IconoGrande * 2)
-                    .clip(CircleShape)
-                    .background(Colores.MarronClaro.copy(alpha = 0.3f))
-            )
+            if (!imagenPerfil.isNullOrEmpty()) {
+                Image(
+                    painter = rememberAsyncImagePainter(imagenPerfil),
+                    contentDescription = "Imagen de perfil",
+                    modifier = Modifier
+                        .size(ConstanteIcono.IconoGrande * 2)
+                        .clip(CircleShape)
+                        .background(Colores.MarronClaro.copy(alpha = 0.3f))
+                )
+            } else {
+                // Imagen por defecto si no hay URL
+                Image(
+                    painter = painterResource(id = R.drawable.fotoperfil),
+                    contentDescription = "Imagen de perfil por defecto",
+                    modifier = Modifier
+                        .size(ConstanteIcono.IconoGrande * 2)
+                        .clip(CircleShape)
+                        .background(Colores.MarronClaro.copy(alpha = 0.3f))
+                )
+            }
 
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -251,12 +267,14 @@ fun PerfilInfo(
                         color = Colores.Gris
                     )
                 }
-                Text(
-                    text = "Miembro desde: diciembre 2024",
-                    fontSize = ConstanteTexto.TextoMuyPequeno,
-                    fontFamily = FamilyQuicksand.quicksand,
-                    color = Colores.Gris
-                )
+                if (fechaRegistro != null) {
+                    Text(
+                        text = fechaRegistro,
+                        fontSize = ConstanteTexto.TextoMuyPequeno,
+                        fontFamily = FamilyQuicksand.quicksand,
+                        color = Colores.Gris
+                    )
+                }
             }
         }
     }
@@ -295,11 +313,14 @@ fun Divisor(texto: String) {
 
 @Composable
 fun BotonCrearReceta(vm: VMPerfil, navController: NavHostController) {
+    val idUsuario by vm.idUsuario.collectAsState()
     Card(
         onClick = {
             vm.clearIngredientes()
-            navController.navigate("creacionReceta") {
-                popUpTo("creacionReceta") { inclusive = true }
+            idUsuario?.let {
+                navController.navigate("creacionReceta/$it") {
+                    popUpTo("creacionReceta") { inclusive = true }
+                }
             }
         },
         shape = RoundedCornerShape(16.dp),

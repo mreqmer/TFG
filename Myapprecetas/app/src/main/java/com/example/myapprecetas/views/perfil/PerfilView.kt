@@ -41,6 +41,8 @@ fun PerfilScreen(
     val nombreUsuario by vm.nombreUsuario.collectAsState()
     val email by vm.email.collectAsState()
     val listaRecetas by vm.listaRecetas.collectAsState()
+    val imagen by vm.imagenPerfil.collectAsState()
+    val fechaRegistro by vm.fechaString.collectAsState()
 
     Column(
         modifier = modifier
@@ -50,7 +52,7 @@ fun PerfilScreen(
     ) {
         Spacer(modifier = Modifier.height(10.dp))
 
-        PerfilInfo(nombreUsuario = nombreUsuario, email = email)
+        PerfilInfo(nombreUsuario, email, imagen, fechaRegistro)
 
         Spacer(modifier = Modifier.height(18.dp))
 

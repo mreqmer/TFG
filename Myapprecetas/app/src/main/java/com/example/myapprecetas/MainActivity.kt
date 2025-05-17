@@ -113,10 +113,13 @@ class MainActivity : ComponentActivity() {
                             PerfilView(vm, navController)
                         }
 
-                        composable("creacionReceta") {
+                        composable("creacionReceta/{idUsuario}") {backStackEntry ->
+                            val idUsuario = backStackEntry.arguments?.getString("idUsuario")?.toIntOrNull()
                             val vm: VMCreacionReceta = hiltViewModel()
                             CrearRecetaView(vm, navController)
+                            vm.setIdUsuario(idUsuario)
                         }
+
                         composable("addIngrediente") {
                             val vm: VMCreacionReceta = hiltViewModel()
                             AddIngredienteView(vm, navController)

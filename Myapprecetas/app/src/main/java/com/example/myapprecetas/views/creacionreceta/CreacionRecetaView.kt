@@ -162,7 +162,7 @@ fun CreacionRecetaScreen(
                 isLoading = cargando,
                 onClick = {
                     coroutineScope.launch {
-                        val recetaCreada = vm.crearRecetaPrueba(1)
+                        val recetaCreada = vm.crearRecetaPrueba()
                         if (recetaCreada) {
                             navController.navigate("perfil")
                         } else {

@@ -52,6 +52,7 @@ class VMCreacionReceta @Inject constructor(
     private val _busqueda = MutableStateFlow("")
     private val _errorImagen = MutableStateFlow("")
     private val _publicId = MutableStateFlow<String?>("")
+    private val _idUsuario = MutableStateFlow<Int>(-1)
 
     val publicId: StateFlow<String?> = _publicId
     val nombreReceta: StateFlow<String> = _nombreReceta
@@ -84,6 +85,12 @@ class VMCreacionReceta @Inject constructor(
     /**
      * Actualiza el nombre de la receta
      */
+    fun setIdUsuario(id: Int?) {
+
+        if (id != null) {
+            _idUsuario.value = id
+        }
+    }
     fun actualizarNombre(nombre: String) {
         _nombreReceta.value = nombre
     }
@@ -223,16 +230,16 @@ class VMCreacionReceta @Inject constructor(
     //region Metodos
 
 
-    suspend fun crearRecetaPrueba(idCreador: Int): Boolean {
+    suspend fun crearRecetaPrueba(): Boolean {
         _cargando.value = true
 
         return try {
-            // 1. Subir imagen primero si existe
+           //Subir imagen primero si existe
             var imageUploaded = false
             _imagenUri.value?.let { uri ->
                 subirImagen(uri)
 
-                // Esperar a que termine la subida usando Flow
+                // Esperar a que termine la subida
                 imageUploaded = _cargandoImagen
                     .drop(1) // Ignorar el estado inicial
                     .first { !it } // Esperar hasta que cargandoImagen sea false
@@ -246,7 +253,7 @@ class VMCreacionReceta @Inject constructor(
             // 2. Crear objeto receta
             val nuevaReceta = DTONuevaReceta(
                 idReceta = 0,
-                idCreador = idCreador,
+                idCreador = _idUsuario.value,
                 nombreReceta = _nombreReceta.value,
                 descripcion = _descripcion.value,
                 tiempoPreparacion = _tiempoPreparacion.value.toIntOrNull() ?: 0,
@@ -286,15 +293,6 @@ class VMCreacionReceta @Inject constructor(
 
             if (response.isSuccessful) {
                 Log.i("OKAY", "Receta subida correctamente: ${response.body()}")
-                //                    _fotoReceta.value = ""
-//                    _publicId.value = null
-//                    _nombreReceta.value = ""
-//                    _descripcion.value = ""
-//                    _tiempoPreparacion.value = ""
-//                    _dificultad.value = ""
-//                    _categoriasSeleccionadas.value = emptyList()
-//                    _ingredientesSeleccionados.value = emptyList()
-//                    _pasos.value = emptyList()
                 true
             } else {
                 Log.i("ERROR SERVIDOR", "Error al subir receta: ${response.message()}")

@@ -5,7 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.myapprecetas.repositories.AuthRepository
 import com.example.myapprecetas.repositories.CloudinaryRepository
+import com.example.myapprecetas.userauth.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VMConstrucciondos @Inject constructor(
-    private val repo: CloudinaryRepository
+    private val repo: CloudinaryRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     var isLoading by mutableStateOf(false)
@@ -75,6 +78,20 @@ class VMConstrucciondos @Inject constructor(
                 isLoading = false
             }
         )
+    }
+
+    suspend fun updateProfilePhoto(photoUrl: String) {
+        isLoading = true
+        uploadError = null
+
+        try {
+            authRepository.updateProfilePhoto(photoUrl)  // con la instancia inyectada
+            uploadError = null
+        } catch (e: Exception) {
+            uploadError = "Error al actualizar la foto: ${e.localizedMessage}"
+        } finally {
+            isLoading = false
+        }
     }
 }
 

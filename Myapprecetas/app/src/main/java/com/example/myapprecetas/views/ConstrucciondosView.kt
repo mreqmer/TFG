@@ -40,7 +40,7 @@ fun PaginaEnConstrucciondosConBotonAtras(
     ) { uri: Uri? -> uri?.let { imageUri = it } }
 
     val isLoading = viewModel.isLoading
-    val imageUrl = viewModel.imageUrl
+    val imageUrl = "https://res.cloudinary.com/dckzmg9c1/image/upload/v1747348523/vwpaxerpmc2tcrdtuwqz.jpg"
     val publicId = viewModel.publicId
     val uploadError = viewModel.uploadError
 
@@ -53,7 +53,7 @@ fun PaginaEnConstrucciondosConBotonAtras(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("En construcción", style = MaterialTheme.typography.headlineMedium)
+        Text("En construcciówern", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
         user?.let {
@@ -67,6 +67,14 @@ fun PaginaEnConstrucciondosConBotonAtras(
             openGalleryLauncher.launch("image/*")
         }) {
             Text("Seleccionar imagen")
+        }
+
+        Button(onClick = {
+            coroutineScope.launch {
+                viewModel.updateProfilePhoto(imageUrl!!)
+            }
+        }) {
+            Text("Actualizar Foto de Perfil")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -92,6 +100,12 @@ fun PaginaEnConstrucciondosConBotonAtras(
             Button(onClick = { viewModel.subirImagen(imageUri!!) }) {
                 Text("Subir Imagen")
             }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (imageUrl != null && !isLoading) {
+
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -123,9 +137,9 @@ fun PaginaEnConstrucciondosConBotonAtras(
             Text(it, color = Color.Green)
         }
 
-        imageUrl?.let {
-            VerImagenDesdeUrl(imageUrl = it)
-        }
+//        imageUrl?.let {
+//            VerImagenDesdeUrl(imageUrl = it)
+//        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -138,21 +152,5 @@ fun PaginaEnConstrucciondosConBotonAtras(
         }) {
             Text("Cerrar sesión")
         }
-    }
-}
-
-@Composable
-fun VerImagenDesdeUrl(imageUrl: String) {
-    Box(
-        modifier = Modifier
-            .size(width = 140.dp, height = 100.dp)
-            .padding(8.dp)
-            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(imageUrl),
-            contentDescription = "Imagen de Cloudinary",
-            modifier = Modifier.fillMaxSize()
-        )
     }
 }

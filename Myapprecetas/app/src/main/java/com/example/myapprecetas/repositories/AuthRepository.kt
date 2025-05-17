@@ -1,8 +1,10 @@
 package com.example.myapprecetas.repositories
 
+import androidx.core.net.toUri
 import com.example.myapprecetas.userauth.AuthManager
 import com.example.myapprecetas.vm.wapper.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -95,6 +97,36 @@ class AuthRepository @Inject constructor(
                     continuation.resume(false)
                 }
             }
+        }
+    }
+
+    /**
+     * Actualiza la foto de perfil del usuario actual.
+     * @param photoUrl La URL de la nueva foto de perfil.
+     * @return true si la actualización fue exitosa, false en caso contrario.
+     */
+    suspend fun updateProfilePhoto(photoUrl: String): Boolean {
+        val user = authWrapper.getCurrentUser()
+
+        return if (user != null) {
+            suspendCoroutine { continuation ->
+                val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setPhotoUri(photoUrl.toUri())
+                    .build()
+
+                user.updateProfile(profileUpdates)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            continuation.resume(true)
+                        } else {
+                            setError(task.exception?.localizedMessage ?: "Error al actualizar la foto de perfil")
+                            continuation.resume(false)
+                        }
+                    }
+            }
+        } else {
+            setError("Usuario no autenticado")
+            false
         }
     }
 
