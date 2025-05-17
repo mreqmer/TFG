@@ -24,18 +24,24 @@ class VMListadoReceta @Inject constructor(
     private val _nombreUsuario = MutableStateFlow<String?>("Usuario")
     val nombreUsuario: StateFlow<String?> = _nombreUsuario
 
-    //TODO Esto es temporal
-    private val _recetasDestacadas = MutableStateFlow<List<DTORecetaSimplificada>>(emptyList())
-    val recetasDestacadas: StateFlow<List<DTORecetaSimplificada>> = _recetasDestacadas
-
     private var _cargando = MutableStateFlow<Boolean>(false)
     var cargando: StateFlow<Boolean> = _cargando
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
     init{
         _nombreUsuario.value = AuthManager.currentUser.value?.displayName ?: "Usuario"
         cargaRecetas()
     }
 
+    fun onRefresh() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            cargaRecetas()
+            _isRefreshing.value = false
+        }
+    }
 
     fun cargaRecetas() {
         viewModelScope.launch {
@@ -62,21 +68,4 @@ class VMListadoReceta @Inject constructor(
             }
         }
     }
-
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing
-
-
-    fun refreshData() {
-        viewModelScope.launch {
-            _isRefreshing.value = true
-            // Ejemplo: Recargar datos desde tu fuente (API, base de datos, etc.)
-            try {
-                cargaRecetas() // Tu función existente para cargar datos
-            } finally {
-                _isRefreshing.value = false
-            }
-        }
-    }
-
 }

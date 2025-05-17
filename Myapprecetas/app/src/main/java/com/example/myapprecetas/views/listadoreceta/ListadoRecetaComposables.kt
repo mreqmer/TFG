@@ -48,7 +48,7 @@ import eu.bambooapps.material3.pullrefresh.rememberPullRefreshState
 val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoRecetaScreen(
     vm: VMListadoReceta,
@@ -57,19 +57,18 @@ fun ListadoRecetaScreen(
 ) {
     val listaReceta by vm.listaRecetas.collectAsState()
     val nombreUsuario by vm.nombreUsuario.collectAsState()
-    val textBienvenida = "¡Bienvenido, ${nombreUsuario?.substringBefore(" ")}!"
-    val cargando = vm.cargando.collectAsState().value
+    val cargando by vm.cargando.collectAsState()
+    val isRefreshing by vm.isRefreshing.collectAsState()
 
-    var isRefreshing by remember { mutableStateOf(false) }
+    val textBienvenida = "¡Bienvenido, ${nombreUsuario?.substringBefore(" ")}!"
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = {
-            isRefreshing = true
-            vm.cargaRecetas()
-            isRefreshing = false
+            vm.onRefresh()
         }
     )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -86,16 +85,19 @@ fun ListadoRecetaScreen(
                 vm = vm
             )
         }
+
         PullRefreshIndicator(
             refreshing = isRefreshing,
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter),
             colors = PullRefreshIndicatorDefaults.colors(
-                contentColor = Colores.RojoError,
+                contentColor = Colores.RojoError
             )
         )
     }
 }
+
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListadoRecetas(

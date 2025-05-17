@@ -1,12 +1,14 @@
 package com.example.myapprecetas.views.creacionreceta
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.Colores
@@ -32,7 +34,7 @@ fun CreacionRecetaScreen(
     navController: NavHostController,
     innerPadding: PaddingValues
 ) {
-
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     vm.obtieneTodo()
@@ -154,12 +156,19 @@ fun CreacionRecetaScreen(
             CategoriasSelector(vm = vm)
 
             Spacer(modifier = Modifier.height(32.dp))
+            //TODO borrar
             var cosa by remember { mutableStateOf("") }
             BtnGuardarReceta(
                 isLoading = cargando,
                 onClick = {
                     coroutineScope.launch {
-                        cosa = vm.crearRecetaPrueba(1).toString()
+                        val recetaCreada = vm.crearRecetaPrueba(1)
+                        if (recetaCreada) {
+                            navController.navigate("perfil")
+                        } else {
+                            Toast.makeText(context, "Error en la creación de la receta", Toast.LENGTH_SHORT).show()
+                            navController.navigate("perfil")
+                        }
                     }
                 }
             )
