@@ -25,6 +25,7 @@ import com.example.myapprecetas.views.*
 import com.example.myapprecetas.views.creacionreceta.AddIngredienteView
 import com.example.myapprecetas.views.creacionreceta.CrearRecetaView
 import com.example.myapprecetas.views.detallesreceta.DetallesRecetaView
+import com.example.myapprecetas.views.favoritas.FavoritasView
 import com.example.myapprecetas.views.inicioview.InicioView
 import com.example.myapprecetas.views.listadoreceta.ListadoRecetaView
 import com.example.myapprecetas.views.perfil.PerfilView
@@ -42,7 +43,9 @@ class MainActivity : ComponentActivity() {
         // Rutas que deben usar Scaffold con barra inferior
         private val RUTAS_CON_SCAFFOLD = setOf(
             "lista_recetas",
+            "lista_recetas",
             "detalles_receta",
+            "lista_favoritos",
             "perfil",
             "construccion",
             "construcciondos"
@@ -100,6 +103,11 @@ class MainActivity : ComponentActivity() {
                         composable("lista_recetas") {
                             val vm: VMListadoReceta = hiltViewModel()
                             ListadoRecetaView(vm, navController)
+                        }
+
+                        composable("lista_favoritos") {
+                            val vm: VMFavoritas = hiltViewModel()
+                            FavoritasView(vm, navController)
                         }
 
                         composable("detalles_receta/{idReceta}") { backStackEntry ->

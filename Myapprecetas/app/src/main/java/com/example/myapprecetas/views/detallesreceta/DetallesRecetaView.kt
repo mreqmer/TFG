@@ -18,6 +18,7 @@ fun DetallesRecetaView(vm: VMDetallesReceta, navController: NavHostController ) 
 
     }else{
         Box {
+
             DetallesRecetaScreen(vm, receta, porciones, navController)
         }
     }

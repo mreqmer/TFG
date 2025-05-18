@@ -27,8 +27,8 @@ import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
 
 @Composable
-fun BotonAtras(size: Dp, navController: NavHostController) {
-    IconButton(onClick = { navController.popBackStack() }) {
+fun BotonAtras(size: Dp, navController: NavHostController,  onClick: () -> Unit = { navController.popBackStack() }) {
+    IconButton(onClick = onClick) {
         Icon(
             painter = painterResource(id = R.drawable.left),
             contentDescription = "Volver",
@@ -39,14 +39,14 @@ fun BotonAtras(size: Dp, navController: NavHostController) {
 }
 
 @Composable
-fun HeaderAtras(texto: String, navController: NavHostController) {
+fun HeaderAtras(texto: String, navController: NavHostController, onClick: () -> Unit = { navController.popBackStack() }) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 40.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BotonAtras(24.dp, navController)
+        BotonAtras(24.dp, navController, onClick)
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = texto,

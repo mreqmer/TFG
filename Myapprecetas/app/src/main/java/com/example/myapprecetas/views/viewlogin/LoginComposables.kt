@@ -52,7 +52,6 @@ import com.example.myapprecetas.R
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
-import com.example.myapprecetas.ui.theme.common.BotonAtras
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.vm.VMLogin
 import com.google.android.gms.auth.api.signin.GoogleSignIn

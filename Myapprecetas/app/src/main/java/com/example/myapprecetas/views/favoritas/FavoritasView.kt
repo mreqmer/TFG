@@ -1,35 +1,28 @@
-package com.example.myapprecetas.views.listadoreceta
+package com.example.myapprecetas.views.favoritas
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.CargandoElementos
-import com.example.myapprecetas.vm.VMListadoReceta
+import com.example.myapprecetas.vm.VMFavoritas
 import eu.bambooapps.material3.pullrefresh.PullRefreshIndicator
 import eu.bambooapps.material3.pullrefresh.PullRefreshIndicatorDefaults
 import eu.bambooapps.material3.pullrefresh.pullRefresh
 import eu.bambooapps.material3.pullrefresh.rememberPullRefreshState
 
 @Composable
-fun ListadoRecetaView(vm: VMListadoReceta, navController: NavHostController) {
+fun FavoritasView(vm: VMFavoritas, navController: NavHostController) {
 
     val insets = androidx.compose.foundation.layout.WindowInsets.systemBars
         .only(androidx.compose.foundation.layout.WindowInsetsSides.Top + androidx.compose.foundation.layout.WindowInsetsSides.Bottom)
@@ -39,24 +32,22 @@ fun ListadoRecetaView(vm: VMListadoReceta, navController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-            ListadoRecetaScreen(vm, navController, insets)
+        FavoritasScreen(vm, navController, insets)
 
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListadoRecetaScreen(
-    vm: VMListadoReceta,
+fun FavoritasScreen(
+    vm: VMFavoritas,
     navController: NavHostController,
     insets: PaddingValues
 ) {
-    val listaReceta by vm.listaRecetas.collectAsState()
-    val nombreUsuario by vm.nombreUsuario.collectAsState()
-    val cargando by vm.cargando.collectAsState()
+    val textBienvenida = "Recetas Favoritas"
     val isRefreshing by vm.isRefreshing.collectAsState()
-
-    val textBienvenida = "¡Bienvenido, ${nombreUsuario?.substringBefore(" ")}!"
+    val listaReceta by vm.listaRecetas.collectAsState()
+    val cargando by vm.cargando.collectAsState()
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
@@ -72,7 +63,9 @@ fun ListadoRecetaScreen(
     ) {
         if (cargando) {
             CargandoElementos()
-        } else {
+        } else if(listaReceta.isEmpty()){
+            MensajeSinRecetas()
+        }else{
             ListadoRecetas(
                 listaReceta = listaReceta,
                 navController = navController,
@@ -92,3 +85,4 @@ fun ListadoRecetaScreen(
         )
     }
 }
+

@@ -47,8 +47,8 @@ fun BottomBar(navController: NavHostController) {
                 onClick = {
                     if (!selected) {
                         navController.navigate(item.route) {
-                            popUpTo("lista_recetas") { inclusive = false }
-                            launchSingleTop = true
+                            popUpTo("lista_recetas") { inclusive = true }
+                            launchSingleTop = false
                         }
                     }
                 },

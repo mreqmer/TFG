@@ -1,16 +1,33 @@
-package com.example.myapprecetas.views.listadoreceta
+package com.example.myapprecetas.views.favoritas
 
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,10 +38,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,22 +50,21 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
 import com.example.myapprecetas.objetos.dto.DTORecetaUsuarioLike
 import com.example.myapprecetas.ui.theme.Colores
-import com.example.myapprecetas.ui.theme.FamilyQuicksand
+import com.example.myapprecetas.ui.theme.common.CargandoElementos
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
+import com.example.myapprecetas.views.listadoreceta.fuenteTexto
+import com.example.myapprecetas.vm.VMFavoritas
 import com.example.myapprecetas.vm.VMListadoReceta
 
-val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
 
-
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListadoRecetas(
     listaReceta: List<DTORecetaUsuarioLike>,
     navController: NavHostController,
     insets: PaddingValues,
     textBienvenida: String,
-    vm: VMListadoReceta
+    vm: VMFavoritas
 ) {
     LazyColumn(
         modifier = Modifier
@@ -58,17 +74,6 @@ fun ListadoRecetas(
         // Texto de bienvenida
         item {
             HeaderBienvenida(textBienvenida)
-        }
-
-        // Buscador (sticky)
-        stickyHeader {
-            Box(
-                modifier = Modifier
-                    .background(Color.White)
-                    .padding(vertical = 8.dp)
-            ) {
-                SearchBar(vm)
-            }
         }
 
         // Lista de recetas
@@ -88,7 +93,7 @@ fun HeaderBienvenida(text: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 18.dp, bottom = 10.dp)
+            .padding(top = 18.dp, bottom = 40.dp)
     ) {
         Text(
             text = text,
@@ -101,7 +106,7 @@ fun HeaderBienvenida(text: String) {
 }
 
 @Composable
-fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, vm: VMListadoReceta) {
+fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, vm: VMFavoritas) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -190,65 +195,36 @@ fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, v
     }
 }
 
-
-
 @Composable
-fun SearchBar(vm: VMListadoReceta) {
-    val search = ""
-
-    Row(
+fun MensajeSinRecetas() {
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxSize()
     ) {
-        OutlinedTextField(
-            value = search,
-            onValueChange = { },
-            placeholder = {
-                Text(
-                    "Buscar receta...",
-                    fontFamily = fuenteTexto,
-                    color = Color.Gray
-                )
-            },
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .height(50.dp)
-                .border(
-                    width = 1.dp,
-                    color = Colores.Gris.copy(alpha = 0.3f),
-                    shape = MaterialTheme.shapes.medium
-                ),
-            shape = MaterialTheme.shapes.medium,
-            maxLines = 1,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Search
-            ),
-            textStyle = TextStyle(color = Color.Black),
-            trailingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.search),
-                    contentDescription = "Buscar",
-                    modifier = Modifier.size(ConstanteIcono.IconoPequeno),
-                    tint = Colores.Gris
-                )
-            }
-        )
+                .widthIn(max = 250.dp)
+                .padding(horizontal = 16.dp)
+                .align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "No hay recetas favoritas. ¡Añade alguna!",
+                fontSize = ConstanteTexto.TextoGrande,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = fuenteTexto,
+                color = Color.Gray,
+                textAlign = TextAlign.Center
+            )
 
-        Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-        Icon(
-            painter = painterResource(R.drawable.filtro2),
-            contentDescription = "Filtrar",
-            modifier = Modifier
-                .size(ConstanteIcono.IconoGrande)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Colores.Gris.copy(alpha = 0.1f))
-                .padding(10.dp),
-            tint = Colores.Gris
-        )
+            Icon(
+                painter = painterResource(R.drawable.potchupchup),
+                contentDescription = "logo",
+                tint = Color.Gray,
+                modifier = Modifier.size(150.dp)
+            )
+        }
     }
 }
-

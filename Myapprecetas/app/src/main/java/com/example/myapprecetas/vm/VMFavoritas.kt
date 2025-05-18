@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.api.Endpoints
 import com.example.myapprecetas.objetos.dto.DTORecetaUsuarioLike
 import com.example.myapprecetas.objetos.dto.DTOToggleLike
-import com.example.myapprecetas.objetos.dto.creacion.DTOInsertUsuario
 import com.example.myapprecetas.userauth.AuthManager.currentUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,31 +14,24 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VMListadoReceta @Inject constructor(
+class VMFavoritas @Inject constructor(
     private val endpoints: Endpoints
-) : ViewModel() {
-
-    private val _listaRecetas = MutableStateFlow<List<DTORecetaUsuarioLike>>(emptyList())
-    val listaRecetas: StateFlow<List<DTORecetaUsuarioLike>> = _listaRecetas
-
-    private val _nombreUsuario = MutableStateFlow<String?>("Usuario")
-    val nombreUsuario: StateFlow<String?> = _nombreUsuario
+) : ViewModel(){
 
     private var _cargando = MutableStateFlow<Boolean>(false)
     var cargando: StateFlow<Boolean> = _cargando
 
+    private val _listaRecetas = MutableStateFlow<List<DTORecetaUsuarioLike>>(emptyList())
+    val listaRecetas: StateFlow<List<DTORecetaUsuarioLike>> = _listaRecetas
+
+    private val _likesEstado = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
+
+    private val _likeInProgress = MutableStateFlow<Boolean>(false)
+
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
-    private val _likesEstado = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
-    val likesEstado: StateFlow<Map<Int, Boolean>> = _likesEstado
-
-    // Estado para bloquear botón like mientras se hace petición
-    private val _likeInProgress = MutableStateFlow<Boolean>(false)
-    val likeInProgress: StateFlow<Boolean> = _likeInProgress
-
     init {
-        enviarUsuarioApi()
         cargaRecetas()
     }
 
@@ -57,7 +49,7 @@ class VMListadoReceta @Inject constructor(
         viewModelScope.launch {
             _cargando.value = true
             try {
-                val response = endpoints.getRecetasConLike(uid)
+                val response = endpoints.getRecetasFavoritasPorUid(uid)
                 if (response.isSuccessful) {
                     response.body()?.let { lista ->
                         _listaRecetas.value = lista
@@ -109,29 +101,4 @@ class VMListadoReceta @Inject constructor(
         }
     }
 
-    private fun enviarUsuarioApi() {
-        val usuarioDTO = DTOInsertUsuario(
-            firebaseUID = currentUser.value?.uid ?: "",
-            correoElectronico = currentUser.value?.email ?: "",
-            nombreUsuario = currentUser.value?.displayName ?: ""
-        )
-        viewModelScope.launch {
-            _cargando.value = true
-            try {
-                Log.d(":::API", "Enviando usuario a API: $usuarioDTO")
-                val response = endpoints.postNuevoUsuario(usuarioDTO)
-                if (response.isSuccessful) {
-                    Log.i(":::OKAY", "Usuario enviado correctamente a la API")
-                } else {
-                    Log.i(":::ERROR SERVIDOR", "Error al enviar usuario: ${response.code()} - ${response.message()}")
-                }
-            } catch (e: Exception) {
-                Log.i(":::EXCEPTION", "Error al enviar usuario: ${e.message}")
-            } finally {
-                _cargando.value = false
-                Log.d(":::API", "Proceso API finalizado")
-                _nombreUsuario.value = currentUser.value?.displayName ?: "Usuario"
-            }
-        }
-    }
 }

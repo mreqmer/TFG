@@ -91,7 +91,12 @@ fun DetallesRecetaScreen(
                         scrolledContainerColor = Color.Transparent
                     ),
                     navigationIcon = {
-                        BotonAtras(ConstanteIcono.IconoNormal, navController)
+                        BotonAtras(ConstanteIcono.IconoNormal, navController) {
+                            navController.navigate("lista_recetas") {
+                                launchSingleTop = true
+                                popUpTo("lista_recetas") { inclusive = true }
+                            }
+                        }
                     }
                 )
             },

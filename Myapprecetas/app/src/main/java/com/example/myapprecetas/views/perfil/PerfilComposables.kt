@@ -45,7 +45,6 @@ import com.example.myapprecetas.R
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
-import com.example.myapprecetas.ui.theme.common.BotonAtras
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.userauth.AuthManager
@@ -68,7 +67,6 @@ fun TopBarPerfil(vm: VMPerfil, navController: NavHostController) {
 @Composable
 fun HeaderTexto(navController: NavHostController) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        BotonAtras(ConstanteIcono.IconoNormal, navController)
         Text(
             text = "Mi Perfil",
             fontSize = ConstanteTexto.TextoGrande,

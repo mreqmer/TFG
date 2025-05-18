@@ -10,7 +10,7 @@ sealed class BottomNavItem(val route: String, val label: String, val icon: Int, 
         R.drawable.pot
     )
     object Favoritas : BottomNavItem(
-        "construcciondos",
+        "lista_favoritos",
         "Favoritas",
         R.drawable.corazonvacio2,
         R.drawable.corazonvacio2
@@ -22,11 +22,3 @@ sealed class BottomNavItem(val route: String, val label: String, val icon: Int, 
         R.drawable.usero
     )
 }
-
-
-
-//sealed class BottomNavItem(val route: String, val label: String, val icon: Int) {
-//    object ListadoRecetas : BottomNavItem("lista_recetas", "Recetas",  R.drawable.pot)
-//    object Favoritas : BottomNavItem("favoritas", "Favoritas",  R.drawable.corazonvacio2)
-//    object Construccion : BottomNavItem("construccion", "Más", R.drawable.user)
-//}
