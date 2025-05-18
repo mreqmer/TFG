@@ -2,9 +2,13 @@ package com.example.myapprecetas.api
 
 import com.example.myapprecetas.objetos.dto.Categoria
 import com.example.myapprecetas.objetos.dto.DTORecetaDetallada
+import com.example.myapprecetas.objetos.dto.DTORecetaDetalladaLike
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
+import com.example.myapprecetas.objetos.dto.DTORecetaUsuarioLike
+import com.example.myapprecetas.objetos.dto.DTOToggleLike
 import com.example.myapprecetas.objetos.dto.DTOUsuario
 import com.example.myapprecetas.objetos.dto.Ingrediente
+import com.example.myapprecetas.objetos.dto.RecetaUsuarioLikeResponse
 import com.example.myapprecetas.objetos.dto.Usuario
 import com.example.myapprecetas.objetos.dto.creacion.DTOInsertUsuario
 import com.example.myapprecetas.objetos.dto.creacion.DTONuevaReceta
@@ -49,5 +53,17 @@ interface Endpoints {
 
     @POST("Usuarios/Nuevo")
     suspend fun postNuevoUsuario(@Body usuarioInsert: DTOInsertUsuario): Response<Usuario>
+
+    @GET("recetas/RecetasLikes/{uid}")
+    suspend fun getRecetasConLike(@Path("uid") firebaseUid: String): Response<List<DTORecetaUsuarioLike>>
+
+    @GET("recetas/likes/{uid}")
+    suspend fun getRecetasFavoritasPorUid(@Path("uid") firebaseUid: String): Response<List<DTORecetaUsuarioLike>>
+
+    @POST("Likes/toggle")
+    suspend fun toggleLike(@Body like: DTOToggleLike): Response<RecetaUsuarioLikeResponse>
+
+    @POST("Recetas/Favorita")
+    suspend fun getRecetaDetalladaLike(@Body recetaDetalladaLike: DTOToggleLike): Response<DTORecetaDetalladaLike>
 
 }

@@ -1,7 +1,6 @@
 package com.example.myapprecetas.views.detallesreceta
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.common.CargandoElementos

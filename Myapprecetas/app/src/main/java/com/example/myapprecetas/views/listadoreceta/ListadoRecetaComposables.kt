@@ -14,9 +14,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
-import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
+import com.example.myapprecetas.objetos.dto.DTORecetaUsuarioLike
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.CargandoElementos
@@ -101,7 +98,7 @@ fun ListadoRecetaScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListadoRecetas(
-    listaReceta: List<DTORecetaSimplificada>,
+    listaReceta: List<DTORecetaUsuarioLike>,
     navController: NavHostController,
     insets: PaddingValues,
     textBienvenida: String,
@@ -133,7 +130,7 @@ fun ListadoRecetas(
             items = listaReceta,
             key = { receta -> receta.idReceta }
         ) { receta ->
-            ItemReceta(receta = receta, navController)
+            ItemReceta(receta, navController, vm)
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
@@ -158,14 +155,14 @@ fun HeaderBienvenida(text: String) {
 }
 
 @Composable
-fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) {
+fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, vm: VMListadoReceta) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
             .background(Color.White)
-            .clickable {  navController.navigate("detalles_receta/${receta.idReceta}")}
+            .clickable { navController.navigate("detalles_receta/${receta.idReceta}") }
             .padding(top = 12.dp, bottom = 2.dp)
             .padding(start = 12.dp, end = 12.dp)
             .height(130.dp)
@@ -176,41 +173,16 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
                     .size(120.dp)
                     .clip(RoundedCornerShape(8.dp))
             ) {
-
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = receta.fotoReceta, // URL de la foto
+                        model = receta.fotoReceta,
                         placeholder = painterResource(R.drawable.ic_launcher_background),
                         error = painterResource(R.drawable.ic_launcher_background)
                     ),
                     contentDescription = "Imagen de ${receta.nombreReceta}",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(120.dp)
+                    modifier = Modifier.size(120.dp)
                 )
-
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(4.dp)
-                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(R.drawable.temporizador2),
-                            contentDescription = "Tiempo",
-                            modifier = Modifier.size(ConstanteIcono.IconoMuyPequeno)
-                        )
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Text(
-                            text = "${receta.tiempoPreparacion}'",
-                            fontSize = ConstanteTexto.TextoMuyPequeno,
-                            fontFamily = fuenteTexto,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -220,59 +192,53 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
                     .weight(1f)
                     .fillMaxHeight()
             ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                ) {
-                    Text(
-                        text = receta.nombreReceta,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = fuenteTexto
-                        ),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                Text(
+                    text = receta.nombreReceta,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = fuenteTexto
+                    ),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(
-                        text = receta.descripcion,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = fuenteTexto
-                        ),
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                Text(
+                    text = receta.descripcion,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = fuenteTexto),
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 4.dp) // Ajustar el espacio inferior
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "Por ${receta.nombreUsuario}",
                         fontSize = ConstanteTexto.TextoMuyPequeno,
                         color = Color.Gray,
                         fontFamily = fuenteTexto,
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(end = 48.dp),
+                        modifier = Modifier.align(Alignment.CenterStart),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
 
+                    val iconoCorazon = if (receta.tieneLike) R.drawable.heart else R.drawable.corazonvacio2
+
                     Icon(
-                        painter = painterResource(R.drawable.heart),
-                        contentDescription = "favoritos",
+                        painter = painterResource(iconoCorazon),
+                        contentDescription = if (receta.tieneLike) "Quitar de favoritos" else "Añadir a favoritos",
                         tint = Colores.RojoError,
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
                             .offset(y = (-3).dp)
                             .size(ConstanteIcono.IconoPequeno)
+                            .clickable {
+                                vm.toggleLike(receta.idReceta)
+                            }
                     )
                 }
             }

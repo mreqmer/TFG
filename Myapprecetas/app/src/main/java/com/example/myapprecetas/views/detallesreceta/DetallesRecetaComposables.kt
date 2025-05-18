@@ -28,7 +28,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
 import com.example.myapprecetas.objetos.dto.Categoria
-import com.example.myapprecetas.objetos.dto.DTORecetaDetallada
+import com.example.myapprecetas.objetos.dto.DTORecetaDetalladaLike
 import com.example.myapprecetas.objetos.dto.Ingrediente
 import com.example.myapprecetas.objetos.dto.Paso
 import com.example.myapprecetas.ui.theme.Colores
@@ -45,7 +45,7 @@ val fuenteTexto = FamilyQuicksand.quicksand
 @Composable
 fun DetallesRecetaScreen(
     vm: VMDetallesReceta,
-    receta: DTORecetaDetallada?,
+    receta: DTORecetaDetalladaLike?,
     porciones: Int,
     navController: NavHostController,
 ) {
@@ -69,11 +69,11 @@ fun DetallesRecetaScreen(
 
         Image(
             painter = rememberAsyncImagePainter(
-                model = receta.receta.fotoReceta,
+                model = receta.fotoReceta,
                 placeholder = painterResource(R.drawable.ic_launcher_background),
                 error = painterResource(R.drawable.ic_launcher_background)
             ),
-            contentDescription = "Imagen de ${receta.receta.nombreReceta}",
+            contentDescription = "Imagen de ${receta.nombreReceta}",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
@@ -111,7 +111,7 @@ fun DetallesRecetaScreen(
 fun DetallesRecetaContenido(
     vm: VMDetallesReceta,
     innerPadding: PaddingValues,
-    data: DTORecetaDetallada,
+    data: DTORecetaDetalladaLike,
     imageHeight: Dp,
     porciones: Int
 ) {
@@ -122,7 +122,7 @@ fun DetallesRecetaContenido(
             .background(Color.Transparent),
         contentPadding = PaddingValues(top = imageHeight / 2.5f)
     ) {
-        item { CabeceraReceta(data) }
+        item { CabeceraReceta(data) { vm.toggleLike() } }
         item { SelectorRaciones(porciones, { vm.AumentaPorciones() }, {vm.DisminuyePorciones()}) }
         item { TituloSeccion("Ingredientes") }
         items(data.ingredientes) { IngredienteItem(it) }
@@ -133,17 +133,38 @@ fun DetallesRecetaContenido(
 }
 
 @Composable
-fun CabeceraReceta(data: DTORecetaDetallada) {
+fun CabeceraReceta(data: DTORecetaDetalladaLike, onToggleLike: () -> Unit) {
     Column(Modifier.padding(horizontal = 16.dp)) {
-        Text(
-            data.receta.nombreReceta,
-            fontFamily = fuenteTexto,
-            fontSize = ConstanteTexto.TextoGrande,
-            fontWeight = FontWeight.Bold
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min) // para que el box tenga altura mínima según contenido
+        ) {
+            Text(
+                data.nombreReceta,
+                fontFamily = fuenteTexto,
+                fontSize = ConstanteTexto.TextoGrande,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(end = 30.dp) // alineado a la izquierda verticalmente centrado
+            )
+            Icon(
+                painter = painterResource(
+                    if (data.tieneLike) R.drawable.heart else R.drawable.corazonvacio2
+                ),
+                tint = Colores.RojoError,
+                contentDescription = if (data.tieneLike) "Favorito" else "No favorito",
+                modifier = Modifier
+                    .size(ConstanteIcono.IconoNormal)
+                    .align(Alignment.TopEnd)
+                    .offset(y = 6.dp)
+                    .clickable { onToggleLike() }
+            )
+        }
         Spacer(Modifier.height(4.dp))
         Text(
-            "Por ${data.receta.nombreUsuario}",
+            "Por ${data.nombreUsuario}",
             fontFamily = fuenteTexto,
             fontSize = ConstanteTexto.TextoPequeno,
             fontWeight = FontWeight.SemiBold,
@@ -151,7 +172,7 @@ fun CabeceraReceta(data: DTORecetaDetallada) {
         )
         Spacer(Modifier.height(12.dp))
         Text(
-            data.receta.descripcion,
+            data.descripcion,
             fontFamily = fuenteTexto,
             fontSize = ConstanteTexto.TextoNormal,
             fontWeight = FontWeight.SemiBold
@@ -163,9 +184,9 @@ fun CabeceraReceta(data: DTORecetaDetallada) {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconoTexto(R.drawable.temporizador, "${data.receta.tiempoPreparacion} min")
+            IconoTexto(R.drawable.temporizador, "${data.tiempoPreparacion} min")
             Spacer(Modifier.width(32.dp))
-            IconoTexto(R.drawable.dificultad, data.receta.dificultad)
+            IconoTexto(R.drawable.dificultad, data.dificultad)
         }
 
         Spacer(Modifier.height(24.dp))
