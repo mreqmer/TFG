@@ -5,6 +5,8 @@ import com.example.myapprecetas.objetos.dto.DTORecetaDetallada
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.objetos.dto.DTOUsuario
 import com.example.myapprecetas.objetos.dto.Ingrediente
+import com.example.myapprecetas.objetos.dto.Usuario
+import com.example.myapprecetas.objetos.dto.creacion.DTOInsertUsuario
 import com.example.myapprecetas.objetos.dto.creacion.DTONuevaReceta
 import retrofit2.Response
 import retrofit2.http.Body
@@ -15,8 +17,6 @@ import retrofit2.http.Query
 import com.example.myapprecetas.objetos.dto.creacion.RecetaResponse
 interface Endpoints {
 
-//    @GET("personas")
-//    suspend fun getPersonas(): Response<List<DTOPersona>>
 
     @GET("recetas")
     suspend fun getRecetas(): Response<List<DTORecetaSimplificada>>
@@ -46,5 +46,8 @@ interface Endpoints {
 
     @POST("recetas/add")
     suspend fun subirNuevaReceta(@Body receta: DTONuevaReceta): Response<RecetaResponse>
+
+    @POST("Usuarios/Nuevo")
+    suspend fun postNuevoUsuario(@Body usuarioInsert: DTOInsertUsuario): Response<Usuario>
 
 }

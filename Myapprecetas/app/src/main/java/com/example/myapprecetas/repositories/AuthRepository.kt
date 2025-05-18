@@ -72,20 +72,6 @@ class AuthRepository @Inject constructor(
         }
     }
 
-//    suspend fun register(email: String, password: String): Boolean {
-//        return suspendCoroutine { continuation ->
-//            authWrapper.register(email, password) { success, errorMessage ->
-//                if (success) {
-//                    _error.value = null
-//                    continuation.resume(true)
-//                } else {
-//                    setError(errorMessage)
-//                    continuation.resume(false)
-//                }
-//            }
-//        }
-//    }
-
     suspend fun register(email: String, password: String, displayName: String): Boolean {
         return suspendCoroutine { continuation ->
             authWrapper.registerWithEmail(email, password, displayName) { success, errorMessage ->
@@ -126,6 +112,27 @@ class AuthRepository @Inject constructor(
             }
         } else {
             setError("Usuario no autenticado")
+            false
+        }
+    }
+
+    suspend fun deleteCurrentUser(): Boolean {
+        val user = authWrapper.getCurrentUser()
+
+        return if (user != null) {
+            suspendCoroutine { continuation ->
+                user.delete()
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            continuation.resume(true)
+                        } else {
+                            setError(task.exception?.localizedMessage ?: "Error al eliminar el usuario")
+                            continuation.resume(false)
+                        }
+                    }
+            }
+        } else {
+            setError("No hay usuario autenticado para eliminar")
             false
         }
     }

@@ -203,7 +203,9 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
                     fontSize = ConstanteTexto.TextoMuyPequeno,
                     color = Color.Gray,
                     fontFamily = fuenteTexto,
-                    modifier = Modifier.padding(bottom = 5.dp)
+                    modifier = Modifier.padding(bottom = 5.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

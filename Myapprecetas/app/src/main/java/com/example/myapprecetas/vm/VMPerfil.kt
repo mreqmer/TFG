@@ -8,14 +8,13 @@ import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.repositories.IngredienteRepository
 import com.example.myapprecetas.userauth.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @HiltViewModel
 class VMPerfil @Inject constructor(
@@ -41,11 +40,13 @@ class VMPerfil @Inject constructor(
     val imagenPerfil: StateFlow<String?> = _imagenPerfil
     val fechaString: StateFlow<String?> = _fechaString
 
+
     init{
         _nombreUsuario.value = AuthManager.currentUser.value?.displayName ?: "Usuario"
         _email.value = AuthManager.currentUser.value?.email ?: ""
-        _imagenPerfil.value = AuthManager.currentUser.value?.photoUrl.toString()
+        _imagenPerfil.value = (AuthManager.currentUser.value?.photoUrl ?: "").toString()
         cargaUsuario()
+        formatearFecha()
     }
 
     fun clearIngredientes() {
@@ -64,9 +65,8 @@ class VMPerfil @Inject constructor(
                     response.body()?.let { usuario ->
                         // Aquí actualizas los campos con el usuario obtenido
                         _idUsuario.value = usuario.idUsuario
-                        _fechaCreacion.value = usuario.fechaRegistro
                         cargaRecetas()
-                        formateaFechaAString()
+
                         Log.i(":::OKAY", "Usuario cargado: $usuario")
                     } ?: run {
                         Log.i("RESPUESTA VACIA", "No se encontró usuario para UID $uid")
@@ -108,15 +108,11 @@ class VMPerfil @Inject constructor(
         }
     }
 
-    private fun formateaFechaAString() {
-        val cosa = _fechaCreacion.value
-        val fecha = LocalDateTime.parse(cosa, DateTimeFormatter.ISO_DATE_TIME)
-
-        val formatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale("es", "ES"))
-
-        val mesAnio = fecha.format(formatter).replaceFirstChar { it.uppercase() }
-
-        _fechaString.value = "Miembro desde: $mesAnio"
+    fun formatearFecha() {
+        val fechaCreacion = AuthManager.currentUser.value?.metadata?.creationTimestamp
+        val date = fechaCreacion?.let { Date(it) }
+        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale("es", "ES"))
+        _fechaString.value = "Miembro desde: ${dateFormat.format(date)}"
     }
 
 }

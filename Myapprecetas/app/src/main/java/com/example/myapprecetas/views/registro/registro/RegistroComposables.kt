@@ -21,6 +21,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -36,6 +37,7 @@ fun CampoTextoRegistro(
     icono: Int,
     tipo: KeyboardType,
     imeAction: ImeAction = ImeAction.Next,
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     OutlinedTextField(
         value = value,
@@ -51,6 +53,7 @@ fun CampoTextoRegistro(
             keyboardType = tipo,
             imeAction = imeAction
         ),
+        visualTransformation = visualTransformation,
         modifier = Modifier
             .fillMaxWidth()
             .border(2.dp, Colores.Gris, MaterialTheme.shapes.medium),

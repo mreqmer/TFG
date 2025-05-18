@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.api.Endpoints
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
+import com.example.myapprecetas.objetos.dto.creacion.DTOInsertUsuario
 import com.example.myapprecetas.userauth.AuthManager
+import com.example.myapprecetas.userauth.AuthManager.currentUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +33,10 @@ class VMListadoReceta @Inject constructor(
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
     init{
-        _nombreUsuario.value = AuthManager.currentUser.value?.displayName ?: "Usuario"
+
+
+        enviarUsuarioApi()
+
         cargaRecetas()
     }
 
@@ -68,4 +73,37 @@ class VMListadoReceta @Inject constructor(
             }
         }
     }
+
+    private fun enviarUsuarioApi() {
+        val usuarioDTO = DTOInsertUsuario(
+            firebaseUID = currentUser.value?.uid ?: "",
+            correoElectronico = currentUser.value?.email ?: "",
+            nombreUsuario = currentUser.value?.displayName ?: ""
+        )
+        viewModelScope.launch {
+            _cargando.value = true
+            try {
+                Log.d(":::API", "Enviando usuario a API: $usuarioDTO")
+                val response = endpoints.postNuevoUsuario(usuarioDTO)
+                if (response.isSuccessful) {
+
+                    Log.i(":::OKAY", "Usuario enviado correctamente a la API")
+
+                } else {
+
+                    Log.i(":::ERROR SERVIDOR", "Error al enviar usuario: ${response.code()} - ${response.message()}")
+
+                }
+            } catch (e: Exception) {
+
+                Log.i(":::EXCEPTION", "Error al enviar usuario: ${e.message}")
+
+            } finally {
+                _cargando.value = false
+                Log.d(":::API", "Proceso API finalizado")
+                _nombreUsuario.value = currentUser.value?.displayName ?: "Usuario"
+            }
+        }
+    }
+
 }

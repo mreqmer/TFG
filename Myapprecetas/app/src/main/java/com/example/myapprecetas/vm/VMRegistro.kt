@@ -55,27 +55,6 @@ class VMRegistro@Inject constructor(
         _repetirPassword.value = newRepetirPassword
     }
 
-//    fun register(onSuccess: () -> Unit) {
-//        var loginSuccess : Boolean
-//        if (password.value != repetirPassword.value) {
-//            _error.value = "Las contraseñas no coinciden"
-//        } else {
-//            viewModelScope.launch {
-//                val result = authRepository.register(email.value, password.value)
-//                if (result) {
-//                    loginSuccess = authRepository.signIn(email.value, password.value)
-//                    if (loginSuccess) {
-//                        _error.value = ""
-//                        onSuccess()
-//                    } else {
-//                        _error.value = "Error al iniciar sesión después del registro"
-//                    }
-//                } else {
-//                    _error.value = authRepository.error.value
-//                }
-//            }
-//        }
-//    }
     fun register(onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {

@@ -260,7 +260,9 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
                         fontFamily = fuenteTexto,
                         modifier = Modifier
                             .align(Alignment.CenterStart)
-                            .padding(end = 48.dp)
+                            .padding(end = 48.dp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
 
                     Icon(

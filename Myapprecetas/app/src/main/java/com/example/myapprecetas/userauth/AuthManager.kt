@@ -34,13 +34,6 @@ object AuthManager {
     }
 
     /**
-     * Cierra sesión del usuario.
-     */
-    fun logout() {
-        firebaseAuth.signOut()
-    }
-
-    /**
      * Cierra sesión y revoca el acceso de Google Sign-In.
      * @param context El contexto de la aplicación.
      * @param onComplete Función que se ejecuta al completar el proceso de cierre de sesión.

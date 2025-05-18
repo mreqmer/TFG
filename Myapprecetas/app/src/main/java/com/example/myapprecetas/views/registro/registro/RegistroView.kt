@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.R
@@ -90,7 +91,8 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
                     onTextChanged = { vm.onPasswordChange(it) },
                     placeholder = "Contraseña",
                     icono = R.drawable.lock,
-                    tipo = KeyboardType.Password
+                    tipo = KeyboardType.Password,
+                    visualTransformation = PasswordVisualTransformation()
                 )
 
                 CampoTextoRegistro(
@@ -99,7 +101,8 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
                     placeholder = "Repetir contraseña",
                     icono = R.drawable.lock,
                     tipo = KeyboardType.Password,
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Done,
+                    visualTransformation = PasswordVisualTransformation()
                 )
 
                 // Texto de enlace para login justo encima del botón
@@ -114,7 +117,7 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
             onClick = {
                 vm.register(
                     onSuccess = {
-                        navController.navigate("construcciondos")
+                        navController.navigate("lista_recetas")
                     }
                 )
                 keyboardController?.hide()

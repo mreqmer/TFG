@@ -81,7 +81,7 @@ fun EmailField(email: String, onTextChanged: (String) -> Unit) {
         onValueChange = { onTextChanged(it) },
         placeholder = {
             Text(
-                text = "Usuario",
+                text = "Correo electrónico",
                 fontFamily = currentFont
             )
         },
