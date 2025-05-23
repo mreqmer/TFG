@@ -3,6 +3,10 @@ package com.example.myapprecetas.repositories
 import androidx.core.net.toUri
 import com.example.myapprecetas.userauth.AuthManager
 import com.example.myapprecetas.vm.wapper.FirebaseAuth
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.FirebaseTooManyRequestsException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -116,6 +120,7 @@ class AuthRepository @Inject constructor(
         }
     }
 
+
     suspend fun deleteCurrentUser(): Boolean {
         val user = authWrapper.getCurrentUser()
 
@@ -133,6 +138,27 @@ class AuthRepository @Inject constructor(
             }
         } else {
             setError("No hay usuario autenticado para eliminar")
+            false
+        }
+    }
+
+    suspend fun sendPasswordReset(email: String): Boolean {
+        return try {
+            authWrapper.sendPasswordResetEmail(email)
+            _error.value = null
+            true
+        } catch (e: Exception) {
+            // Aquí capturamos las excepciones Firebase comunes y ponemos un mensaje claro
+            val mensaje = when (e) {
+
+                is FirebaseAuthInvalidUserException -> "Este correo no está registrado"
+                is FirebaseAuthInvalidCredentialsException -> "Correo electrónico no válido"
+                is FirebaseNetworkException -> "Error de red. Verifica tu conexión"
+                is FirebaseTooManyRequestsException -> "Demasiados intentos. Intenta más tarde"
+                is IllegalArgumentException -> "El campo no puede estar vacío"
+                else -> "Error desconocido"
+            }
+            setError(mensaje)
             false
         }
     }

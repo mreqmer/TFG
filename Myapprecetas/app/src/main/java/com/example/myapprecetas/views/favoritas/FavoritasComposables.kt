@@ -134,6 +134,31 @@ fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, v
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(120.dp)
                 )
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(4.dp)
+                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(R.drawable.temporizador2),
+                            contentDescription = "Tiempo",
+
+                            modifier = Modifier.size(ConstanteIcono.IconoMuyPequeno)
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Text(
+                            text = "${receta.tiempoPreparacion}'",
+                            fontSize = 12.sp,
+                            fontFamily = fuenteTexto,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.width(10.dp))

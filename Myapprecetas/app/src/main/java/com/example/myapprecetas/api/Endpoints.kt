@@ -57,6 +57,9 @@ interface Endpoints {
     @GET("recetas/RecetasLikes/{uid}")
     suspend fun getRecetasConLike(@Path("uid") firebaseUid: String): Response<List<DTORecetaUsuarioLike>>
 
+    @GET("recetas/RecetasLikes/Busqueda/{uid}/{busqueda}")
+    suspend fun obtenerRecetasLikesPorNombre(@Path("uid") uid: String, @Path("busqueda") busqueda: String): Response<List<DTORecetaUsuarioLike>>
+
     @GET("recetas/likes/{uid}")
     suspend fun getRecetasFavoritasPorUid(@Path("uid") firebaseUid: String): Response<List<DTORecetaUsuarioLike>>
 
@@ -65,5 +68,6 @@ interface Endpoints {
 
     @POST("Recetas/Favorita")
     suspend fun getRecetaDetalladaLike(@Body recetaDetalladaLike: DTOToggleLike): Response<DTORecetaDetalladaLike>
+
 
 }

@@ -43,12 +43,15 @@ class MainActivity : ComponentActivity() {
         // Rutas que deben usar Scaffold con barra inferior
         private val RUTAS_CON_SCAFFOLD = setOf(
             "lista_recetas",
-            "lista_recetas",
-            "detalles_receta",
             "lista_favoritos",
             "perfil",
-            "construccion",
-            "construcciondos"
+        )
+
+        private val RUTAS_BOTTOM_TRANSPARENTE = setOf(
+            "inicio",
+            "login",
+            "selector_registro",
+            "registro",
         )
     }
 
@@ -69,8 +72,10 @@ class MainActivity : ComponentActivity() {
             // Comprueba si se necesita scaffold
             val isScaffoldNeeded = currentRoute in RUTAS_CON_SCAFFOLD
 
+            val isTransparentNeeded = currentRoute in RUTAS_BOTTOM_TRANSPARENTE
+
             // Dependiendo de la pantalla la botonera de navegación cambia el color
-            window.navigationBarColor = if (isScaffoldNeeded) Color.Black.hashCode() else Color.Transparent.hashCode()
+            window.navigationBarColor = if (isTransparentNeeded) Color.Transparent.hashCode() else Color.Black.hashCode()
 
             MyapprecetasTheme {
                 val navHostContent = @Composable { modifier: Modifier ->
@@ -135,7 +140,15 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("construccion") {
-                            PaginaEnConstruccionConBotonAtras(navController)
+                            EditarPerfilDemoView(
+                                navController = navController, // <- ¡Aquí el cambio importante!
+                                onGuardar = { nombre, imagenUri, nuevaContrasena ->
+                                    println("Guardar: $nombre con imagen $imagenUri y contraseña: $nuevaContrasena")
+                                },
+                                onCancelar = {
+                                    println("Cancelado")
+                                }
+                            )
                         }
 
                         composable("construcciondos") {

@@ -74,6 +74,10 @@ class FirebaseAuth @Inject constructor(
      */
     fun getCurrentUser(): FirebaseUser? = auth.currentUser
 
+    suspend fun sendPasswordResetEmail(email: String) {
+        auth.sendPasswordResetEmail(email).await()
+    }
+
     /**
      * Cierra la sesión actual.
      */

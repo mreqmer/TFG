@@ -60,7 +60,7 @@ fun LoginScreen(vm: VMLogin, navController: NavHostController) {
                 EmailField(email) { vm.onLoginChanged(it, password) }
                 Spacer(modifier = Modifier.height(20.dp))
                 PasswordField(vm, password, { vm.onLoginChanged(email, it) }, isPasswordVisible)
-                PasswordOlvidada()
+                PasswordOlvidada(vm)
             }
 
             Spacer(modifier = Modifier.height(16.dp))

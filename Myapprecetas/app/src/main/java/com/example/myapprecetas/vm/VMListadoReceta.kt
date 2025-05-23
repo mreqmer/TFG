@@ -38,17 +38,25 @@ class VMListadoReceta @Inject constructor(
     private val _likeInProgress = MutableStateFlow<Boolean>(false)
     val likeInProgress: StateFlow<Boolean> = _likeInProgress
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
     init {
         enviarUsuarioApi()
         cargaRecetas()
     }
 
     fun onRefresh() {
+        _searchQuery.value = "";
         viewModelScope.launch {
             _isRefreshing.value = true
             cargaRecetas()
             _isRefreshing.value = false
         }
+    }
+
+    fun onActualizaQuery(newQuery: String) {
+        _searchQuery.value = newQuery
     }
 
     fun cargaRecetas() {
@@ -105,6 +113,36 @@ class VMListadoReceta @Inject constructor(
                 Log.e("ToggleLike", "Excepción: ${e.message}")
             } finally {
                 _likeInProgress.value = false
+            }
+        }
+    }
+
+    fun buscarRecetas() {
+        val uid = currentUser.value?.uid ?: return
+        val query = _searchQuery.value.trim()
+
+        if (query.isEmpty()) {
+            cargaRecetas()  // Si la búsqueda está vacía, carga todas las recetas
+            return
+        }
+
+        _cargando.value = true
+
+        viewModelScope.launch {
+            try {
+                val response = endpoints.obtenerRecetasLikesPorNombre(uid, query)
+                if (response.isSuccessful) {
+                    response.body()?.let { lista ->
+                        _listaRecetas.value = lista
+                        _likesEstado.value = lista.associate { it.idReceta to it.tieneLike }
+                    }
+                } else {
+                    Log.e("BuscarRecetas", "Error servidor: ${response.code()} ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("BuscarRecetas", "Excepción: ${e.message}")
+            } finally {
+                _cargando.value = false
             }
         }
     }

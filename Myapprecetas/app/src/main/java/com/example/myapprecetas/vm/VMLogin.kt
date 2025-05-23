@@ -1,5 +1,8 @@
 package com.example.myapprecetas.vm
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.repositories.AuthRepository
@@ -32,6 +35,9 @@ class VMLogin @Inject constructor(
 
     private val _errorMostrado = MutableStateFlow("")
     val errorMostrado: StateFlow<String> = _errorMostrado
+
+    private val _errorMostradoDialog = MutableStateFlow("")
+    val errorMostradoDialog: StateFlow<String> = _errorMostradoDialog
 
     private val _cargando = MutableStateFlow(false)
     val cargando: StateFlow<Boolean> = _cargando
@@ -117,5 +123,33 @@ class VMLogin @Inject constructor(
             else -> "Error al autenticar: ${errorMessage ?: "Desconocido"}"
         }
     }
+
+    var estadoResetPassword by mutableStateOf<Result<Unit>?>(null)
+        private set
+
+    fun restablecerPassword(email: String) {
+        viewModelScope.launch {
+            val success = authRepository.sendPasswordReset(email)
+            if (success) {
+
+                _errorMostradoDialog.value = ""
+                estadoResetPassword = Result.success(Unit)
+            } else {
+
+                _errorMostradoDialog.value = authRepository.error.value ?: "Error desconocido"
+                estadoResetPassword = Result.failure(Exception(_errorMostradoDialog.value))
+            }
+        }
+    }
+
+
+    fun resetErrorDialog(){
+        _errorMostradoDialog.value = ""
+    }
+
+    fun limpiarEstadoResetPassword() {
+        estadoResetPassword = null
+    }
+
 }
 
