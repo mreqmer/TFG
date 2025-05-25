@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,7 +49,8 @@ fun ListadoRecetas(
     navController: NavHostController,
     insets: PaddingValues,
     textBienvenida: String,
-    vm: VMListadoReceta
+    vm: VMListadoReceta,
+    onAbrirDrawer: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -67,17 +69,30 @@ fun ListadoRecetas(
                     .background(Color.White)
                     .padding(vertical = 8.dp)
             ) {
-                SearchBar(vm)
+                SearchBar(vm = vm, onAbrirDrawer = onAbrirDrawer)
             }
         }
 
-        // Lista de recetas
-        items(
-            items = listaReceta,
-            key = { receta -> receta.idReceta }
-        ) { receta ->
-            ItemReceta(receta, navController, vm)
-            Spacer(modifier = Modifier.height(12.dp))
+        if (listaReceta.isEmpty()) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillParentMaxHeight()
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    MensajeSinRecetasLista()
+                }
+            }
+        } else {
+            // Si no está vacía, mostrar items normalmente
+            items(
+                items = listaReceta,
+                key = { receta -> receta.idReceta }
+            ) { receta ->
+                ItemReceta(receta, navController, vm)
+                Spacer(modifier = Modifier.height(12.dp))
+            }
         }
     }
 }
@@ -218,7 +233,7 @@ fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, v
 
 
 @Composable
-fun SearchBar(vm: VMListadoReceta) {
+fun SearchBar(vm: VMListadoReceta, onAbrirDrawer: () -> Unit) {
     val searchQuery by vm.searchQuery.collectAsState()
 
     Row(
@@ -263,8 +278,7 @@ fun SearchBar(vm: VMListadoReceta) {
                     modifier = Modifier
                         .size(ConstanteIcono.IconoPequeno)
                         .clickable { vm.buscarRecetas() },
-                    tint = Colores.Gris,
-
+                    tint = Colores.Gris
                 )
             }
         )
@@ -278,11 +292,38 @@ fun SearchBar(vm: VMListadoReceta) {
                 .size(ConstanteIcono.IconoGrande)
                 .clip(RoundedCornerShape(12.dp))
                 .background(Colores.Gris.copy(alpha = 0.1f))
-                .padding(10.dp),
+                .padding(10.dp)
+                .clickable { onAbrirDrawer() },
             tint = Colores.Gris
         )
     }
 }
 
+@Composable
+fun MensajeSinRecetasLista() {
+    Column(
+        modifier = Modifier.offset(y = (-60).dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "¡Vaya, no hay recetas!",
+            fontSize = ConstanteTexto.TextoGrande,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = fuenteTexto,
+            color = Color.Gray,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Icon(
+            painter = painterResource(R.drawable.potchupchup),
+            contentDescription = "logo",
+            tint = Color.Gray,
+            modifier = Modifier.size(150.dp)
+        )
+    }
+}
 
 

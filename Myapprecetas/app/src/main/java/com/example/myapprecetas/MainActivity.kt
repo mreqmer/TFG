@@ -25,6 +25,7 @@ import com.example.myapprecetas.views.*
 import com.example.myapprecetas.views.creacionreceta.AddIngredienteView
 import com.example.myapprecetas.views.creacionreceta.CrearRecetaView
 import com.example.myapprecetas.views.detallesreceta.DetallesRecetaView
+import com.example.myapprecetas.views.editarperfi.EditarPerfilView
 import com.example.myapprecetas.views.favoritas.FavoritasView
 import com.example.myapprecetas.views.inicioview.InicioView
 import com.example.myapprecetas.views.listadoreceta.ListadoRecetaView
@@ -125,6 +126,11 @@ class MainActivity : ComponentActivity() {
                         composable("perfil") {
                             val vm: VMPerfil = hiltViewModel()
                             PerfilView(vm, navController)
+                        }
+
+                        composable("editar-perfil") {
+                            val vm: VMEditarPerfil = hiltViewModel()
+                            EditarPerfilView (vm, navController)
                         }
 
                         composable("creacionReceta/{idUsuario}") {backStackEntry ->

@@ -81,7 +81,7 @@ fun HeaderTexto(navController: NavHostController) {
 @Composable
 fun AccionesPerfil(vm: VMPerfil, navController: NavHostController) {
     Row {
-        IconButton(onClick = { navController.navigate("construccion") }) {
+        IconButton(onClick = { navController.navigate("editar-perfil") }) {
             Icon(
                 painter = painterResource(id = R.drawable.edit2),
                 contentDescription = "Editar perfil",

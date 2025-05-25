@@ -428,7 +428,6 @@ fun TiempoPreparacionField(
     }
 }
 
-//Chips para elegir la dificultad de la receta
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DificultadChips(
@@ -532,7 +531,6 @@ fun BtnGuardarReceta(
     }
 }
 
-//Función para mostrar una foto que se selecciona
 @Composable
 fun FotoSelector(
     imagenUri: Uri?,

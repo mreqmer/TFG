@@ -6,8 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.api.Endpoints
 import com.example.myapprecetas.objetos.dto.DTORecetaUsuarioLike
 import com.example.myapprecetas.objetos.dto.DTOToggleLike
+import com.example.myapprecetas.objetos.dto.Ingrediente
+import com.example.myapprecetas.objetos.dto.constantesobjetos.ConstantesObjetos
 import com.example.myapprecetas.objetos.dto.creacion.DTOInsertUsuario
 import com.example.myapprecetas.userauth.AuthManager.currentUser
+import com.google.android.play.integrity.internal.c
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +21,23 @@ import javax.inject.Inject
 class VMListadoReceta @Inject constructor(
     private val endpoints: Endpoints
 ) : ViewModel() {
+
+//    val categorias = listOf("Postres", "Carnes", "Veganas", "Rápidas", "Internacional")
+    val tiempos = listOf("< 15 min","< 30 min", "< 45 min", "< 1h", "< 2h")
+    val dificultades = ConstantesObjetos.Recetas_Dificultad.values().map { it.label }
+
+    private val _categorias = MutableStateFlow<List<String?>>(emptyList())
+    val categorias: StateFlow<List<String?>> = _categorias
+
+    // Estados de filtros seleccionados
+    private val _filtroSeleccionadoCategoria = MutableStateFlow<String?>(null)
+    val filtroSeleccionadoCategoria: StateFlow<String?> = _filtroSeleccionadoCategoria
+
+    private val _filtroSeleccionadoTiempo = MutableStateFlow<String?>(null)
+    val filtroSeleccionadoTiempo: StateFlow<String?> = _filtroSeleccionadoTiempo
+
+    private val _filtroSeleccionadoDificultad = MutableStateFlow<String?>(null)
+    val filtroSeleccionadoDificultad: StateFlow<String?> = _filtroSeleccionadoDificultad
 
     private val _listaRecetas = MutableStateFlow<List<DTORecetaUsuarioLike>>(emptyList())
     val listaRecetas: StateFlow<List<DTORecetaUsuarioLike>> = _listaRecetas
@@ -32,19 +52,40 @@ class VMListadoReceta @Inject constructor(
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
     private val _likesEstado = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
-    val likesEstado: StateFlow<Map<Int, Boolean>> = _likesEstado
 
     // Estado para bloquear botón like mientras se hace petición
     private val _likeInProgress = MutableStateFlow<Boolean>(false)
-    val likeInProgress: StateFlow<Boolean> = _likeInProgress
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
 
+    private val _ingredientesDisponibles = MutableStateFlow<List<Ingrediente>>(emptyList())
+    val ingredientesDisponibles: StateFlow<List<Ingrediente>> = _ingredientesDisponibles
+
+
+
+
     init {
         enviarUsuarioApi()
         cargaRecetas()
+        cargaCategorias()
     }
+
+
+
+    fun setFiltroCategoria(categoria: String?) {
+        _filtroSeleccionadoCategoria.value = categoria
+    }
+
+    fun setFiltroTiempo(tiempo: String?) {
+        _filtroSeleccionadoTiempo.value = tiempo
+    }
+
+    fun setFiltroDificultad(dificultad: String?) {
+        _filtroSeleccionadoDificultad.value = dificultad
+    }
+
+
 
     fun onRefresh() {
         _searchQuery.value = "";
@@ -117,27 +158,63 @@ class VMListadoReceta @Inject constructor(
         }
     }
 
+    fun cargaCategorias(){
+        viewModelScope.launch {
+            try {
+                val response = endpoints.getCategorias()
+                if (response.isSuccessful) {
+                    response.body()?.let { lista ->
+                        val nombres = lista.map { it.nombreCategoria }
+                        val listaActual = _categorias.value.toMutableList()
+                        listaActual.addAll(nombres)
+                        _categorias.value = listaActual
+                    }
+                } else {
+                    Log.e("BuscarRecetas", "Error servidor: ${response.code()} ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("BuscarRecetas", "Excepción: ${e.message}")
+            } finally {
+                _cargando.value = false
+            }
+        }
+    }
+
     fun buscarRecetas() {
         val uid = currentUser.value?.uid ?: return
-        val query = _searchQuery.value.trim()
+        val query = _searchQuery.value?.trim().orEmpty()
 
-        if (query.isEmpty()) {
-            cargaRecetas()  // Si la búsqueda está vacía, carga todas las recetas
-            return
-        }
+        val categoria = _filtroSeleccionadoCategoria.value
+        val dificultad = _filtroSeleccionadoDificultad.value
+        val tiempoFiltrado = parseTiempoSeleccionado()
+        val ingredientesNombres = _ingredientesSeleccionados.value
+            ?.mapNotNull { it.nombreIngrediente }
+            ?.filter { it.isNotBlank() }
+            ?: emptyList()
 
         _cargando.value = true
 
         viewModelScope.launch {
             try {
-                val response = endpoints.obtenerRecetasLikesPorNombre(uid, query)
+                val response = endpoints.getRecetasLikesFiltrado(
+                    uid = uid,
+                    busqueda = query,
+                    categoria = categoria,
+                    tiempo = tiempoFiltrado,
+                    dificultad = dificultad,
+                    ingredientes = if (ingredientesNombres.isNotEmpty()) ingredientesNombres else null
+                )
                 if (response.isSuccessful) {
                     response.body()?.let { lista ->
                         _listaRecetas.value = lista
                         _likesEstado.value = lista.associate { it.idReceta to it.tieneLike }
                     }
-                } else {
+                } else if (response.code() == 404) {
+                    _listaRecetas.value = emptyList()
+                    _likesEstado.value = emptyMap()
+                }else {
                     Log.e("BuscarRecetas", "Error servidor: ${response.code()} ${response.message()}")
+
                 }
             } catch (e: Exception) {
                 Log.e("BuscarRecetas", "Excepción: ${e.message}")
@@ -170,6 +247,61 @@ class VMListadoReceta @Inject constructor(
                 Log.d(":::API", "Proceso API finalizado")
                 _nombreUsuario.value = currentUser.value?.displayName ?: "Usuario"
             }
+        }
+    }
+
+    private val _listadoIngredientes = MutableStateFlow<List<Ingrediente>>(emptyList())
+    val listadoIngredientes: StateFlow<List<Ingrediente>> = _listadoIngredientes
+
+    private val _cargandoIngredientes = MutableStateFlow(false)
+    val cargandoIngredientes: StateFlow<Boolean> = _cargandoIngredientes
+
+    private val _ingredientesSeleccionados = MutableStateFlow<List<Ingrediente>>(emptyList())
+    val ingredientesSeleccionados: StateFlow<List<Ingrediente>> = _ingredientesSeleccionados
+
+    fun agregarIngredienteSeleccionado(ingrediente: Ingrediente) {
+        _ingredientesSeleccionados.value += ingrediente
+        _listadoIngredientes.value = emptyList()
+    }
+
+    fun quitarIngredienteSeleccionado(ingrediente: Ingrediente) {
+        _ingredientesSeleccionados.value = _ingredientesSeleccionados.value - ingrediente
+    }
+
+
+
+    fun buscarIngredientes(busquedaNombre: String) {
+        viewModelScope.launch {
+            _cargandoIngredientes.value = true
+            try {
+                // Llamamos al endpoint de búsqueda de ingredientes
+                val response = endpoints.buscarIngredientes(busquedaNombre)
+
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _listadoIngredientes.value = it // Actualizamos la lista de ingredientes
+                        Log.i("OKAY", "Ingredientes encontrados: ${it.size}")
+                    } ?: run {
+                        Log.i("RESPUESTA VACIA", "La respuesta de búsqueda está vacía.")
+                    }
+                } else {
+                    Log.i("ERROR SERVIDOR", "Error en la respuesta del servidor: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.i("EXCEPTION", "Error al buscar ingredientes: $e")
+            } finally {
+                _cargandoIngredientes.value = false
+            }
+        }
+    }
+    fun parseTiempoSeleccionado(): Int? {
+        return when (_filtroSeleccionadoTiempo.value) {
+            "< 15 min" -> 15
+            "< 30 min" -> 30
+            "< 45 min" -> 45
+            "< 1h" -> 60
+            "< 2h" -> 120
+            else -> null
         }
     }
 }

@@ -69,5 +69,15 @@ interface Endpoints {
     @POST("Recetas/Favorita")
     suspend fun getRecetaDetalladaLike(@Body recetaDetalladaLike: DTOToggleLike): Response<DTORecetaDetalladaLike>
 
+    @GET("recetas/RecetasLikes/Busqueda/{uid}")
+    suspend fun getRecetasLikesFiltrado(
+        @Path("uid") uid: String,
+        @Query("busqueda") busqueda: String? = null,
+        @Query("categoria") categoria: String? = null,
+        @Query("tiempo") tiempo: Int? = null,
+        @Query("dificultad") dificultad: String? = null,
+        @Query("ingredientes") ingredientes: List<String>? = null
+    ): Response<List<DTORecetaUsuarioLike>>
+
 
 }
