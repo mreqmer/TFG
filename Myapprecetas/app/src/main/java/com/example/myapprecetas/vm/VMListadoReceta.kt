@@ -85,6 +85,15 @@ class VMListadoReceta @Inject constructor(
         _filtroSeleccionadoDificultad.value = dificultad
     }
 
+    fun reestableceFiltro(){
+        _searchQuery.value = ""
+        _filtroSeleccionadoTiempo.value = null
+        _filtroSeleccionadoCategoria.value = null
+        _filtroSeleccionadoDificultad.value = null
+        _ingredientesSeleccionados.value = emptyList()
+        cargaRecetas()
+
+    }
 
 
     fun onRefresh() {

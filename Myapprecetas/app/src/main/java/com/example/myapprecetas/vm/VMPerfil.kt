@@ -10,6 +10,7 @@ import com.example.myapprecetas.userauth.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
@@ -53,14 +54,19 @@ class VMPerfil @Inject constructor(
         repository.clearIngredientes()
     }
 
+    fun eliminarRecetaLocal(idReceta: Int) {
+        val nuevaLista = _listaRecetas.value.filterNot { it.idReceta == idReceta }
+        _listaRecetas.value = nuevaLista
+
+    }
 
     private fun cargaUsuario() {
-        val uid = AuthManager.currentUser.value?.uid ?: return // Si no hay usuario logueado, no hace nada
+        val uid = AuthManager.currentUser.value?.uid ?: return
 
         viewModelScope.launch {
             _cargandoUsuario.value = true
             try {
-                val response = endpoints.getUsuarioUID(uid) // Pasa el UID a la llamada
+                val response = endpoints.getUsuarioUID(uid)
                 if (response.isSuccessful) {
                     response.body()?.let { usuario ->
                         // Aquí actualizas los campos con el usuario obtenido
@@ -86,7 +92,6 @@ class VMPerfil @Inject constructor(
         viewModelScope.launch {
             _cargando.value = true
             try {
-//                val response = endpoints.getRecetasPorIdUsuario(_idUsuario.value)
                 val response = endpoints.getRecetasPorIdUsuario(_idUsuario.value)
                 if (response.isSuccessful) {
                     response.body()?.let {
@@ -114,5 +119,27 @@ class VMPerfil @Inject constructor(
         val dateFormat = SimpleDateFormat("MMMM yyyy", Locale("es", "ES"))
         _fechaString.value = "Miembro desde: ${dateFormat.format(date)}"
     }
+
+    fun borrarReceta(idReceta: Int){
+        val uid = AuthManager.currentUser.value?.uid ?: return
+
+        viewModelScope.launch {
+            try {
+                val response = endpoints.borrarReceta(uid, idReceta)
+                if (response.isSuccessful) {
+                    Log.d(":::Correcto",  _listaRecetas.value.toString())
+                    _listaRecetas.update { recetas -> recetas.filter { it.idReceta != idReceta } }
+                    Log.d(":::Correcto",  "Borrado correctamente")
+                    Log.d(":::Correcto",  _listaRecetas.value.toString())
+                } else {
+                    val errorMessage = response.errorBody()?.string()
+                    Log.d(":::Error", "Mensaje: $errorMessage")
+                }
+            } catch (e: Exception) {
+                Log.d(":::Error",  "Excepción: ${e.localizedMessage}")
+            }
+        }
+    }
+
 
 }

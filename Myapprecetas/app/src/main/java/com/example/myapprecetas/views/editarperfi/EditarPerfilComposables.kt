@@ -15,10 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
-import com.example.myapprecetas.vm.VMEditarPerfil
+import com.example.myapprecetas.R
+import com.example.myapprecetas.ui.theme.Colores
 
 @Composable
 fun ImagenPerfil(uri: Uri?, onClick: () -> Unit) {
@@ -26,7 +31,7 @@ fun ImagenPerfil(uri: Uri?, onClick: () -> Unit) {
         modifier = Modifier
             .size(120.dp)
             .clip(CircleShape)
-            .background(Color(0xFFE0E0E0))
+            .background(Colores.Gris.copy(alpha = 0.1f))
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -37,39 +42,24 @@ fun ImagenPerfil(uri: Uri?, onClick: () -> Unit) {
                 modifier = Modifier.fillMaxSize()
             )
         } else {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Icono de perfil",
-                tint = Color.Gray,
-                modifier = Modifier.size(64.dp)
+            val url = stringResource(id = R.string.img_perfil_default)
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = url,
+                    error = painterResource(R.drawable.ic_launcher_background)),
+                contentDescription = "Imagen de perfil",
+                modifier = Modifier.fillMaxSize(),
+
             )
         }
     }
 }
 
-@Composable
-fun CorreoNoEditable(email: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = email,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f),
-            color = Color.Gray
-        )
-        TextButton(onClick = {}) {
-            Text("No editable", color = Color.LightGray)
-        }
-    }
-}
 
 @Composable
 fun CampoNombre(
     nombreUsuario: String,
     editandoNombre: Boolean,
-    editandoContrasena: Boolean,
     onNombreChange: (String) -> Unit,
     onCancelarNombre: () -> Unit,
     onEditarNombre: () -> Unit
@@ -98,51 +88,6 @@ fun CampoNombre(
             )
             TextButton(
                 onClick = onEditarNombre,
-                enabled = !editandoContrasena
-            ) {
-                Text("Editar")
-            }
-        }
-    }
-}
-
-
-@Composable
-fun CampoContrasena(
-    nuevaContrasena: String,
-    editandoContrasena: Boolean,
-    editandoNombre: Boolean,
-    onContrasenaChange: (String) -> Unit,
-    onEditarClick: () -> Unit,
-    onCancelarClick: () -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        if (editandoContrasena) {
-            OutlinedTextField(
-                value = nuevaContrasena,
-                onValueChange = onContrasenaChange,
-                label = { Text("Nueva contraseña") },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp)
-            )
-            TextButton(onClick = onCancelarClick) {
-                Text("Cancelar")
-            }
-        } else {
-            Text(
-                text = "••••••••",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f),
-                color = Color.Gray
-            )
-            TextButton(
-                onClick = onEditarClick,
-                enabled = !editandoNombre
             ) {
                 Text("Editar")
             }
@@ -156,10 +101,18 @@ fun BotonGuardar(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(10.dp),
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(45.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Colores.VerdeOscuro,
+            contentColor = Colores.Blanco
+        ),
     ) {
-        Text("Guardar", color = Color.White)
+        Text(
+            text = "Guardar cambios",
+            fontSize = 16.sp
+        )
     }
 }
 

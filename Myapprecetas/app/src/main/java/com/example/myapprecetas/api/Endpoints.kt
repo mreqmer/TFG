@@ -19,6 +19,9 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import com.example.myapprecetas.objetos.dto.creacion.RecetaResponse
+import okhttp3.ResponseBody
+import retrofit2.http.DELETE
+
 interface Endpoints {
 
 
@@ -79,5 +82,10 @@ interface Endpoints {
         @Query("ingredientes") ingredientes: List<String>? = null
     ): Response<List<DTORecetaUsuarioLike>>
 
+    @DELETE("Recetas/Borrar")
+    suspend fun borrarReceta(
+        @Query("uid") uid: String,
+        @Query("idReceta") idReceta: Int
+    ): Response<Unit>
 
 }

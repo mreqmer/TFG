@@ -102,7 +102,7 @@ fun DetallesRecetaScreen(
             },
             containerColor = Color.Transparent
         ) { innerPadding ->
-            DetallesRecetaContenido(vm, innerPadding,data,imageHeight, porciones
+            DetallesRecetaContenido(vm, innerPadding,data,imageHeight, porciones, navController
             )
         }
     } ?: run {
@@ -118,7 +118,8 @@ fun DetallesRecetaContenido(
     innerPadding: PaddingValues,
     data: DTORecetaDetalladaLike,
     imageHeight: Dp,
-    porciones: Int
+    porciones: Int,
+    navController: NavHostController
 ) {
     LazyColumn(
         modifier = Modifier
@@ -133,7 +134,7 @@ fun DetallesRecetaContenido(
         items(data.ingredientes) { IngredienteItem(it) }
         item { TituloSeccion("Pasos") }
         items(data.pasos) { PasoItem(it) }
-        item { CategoriaChips(data.categorias) }
+        item { CategoriaChips(data.categorias, navController) }
     }
 }
 
@@ -366,7 +367,7 @@ fun TituloSeccion(titulo: String) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CategoriaChips(categorias: List<Categoria>) {
+fun CategoriaChips(categorias: List<Categoria>, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -377,7 +378,7 @@ fun CategoriaChips(categorias: List<Categoria>) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
             categorias.forEach {
                 AssistChip(
-                    onClick = {},
+                    onClick = {navController.navigate("receta_categoria/${it.nombreCategoria}")},
                     label = {
                         Text(
                             it.nombreCategoria,

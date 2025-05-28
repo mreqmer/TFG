@@ -163,5 +163,30 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    suspend fun updateDisplayName(displayName: String): Boolean {
+        val user = authWrapper.getCurrentUser()
+
+        return if (user != null) {
+            suspendCoroutine { continuation ->
+                val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setDisplayName(displayName)
+                    .build()
+
+                user.updateProfile(profileUpdates)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            continuation.resume(true)
+                        } else {
+                            setError(task.exception?.localizedMessage ?: "Error al actualizar el nombre de usuario")
+                            continuation.resume(false)
+                        }
+                    }
+            }
+        } else {
+            setError("Usuario no autenticado")
+            false
+        }
+    }
+
 //    fun getCurrentUser(): FirebaseUser? = authWrapper.getCurrentUser()
 }

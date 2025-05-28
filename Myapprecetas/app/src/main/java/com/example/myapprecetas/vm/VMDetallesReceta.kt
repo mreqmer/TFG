@@ -32,7 +32,6 @@ class VMDetallesReceta @Inject constructor(
     private var _idReceta: Int? = null
 
     init {
-        cargaRecetas()
     }
 
     fun setRecetaId(idReceta: Int) {

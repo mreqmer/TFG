@@ -20,6 +20,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -27,9 +30,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -110,18 +118,20 @@ fun AccionesPerfil(vm: VMPerfil, navController: NavHostController) {
 }
 
 @Composable
-fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) {
+fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, onConfirmar: (Int) -> Unit ,) {
+    var showDialog by remember { mutableStateOf(false) }
+    var isDeleting by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
             .background(Color.White)
-            .clickable {  navController.navigate("detalles_receta/${receta.idReceta}")}
+            .clickable { navController.navigate("detalles_receta/${receta.idReceta}") }
             .padding(top = 12.dp, bottom = 2.dp)
             .padding(start = 12.dp, end = 12.dp)
             .height(130.dp)
     ) {
-
         Row(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
@@ -171,7 +181,7 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
                     .weight(1f)
                     .fillMaxHeight()
             ) {
-                Column {
+                Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = receta.nombreReceta,
                         style = MaterialTheme.typography.titleMedium.copy(
@@ -179,23 +189,33 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
                             fontFamily = fuenteTexto
                         ),
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = receta.descripcion,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = fuenteTexto
-                        ),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-
-                    )
+                    IconButton(onClick = { showDialog = true }) {
+                        Icon(
+                            modifier = Modifier.size(ConstanteIcono.IconoPequeno),
+                            painter = painterResource(R.drawable.papelera),
+                            contentDescription = "Eliminar receta",
+                            tint = Colores.RojoError
+                        )
+                    }
                 }
 
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = receta.descripcion,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = fuenteTexto
+                    ),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
                 Spacer(modifier = Modifier.weight(1f))
+
                 Text(
                     text = "Por ${receta.nombreUsuario}",
                     fontSize = ConstanteTexto.TextoMuyPequeno,
@@ -206,6 +226,17 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController) 
                     overflow = TextOverflow.Ellipsis
                 )
             }
+        }
+
+        if (showDialog) {
+            ConfirmarBorradoDialog(
+                onConfirmar = {
+                    onConfirmar(receta.idReceta)
+                    showDialog = false
+                },
+                    onCancelar = {
+                        showDialog = false
+                    })
         }
     }
 }
@@ -361,9 +392,10 @@ fun BotonCrearReceta(vm: VMPerfil, navController: NavHostController) {
 
 @Composable
 fun ListaRecetasPerfil(
-    listaRecetas: List<DTORecetaSimplificada>,
-    navController: NavHostController
+    vm: VMPerfil,
+    navController: NavHostController,
 ) {
+    val listaRecetas by vm.listaRecetas.collectAsState()
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -372,9 +404,61 @@ fun ListaRecetasPerfil(
     ) {
         items(
             items = listaRecetas,
-            key = { it.idReceta.toString() }
+            key = { receta -> receta.idReceta }
         ) { receta ->
-            ItemReceta(receta = receta, navController)
+            ItemReceta(receta = receta, navController,  onConfirmar = { idReceta -> vm.borrarReceta(idReceta) } )
         }
     }
+}
+
+@Composable
+fun ConfirmarBorradoDialog(
+    onConfirmar: () -> Unit,
+    onCancelar: () -> Unit
+) {
+    AlertDialog(
+        containerColor = Colores.MarronClaro,
+        onDismissRequest = onCancelar,
+        title = {
+            Text(
+                text = "Borrar Receta",
+                fontFamily = fuenteTexto,
+                fontWeight = FontWeight.Bold,
+                color = Colores.Negro
+            )
+        },
+        text = {
+            Text(
+                text = "¿Está seguro que quiere borrar esta receta?",
+                fontFamily = fuenteTexto,
+                fontWeight = FontWeight.SemiBold,
+                color = Colores.Negro
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirmar,
+                modifier = Modifier.padding(start = 62.dp)
+            ) {
+                Text(
+                    "Confirmar",
+                    fontFamily = fuenteTexto,
+                    fontWeight = FontWeight.Bold,
+                    color = Colores.VerdeOscuro,
+                    fontSize = ConstanteTexto.TextoNormal
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onCancelar) {
+                Text(
+                    "Cancelar",
+                    fontFamily = fuenteTexto,
+                    fontWeight = FontWeight.Bold,
+                    color = Colores.RojoError,
+                    fontSize = ConstanteTexto.TextoNormal
+                )
+            }
+        }
+    )
 }

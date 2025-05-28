@@ -4,5 +4,6 @@
     <string name="cloud_name">dckzmg9c1</string>
     <string name="apikey">846569937545751</string>
     <string name="apisecret">BCYIfpDpOb7-nFtqM0Kzj2yCDX4</string>
+    <string name="img_perfil_default">https://res.cloudinary.com/dckzmg9c1/image/upload/v1747491439/fotoperfil_cfajca.png</string>
 
 </resources>

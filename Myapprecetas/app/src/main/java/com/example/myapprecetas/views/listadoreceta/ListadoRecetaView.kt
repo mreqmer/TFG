@@ -1,6 +1,5 @@
 package com.example.myapprecetas.views.listadoreceta
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -90,7 +89,8 @@ fun ListadoRecetaScreen(
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = {
-            vm.onRefresh()
+//            vm.onRefresh()
+            vm.buscarRecetas()
         }
     )
     Box(

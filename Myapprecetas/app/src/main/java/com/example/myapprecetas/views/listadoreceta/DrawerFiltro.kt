@@ -82,6 +82,8 @@ fun DrawerContent(
                 )
                 Spacer(Modifier.height(16.dp))
 
+                ReestableceFiltro({ vm.reestableceFiltro() })
+
                 FiltroIngrediente(vm)
 
                 FiltroFlowRow(
@@ -137,7 +139,8 @@ fun FiltroFlowRow(
     titulo: String,
     items: List<String?>,
     seleccion: String?,
-    onSeleccionChange: (String?) -> Unit
+    onSeleccionChange: (String?) -> Unit,
+
 ) {
     Text(
         titulo,
@@ -147,6 +150,11 @@ fun FiltroFlowRow(
         color = Colores.Negro
     )
     Spacer(Modifier.height(8.dp))
+
+
+
+    Spacer(Modifier.height(8.dp))
+
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
@@ -268,4 +276,33 @@ fun FiltroIngrediente(vm: VMListadoReceta) {
             )
         }
     }
+}
+
+@Composable
+fun ReestableceFiltro(onClick: () -> Unit) {
+    AssistChip(
+        onClick = onClick,
+        label = {
+            Text(
+                "Restablecer filtros",
+                fontFamily = fuenteTexto,
+                fontWeight = FontWeight.Medium,
+                fontSize = ConstanteTexto.TextoNormal
+            )
+        },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(R.drawable.cerrar), // Usa un icono de reinicio si tienes
+                contentDescription = "Restablecer filtros",
+                modifier = Modifier.size(ConstanteIcono.IconoPequeno)
+            )
+        },
+        colors = AssistChipDefaults.assistChipColors(
+            containerColor = Colores.Gris.copy(alpha = 0.2f),
+            labelColor = Colores.Negro
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp)
+    )
 }

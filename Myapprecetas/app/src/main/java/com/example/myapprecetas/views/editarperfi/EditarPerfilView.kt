@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
 import com.example.myapprecetas.vm.VMEditarPerfil
 
@@ -28,11 +29,8 @@ fun EditarPerfilView(
 ) {
 
     val nombreUsuario by vm.nombreUsuario.collectAsState()
-    val nuevaContrasena by vm.nuevaContrasena.collectAsState()
     val imagenUri by vm.imagenUri.collectAsState()
     val editandoNombre by vm.editandoNombre.collectAsState()
-    val editandoContrasena by vm.editandoContrasena.collectAsState()
-    val emailUsuario by vm.emailUsuario.collectAsState()
 
 
     val launcherImagen = rememberLauncherForActivityResult(
@@ -42,43 +40,33 @@ fun EditarPerfilView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Colores.Blanco)
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        HeaderAtras("Editar perfil", navController)
+        HeaderAtras("Editar perfil", navController) {
+            navController.navigate("perfil") {
+                launchSingleTop = true
+                popUpTo("perfil") { inclusive = true }
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         ImagenPerfil(imagenUri) { launcherImagen.launch("image/*") }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        CorreoNoEditable(emailUsuario)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         CampoNombre(
             nombreUsuario = nombreUsuario,
             editandoNombre = editandoNombre,
-            editandoContrasena = editandoContrasena,
-            onNombreChange = { vm.cambiarNombre(it) }, // o directamente: { vm.nombreUsuario = it }
+            onNombreChange = { vm.cambiarNombre(it) },
             onCancelarNombre = { vm.cancelarNombre() },
-            onEditarNombre = { if (!editandoContrasena) vm.toggleEditandoNombre() }
+            onEditarNombre = { vm.toggleEditandoNombre() }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        CampoContrasena(
-            nuevaContrasena = nuevaContrasena,
-            editandoContrasena = editandoContrasena,
-            editandoNombre = editandoNombre,
-            onContrasenaChange = { vm.nuevaContrasena.value = it },
-            onEditarClick = { if (!editandoNombre) vm.editandoContrasena.value = true },
-            onCancelarClick = { vm.cancelarContrasena() }
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(50.dp))
 
         BotonGuardar {
 
@@ -87,7 +75,7 @@ fun EditarPerfilView(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        TextButton({ vm.toggleEditandoNombre() }) {
+        TextButton({navController.navigate("perfil")}) {
             Text("Cancelar", color = Color.Gray)
         }
     }

@@ -60,6 +60,6 @@ fun PerfilScreen(
 
         BotonCrearReceta(vm = vm, navController = navController)
 
-        ListaRecetasPerfil(listaRecetas = listaRecetas, navController = navController)
+        ListaRecetasPerfil(vm = vm, navController = navController)
     }
 }

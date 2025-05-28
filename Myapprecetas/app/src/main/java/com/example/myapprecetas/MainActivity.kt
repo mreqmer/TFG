@@ -30,6 +30,7 @@ import com.example.myapprecetas.views.favoritas.FavoritasView
 import com.example.myapprecetas.views.inicioview.InicioView
 import com.example.myapprecetas.views.listadoreceta.ListadoRecetaView
 import com.example.myapprecetas.views.perfil.PerfilView
+import com.example.myapprecetas.views.recetacategoria.RecetaCategoriaView
 import com.example.myapprecetas.views.registro.registro.RegistroView
 import com.example.myapprecetas.views.registro.selector.SelectorRegistroView
 import com.example.myapprecetas.views.viewlogin.ViewLogin
@@ -123,6 +124,15 @@ class MainActivity : ComponentActivity() {
                             DetallesRecetaView(vm, navController)
 
                         }
+
+                        composable("receta_categoria/{categoria}") { backStackEntry ->
+                            val categoria = backStackEntry.arguments?.getString("categoria") ?: ""
+                            val vm: VMRecetaCategoria = hiltViewModel()
+                            vm.setCategoria(categoria)
+                            RecetaCategoriaView(vm, navController)
+
+                        }
+
                         composable("perfil") {
                             val vm: VMPerfil = hiltViewModel()
                             PerfilView(vm, navController)
