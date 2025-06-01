@@ -22,6 +22,9 @@ import eu.bambooapps.material3.pullrefresh.PullRefreshIndicatorDefaults
 import eu.bambooapps.material3.pullrefresh.pullRefresh
 import eu.bambooapps.material3.pullrefresh.rememberPullRefreshState
 
+/**
+ * Vista principal de la pantalla de recetas por categoría.
+ */
 @Composable
 fun RecetaCategoriaView(vm: VMRecetaCategoria, navController: NavHostController) {
 
@@ -38,6 +41,9 @@ fun RecetaCategoriaView(vm: VMRecetaCategoria, navController: NavHostController)
     }
 }
 
+/**
+ * Muestra una lista de recetas o un loader dependiendo del estado del ViewModel.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecetaCategoriaScreen(
@@ -45,7 +51,7 @@ fun RecetaCategoriaScreen(
     navController: NavHostController,
     insets: PaddingValues
 ) {
-    val textBienvenida = "Filtrando por: Tradicional Español"
+
     val isRefreshing by vm.isRefreshing.collectAsState()
     val listaReceta by vm.listaRecetas.collectAsState()
     val cargando by vm.cargando.collectAsState()
@@ -63,9 +69,11 @@ fun RecetaCategoriaScreen(
             .pullRefresh(pullRefreshState)
     ) {
         if (cargando) {
+            //circulo de carga
             CargandoElementos()
 
         }else{
+            //Listado de recetas
             ListadoRecetas(
                 listaReceta = listaReceta,
                 navController = navController,
@@ -74,6 +82,7 @@ fun RecetaCategoriaScreen(
             )
         }
 
+        //Recarga las recetas
         PullRefreshIndicator(
             refreshing = isRefreshing,
             state = pullRefreshState,

@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,14 +33,14 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
 import com.example.myapprecetas.objetos.dto.DTORecetaUsuarioLike
 import com.example.myapprecetas.ui.theme.Colores
-import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
+import com.example.myapprecetas.ui.theme.fuenteTexto
 import com.example.myapprecetas.vm.VMListadoReceta
 
-val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
-
-
+/**
+ * Lista principal de recetas con buscador y mensaje si no hay resultados
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListadoRecetas(
@@ -62,17 +61,18 @@ fun ListadoRecetas(
             HeaderBienvenida(textBienvenida)
         }
 
-        // Buscador (sticky)
+        // Buscador en la parte superior
         stickyHeader {
             Box(
                 modifier = Modifier
-                    .background(Color.White)
+                    .background(Colores.Blanco)
                     .padding(vertical = 8.dp)
             ) {
-                SearchBar(vm = vm, onAbrirDrawer = onAbrirDrawer)
+                FilaBuscador(vm = vm, onAbrirDrawer = onAbrirDrawer)
             }
         }
 
+        // Lista de recetas si no hay elementos muestra una imagen
         if (listaReceta.isEmpty()) {
             item {
                 Box(
@@ -85,7 +85,6 @@ fun ListadoRecetas(
                 }
             }
         } else {
-            // Si no está vacía, mostrar items normalmente
             items(
                 items = listaReceta,
                 key = { receta -> receta.idReceta }
@@ -97,7 +96,9 @@ fun ListadoRecetas(
     }
 }
 
-
+/**
+ * Mensaje de bienvenida
+ */
 @Composable
 fun HeaderBienvenida(text: String) {
     Box(
@@ -115,69 +116,42 @@ fun HeaderBienvenida(text: String) {
     }
 }
 
+/**
+ * Muestra un ítem de receta con su imagen, título, descripción y botón de like
+ */
 @Composable
-fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, vm: VMListadoReceta) {
+fun ItemReceta(
+    receta: DTORecetaUsuarioLike,
+    navController: NavHostController,
+    vm: VMListadoReceta
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
-            .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .border(1.dp, Colores.Gris, RoundedCornerShape(12.dp))
+            .background(Colores.Blanco)
             .clickable { navController.navigate("detalles_receta/${receta.idReceta}") }
             .padding(top = 12.dp, bottom = 2.dp)
-            .padding(start = 12.dp, end = 12.dp)
+            .padding(horizontal = 12.dp)
             .height(130.dp)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = receta.fotoReceta,
-                        placeholder = painterResource(R.drawable.ic_launcher_background),
-                        error = painterResource(R.drawable.ic_launcher_background)
-                    ),
-                    contentDescription = "Imagen de ${receta.nombreReceta}",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(120.dp)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(4.dp)
-                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(R.drawable.temporizador2),
-                            contentDescription = "Tiempo",
-
-                            modifier = Modifier.size(ConstanteIcono.IconoMuyPequeno)
-                        )
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Text(
-                            text = "${receta.tiempoPreparacion}'",
-                            fontSize = 12.sp,
-                            fontFamily = fuenteTexto,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-                    }
-                }
-            }
+            // Imagen con temporizador
+            ImagenRecetaTimer(
+                fotoReceta = receta.fotoReceta,
+                tiempoPreparacion = receta.tiempoPreparacion
+            )
 
             Spacer(modifier = Modifier.width(10.dp))
 
+            // Contenido textual
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
             ) {
+                // Nombre de la receta
                 Text(
                     text = receta.nombreReceta,
                     fontSize = 16.sp,
@@ -187,53 +161,119 @@ fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, v
                     overflow = TextOverflow.Ellipsis
                 )
 
-
+                // Descripción de la receta
                 Text(
                     text = receta.descripcion,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = fuenteTexto),
+                    fontSize = ConstanteTexto.TextoPequeno,
+                    fontFamily = fuenteTexto,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Por ${receta.nombreUsuario}",
-                        fontSize = ConstanteTexto.TextoMuyPequeno,
-                        color = Color.Gray,
-                        fontFamily = fuenteTexto,
-                        modifier = Modifier.align(Alignment.CenterStart),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    val iconoCorazon = if (receta.tieneLike) R.drawable.heart else R.drawable.corazonvacio2
-
-                    Icon(
-                        painter = painterResource(iconoCorazon),
-                        contentDescription = if (receta.tieneLike) "Quitar de favoritos" else "Añadir a favoritos",
-                        tint = Colores.RojoError,
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .offset(y = (-3).dp)
-                            .size(ConstanteIcono.IconoPequeno)
-                            .clickable {
-                                vm.toggleLike(receta.idReceta)
-                            }
-                    )
-                }
+                // Fila inferior con usuario y like
+                RecetaLikeUsername(
+                    nombreUsuario = receta.nombreUsuario,
+                    tieneLike = receta.tieneLike,
+                    onToggleLike = { vm.toggleLike(receta.idReceta) }
+                )
             }
         }
     }
 }
 
-
-
+/**
+ * Componente que muestra la imagen de la receta con el temporizador superpuesto
+ */
 @Composable
-fun SearchBar(vm: VMListadoReceta, onAbrirDrawer: () -> Unit) {
+fun ImagenRecetaTimer(
+    fotoReceta: String,
+    tiempoPreparacion: Int
+) {
+    Box(
+        modifier = Modifier
+            .size(120.dp)
+            .clip(RoundedCornerShape(8.dp))
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(
+                model = fotoReceta,
+                placeholder = painterResource(R.drawable.ic_launcher_background),
+                error = painterResource(R.drawable.ic_launcher_background)
+            ),
+            contentDescription = "Imagen de receta",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(120.dp)
+        )
+
+        // Tiempo de preparación en la esquina superior
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(4.dp)
+                .background(Colores.Blanco.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
+                .padding(horizontal = 4.dp, vertical = 2.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painterResource(R.drawable.temporizador2),
+                    contentDescription = "Tiempo",
+                    modifier = Modifier.size(ConstanteIcono.IconoMuyPequeno)
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Text(
+                    text = "${tiempoPreparacion}'",
+                    fontSize = 12.sp,
+                    fontFamily = fuenteTexto,
+                    fontWeight = FontWeight.Bold,
+                    color = Colores.Negro
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Componente que muestra el nombre de usuario y el botón de like
+ */
+@Composable
+fun RecetaLikeUsername(
+    nombreUsuario: String,
+    tieneLike: Boolean,
+    onToggleLike: () -> Unit
+) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Por $nombreUsuario",
+            fontSize = ConstanteTexto.TextoMuyPequeno,
+            color = Colores.Gris,
+            fontFamily = fuenteTexto,
+            modifier = Modifier.align(Alignment.CenterStart),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        val iconoCorazon = if (tieneLike) R.drawable.heart else R.drawable.corazonvacio2
+
+        Icon(
+            painter = painterResource(iconoCorazon),
+            contentDescription = if (tieneLike) "Quitar de favoritos" else "Añadir a favoritos",
+            tint = Colores.RojoError,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .offset(y = (-3).dp)
+                .size(ConstanteIcono.IconoPequeno)
+                .clickable { onToggleLike() }
+        )
+    }
+}
+
+/**
+ * Barra de búsqueda de recetas con botón para abrir el drawer de filtros
+ */
+@Composable
+fun FilaBuscador(vm: VMListadoReceta, onAbrirDrawer: () -> Unit) {
     val searchQuery by vm.searchQuery.collectAsState()
 
     Row(
@@ -242,6 +282,7 @@ fun SearchBar(vm: VMListadoReceta, onAbrirDrawer: () -> Unit) {
             .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Textfield del buscador
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { vm.onActualizaQuery(it) },
@@ -267,7 +308,7 @@ fun SearchBar(vm: VMListadoReceta, onAbrirDrawer: () -> Unit) {
                 imeAction = ImeAction.Search
             ),
             textStyle = TextStyle(
-                color = Color.Black,
+                color = Colores.Negro,
                 fontFamily = fuenteTexto,
                 fontSize = ConstanteTexto.TextoSemigrande
             ),
@@ -285,6 +326,7 @@ fun SearchBar(vm: VMListadoReceta, onAbrirDrawer: () -> Unit) {
 
         Spacer(modifier = Modifier.width(10.dp))
 
+        // Icono con funciones de filtrado, abre el drawer
         Icon(
             painter = painterResource(R.drawable.filtro2),
             contentDescription = "Filtrar",
@@ -299,6 +341,9 @@ fun SearchBar(vm: VMListadoReceta, onAbrirDrawer: () -> Unit) {
     }
 }
 
+/**
+ * Muestra un mensaje cuando no hay recetas disponibles
+ */
 @Composable
 fun MensajeSinRecetasLista() {
     Column(
@@ -311,7 +356,7 @@ fun MensajeSinRecetasLista() {
             fontSize = ConstanteTexto.TextoGrande,
             fontWeight = FontWeight.SemiBold,
             fontFamily = fuenteTexto,
-            color = Color.Gray,
+            color = Colores.Gris.copy(alpha = 0.9f),
             textAlign = TextAlign.Center
         )
 
@@ -320,10 +365,8 @@ fun MensajeSinRecetasLista() {
         Icon(
             painter = painterResource(R.drawable.potchupchup),
             contentDescription = "logo",
-            tint = Color.Gray,
+            tint =  Colores.Gris.copy(alpha = 0.9f),
             modifier = Modifier.size(150.dp)
         )
     }
 }
-
-

@@ -11,6 +11,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.Colores
 
+/**
+ * Vista de inicio
+ */
 @Composable
 fun InicioView(navController: NavHostController) {
     Box(

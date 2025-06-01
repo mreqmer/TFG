@@ -16,14 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigation.NavHostController
-import com.example.myapprecetas.objetos.dto.constantesobjetos.ConstantesObjetos
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.CargandoElementos
 import com.example.myapprecetas.vm.VMListadoReceta
@@ -33,7 +30,9 @@ import eu.bambooapps.material3.pullrefresh.pullRefresh
 import eu.bambooapps.material3.pullrefresh.rememberPullRefreshState
 import kotlinx.coroutines.launch
 
-
+/**
+ * Función principal que representa la vista del listado de recetas
+ */
 @Composable
 fun ListadoRecetaView(vm: VMListadoReceta, navController: NavHostController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -47,9 +46,11 @@ fun ListadoRecetaView(vm: VMListadoReceta, navController: NavHostController) {
         }
     }
 
+    // Drawer de navegación lateral para los filtros
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
+            // Contenido del drawer (perfil, navegación, etc.)
             DrawerContent(
                 vm = vm,
                 insets = WindowInsets.systemBars
@@ -58,19 +59,24 @@ fun ListadoRecetaView(vm: VMListadoReceta, navController: NavHostController) {
             )
         }
     ){
+        // Contenedor principal de la pantalla
         Box(Modifier.fillMaxSize()) {
+            // Llama a la función que construye la UI principal de la pantalla de recetas
             ListadoRecetaScreen(
                 vm = vm,
                 navController = navController,
                 insets = WindowInsets.systemBars
                     .only(WindowInsetsSides.Top + WindowInsetsSides.Bottom)
                     .asPaddingValues(),
-                onAbrirDrawer = { scope.launch { drawerState.open() } }
+                onAbrirDrawer = { scope.launch { drawerState.open() } } // Abre el drawer
             )
         }
     }
 }
 
+/**
+ * /Función que contiene la lógica principal y UI del listado de recetas
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoRecetaScreen(
@@ -84,15 +90,17 @@ fun ListadoRecetaScreen(
     val cargando by vm.cargando.collectAsState()
     val isRefreshing by vm.isRefreshing.collectAsState()
 
-    val textBienvenida = "¡Bienvenido, ${nombreUsuario?.substringBefore(" ")}!"
+    val textBienvenida = "¡Saludos, ${nombreUsuario?.substringBefore(" ")}!"
 
+    //Refresh, vuelve a cargar recetas
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = {
-//            vm.onRefresh()
             vm.buscarRecetas()
         }
     )
+
+    // Contenedor principal, varia dependiendo de si está o no cargando
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -107,10 +115,11 @@ fun ListadoRecetaScreen(
                 insets = insets,
                 textBienvenida = textBienvenida,
                 vm = vm,
-                onAbrirDrawer = onAbrirDrawer // Nuevo parámetro
+                onAbrirDrawer = onAbrirDrawer
             )
         }
 
+        // Indicador de pull-to-refresh
         PullRefreshIndicator(
             refreshing = isRefreshing,
             state = pullRefreshState,

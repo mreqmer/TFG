@@ -16,9 +16,10 @@ import javax.inject.Inject
 @HiltViewModel
 class VMFavoritas @Inject constructor(
     private val endpoints: Endpoints
-) : ViewModel(){
+) : ViewModel() {
 
-    private var _cargando = MutableStateFlow<Boolean>(false)
+    // region Estados observables
+    private var _cargando = MutableStateFlow(false)
     var cargando: StateFlow<Boolean> = _cargando
 
     private val _listaRecetas = MutableStateFlow<List<DTORecetaUsuarioLike>>(emptyList())
@@ -26,15 +27,22 @@ class VMFavoritas @Inject constructor(
 
     private val _likesEstado = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
 
-    private val _likeInProgress = MutableStateFlow<Boolean>(false)
-
+    private val _likeInProgress = MutableStateFlow(false)
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+    // endregion
+
+    // region Init
     init {
         cargaRecetas()
     }
+    // endregion
 
+    // region Actualiza
+    /**
+     * Refresca la lista de recetas favoritas en el pulltorefesh
+     */
     fun onRefresh() {
         viewModelScope.launch {
             _isRefreshing.value = true
@@ -42,17 +50,26 @@ class VMFavoritas @Inject constructor(
             _isRefreshing.value = false
         }
     }
+    // endregion
 
-    fun cargaRecetas() {
+    // region Llamadas API
+
+    /**
+     * Llama al endpoint para obtener las recetas favoritas del usuario actual
+     * y actualiza la lista y los estados de like.
+     */
+    private fun cargaRecetas() {
         val uid = currentUser.value?.uid ?: ""
         _cargando.value = true
+
         viewModelScope.launch {
-            _cargando.value = true
             try {
                 val response = endpoints.getRecetasFavoritasPorUid(uid)
                 if (response.isSuccessful) {
                     response.body()?.let { lista ->
                         _listaRecetas.value = lista
+
+                        // Asocia el estado de like de cada receta a su id
                         _likesEstado.value = lista.associate { it.idReceta to it.tieneLike }
                     }
                 }
@@ -64,6 +81,9 @@ class VMFavoritas @Inject constructor(
         }
     }
 
+    /**
+     * Cambia el estado de like para una receta determinada.
+     */
     fun toggleLike(idReceta: Int) {
         if (_likeInProgress.value) return
 
@@ -80,10 +100,12 @@ class VMFavoritas @Inject constructor(
                     if (respuesta != null && respuesta.success) {
                         val nuevoEstado = respuesta.likeActivo
 
-                        // Actualizar el estado local del like
+                        // Actualizar mapa de likes en memoria
                         _likesEstado.value = _likesEstado.value.toMutableMap().apply {
                             put(idReceta, nuevoEstado)
                         }
+
+                        // Actualizar la receta correspondiente en la lista
                         _listaRecetas.value = _listaRecetas.value.map { receta ->
                             if (receta.idReceta == idReceta) {
                                 receta.copy(tieneLike = nuevoEstado)
@@ -101,4 +123,5 @@ class VMFavoritas @Inject constructor(
         }
     }
 
+    // endregion
 }

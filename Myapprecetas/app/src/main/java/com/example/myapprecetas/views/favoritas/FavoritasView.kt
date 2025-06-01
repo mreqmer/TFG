@@ -21,6 +21,9 @@ import eu.bambooapps.material3.pullrefresh.PullRefreshIndicatorDefaults
 import eu.bambooapps.material3.pullrefresh.pullRefresh
 import eu.bambooapps.material3.pullrefresh.rememberPullRefreshState
 
+/**
+ * Función principal que representa la vista del las recetas favoritas
+ */
 @Composable
 fun FavoritasView(vm: VMFavoritas, navController: NavHostController) {
 
@@ -32,11 +35,16 @@ fun FavoritasView(vm: VMFavoritas, navController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
     ) {
+        // Composable principal de la pantalla
         FavoritasScreen(vm, navController, insets)
 
     }
 }
 
+/**
+ * Pantalla principal que muestra la lista de recetas favoritas,
+ * junto con indicador de carga y pulltorefresh
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritasScreen(
@@ -62,10 +70,13 @@ fun FavoritasScreen(
             .pullRefresh(pullRefreshState)
     ) {
         if (cargando) {
+            // Muestra pantalla de carga
             CargandoElementos()
         } else if(listaReceta.isEmpty()){
+            // Muestra mensaje si no hay recetas favoritas
             MensajeSinRecetas()
         }else{
+            // Muestra la lista de recetas favoritas
             ListadoRecetas(
                 listaReceta = listaReceta,
                 navController = navController,
@@ -75,6 +86,7 @@ fun FavoritasScreen(
             )
         }
 
+        // Muestra el indicador de refresco en la parte superior
         PullRefreshIndicator(
             refreshing = isRefreshing,
             state = pullRefreshState,

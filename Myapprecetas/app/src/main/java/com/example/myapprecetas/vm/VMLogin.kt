@@ -23,7 +23,7 @@ class VMLogin @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    // Estados privados
+    //region Atributos y propiedades
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email
 
@@ -47,12 +47,16 @@ class VMLogin @Inject constructor(
 
     val user: StateFlow<FirebaseUser?> = AuthManager.currentUser
 
-    // 🔥 Acceso al estado del login
-//    val isLoggedIn: Boolean
-//        get() = AuthManager.isLoggedIn()
-
     val error: StateFlow<String?> = authRepository.error
+    //endregion
 
+
+    //region constructor
+    init {
+
+    }
+    //endregion
+    //region Actualiza
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
         _password.value = password
@@ -61,7 +65,16 @@ class VMLogin @Inject constructor(
     fun onPasswordVisibleChanged() {
         _esPasswordVisible.value = !_esPasswordVisible.value
     }
+    fun resetErrorDialog(){
+        _errorMostradoDialog.value = ""
+    }
 
+    fun limpiarEstadoResetPassword() {
+        estadoResetPassword = null
+    }
+    //endregion
+
+    //region Metodos
     fun signInWithGoogle(idToken: String) {
         viewModelScope.launch {
             try {
@@ -124,6 +137,7 @@ class VMLogin @Inject constructor(
         }
     }
 
+
     var estadoResetPassword by mutableStateOf<Result<Unit>?>(null)
         private set
 
@@ -141,15 +155,9 @@ class VMLogin @Inject constructor(
             }
         }
     }
+    //endregion
 
 
-    fun resetErrorDialog(){
-        _errorMostradoDialog.value = ""
-    }
-
-    fun limpiarEstadoResetPassword() {
-        estadoResetPassword = null
-    }
 
 }
 

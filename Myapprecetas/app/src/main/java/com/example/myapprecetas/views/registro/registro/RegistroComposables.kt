@@ -27,8 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
+import com.example.myapprecetas.ui.theme.fuenteTexto
 import com.google.android.play.integrity.internal.i
 
+/**
+ * campos de texto para el registro
+ */
 @Composable
 fun CampoTextoRegistro(
     value: String,
@@ -58,7 +62,7 @@ fun CampoTextoRegistro(
             .fillMaxWidth()
             .border(2.dp, Colores.Gris, MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
-        textStyle = TextStyle(color = Color.Black),
+        textStyle = TextStyle(color = Colores.Negro),
         leadingIcon = {
             Icon(
                 painter = painterResource(id = icono),
@@ -70,7 +74,9 @@ fun CampoTextoRegistro(
     )
 }
 
-
+/**
+ * Mensaje de error
+ */
 @Composable
 fun MensajeError(error: String?) {
     Box(
@@ -88,6 +94,9 @@ fun MensajeError(error: String?) {
     }
 }
 
+/**
+Texto para redireccionar a iniciar sesión
+ */
 @Composable
 fun TextoCuenta(navController: NavHostController){
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -105,9 +114,11 @@ fun TextoCuenta(navController: NavHostController){
             )
         }
     }
+}
 
-
-    }
+/**
+ * Botón para registrarse
+ */
 @Composable
 fun BotonRegistro(modifier: Modifier = Modifier, onClick: () -> Unit = {}, cargando: Boolean) {
 
@@ -123,7 +134,7 @@ fun BotonRegistro(modifier: Modifier = Modifier, onClick: () -> Unit = {}, carga
             contentColor = MaterialTheme.colorScheme.onPrimary
         )
     ) {
-
+        //Carga
         if (cargando) {
             CircularProgressIndicator()
         }else{

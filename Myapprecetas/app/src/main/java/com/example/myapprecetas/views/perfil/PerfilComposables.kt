@@ -20,19 +20,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,9 +50,14 @@ import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
+import com.example.myapprecetas.ui.theme.fuenteTexto
 import com.example.myapprecetas.userauth.AuthManager
 import com.example.myapprecetas.vm.VMPerfil
 
+/**
+ * Barra superior del perfil del usuario que muestra el título y las acciones disponibles,
+ * como editar perfil o cerrar sesión.
+ */
 @Composable
 fun TopBarPerfil(vm: VMPerfil, navController: NavHostController) {
     Row(
@@ -67,39 +67,47 @@ fun TopBarPerfil(vm: VMPerfil, navController: NavHostController) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        HeaderTexto(navController)
-        AccionesPerfil(vm, navController)
+        HeaderTexto()
+        AccionesPerfil( navController)
     }
 }
 
+/**
+ * Título principal de la pantalla de perfil.
+ */
 @Composable
-fun HeaderTexto(navController: NavHostController) {
+fun HeaderTexto() {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = "Mi Perfil",
             fontSize = ConstanteTexto.TextoGrande,
             fontFamily = FamilyQuicksand.quicksand,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            color = Colores.Negro,
             modifier = Modifier.padding(start = 4.dp)
         )
     }
 }
 
+/**
+ * Contiene los botones de acción del perfil
+ */
 @Composable
-fun AccionesPerfil(vm: VMPerfil, navController: NavHostController) {
+fun AccionesPerfil( navController: NavHostController) {
     Row {
+        //Editar perfil
         IconButton(onClick = { navController.navigate("editar-perfil") }) {
             Icon(
                 painter = painterResource(id = R.drawable.edit2),
                 contentDescription = "Editar perfil",
-                tint = Color.Black,
+                tint = Colores.Negro,
                 modifier = Modifier.size(ConstanteIcono.IconoPequeno)
             )
         }
 
         Spacer(modifier = Modifier.width(8.dp))
 
+        //Cerrar sesión
         IconButton(onClick = {
             AuthManager.logoutWithRevokeAccess(navController.context) {
                 navController.navigate("inicio") {
@@ -110,23 +118,25 @@ fun AccionesPerfil(vm: VMPerfil, navController: NavHostController) {
             Icon(
                 painter = painterResource(id = R.drawable.logout2),
                 contentDescription = "Cerrar sesión",
-                tint = Color.Black,
+                tint = Colores.Negro,
                 modifier = Modifier.size(ConstanteIcono.IconoPequeno)
             )
         }
     }
 }
 
+/**
+ * Muestra un ítem individual de receta con imagen, título, descripción y opción de eliminar
+ */
 @Composable
 fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, onConfirmar: (Int) -> Unit ,) {
     var showDialog by remember { mutableStateOf(false) }
-    var isDeleting by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .border(1.dp,Colores.Gris.copy(alpha = 0.9f), RoundedCornerShape(12.dp))
+            .background(Colores.Blanco)
             .clickable { navController.navigate("detalles_receta/${receta.idReceta}") }
             .padding(top = 12.dp, bottom = 2.dp)
             .padding(start = 12.dp, end = 12.dp)
@@ -138,6 +148,7 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, 
                     .size(120.dp)
                     .clip(RoundedCornerShape(8.dp))
             ) {
+                // Imagen de la receta
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = receta.fotoReceta,
@@ -148,19 +159,19 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, 
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
-
+                // Etiqueta de tiempo
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(4.dp)
-                        .background(Color.White.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                        .background(Colores.Blanco.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
                         .padding(horizontal = 4.dp, vertical = 2.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(R.drawable.temporizador2),
                             contentDescription = "Tiempo",
-                            tint = Color.DarkGray,
+                            tint = Colores.Negro,
                             modifier = Modifier.size(ConstanteIcono.IconoMuyPequeno)
                         )
                         Spacer(modifier = Modifier.width(2.dp))
@@ -175,7 +186,7 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, 
             }
 
             Spacer(modifier = Modifier.width(12.dp))
-
+            // Información de la receta
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -184,15 +195,15 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, 
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = receta.nombreReceta,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = fuenteTexto
-                        ),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = fuenteTexto,
+                        fontSize = ConstanteTexto.TextoNormal,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
 
+                    //Borrar receta
                     IconButton(onClick = { showDialog = true }) {
                         Icon(
                             modifier = Modifier.size(ConstanteIcono.IconoPequeno),
@@ -207,9 +218,9 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, 
 
                 Text(
                     text = receta.descripcion,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = fuenteTexto
-                    ),
+                    fontWeight = FontWeight.Light,
+                    fontFamily = fuenteTexto,
+                    fontSize = ConstanteTexto.TextoPequeno,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -219,7 +230,7 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, 
                 Text(
                     text = "Por ${receta.nombreUsuario}",
                     fontSize = ConstanteTexto.TextoMuyPequeno,
-                    color = Color.Gray,
+                    color = Colores.Gris,
                     fontFamily = fuenteTexto,
                     modifier = Modifier.padding(bottom = 5.dp),
                     maxLines = 1,
@@ -227,7 +238,7 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, 
                 )
             }
         }
-
+        // Diálogo de confirmación para eliminar receta
         if (showDialog) {
             ConfirmarBorradoDialog(
                 onConfirmar = {
@@ -241,6 +252,9 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, 
     }
 }
 
+/**
+ * Muestra la información del usuario en el perfil: nombre, email, fecha y foto.
+ */
 @Composable
 fun PerfilInfo(
     nombreUsuario: String?,
@@ -259,29 +273,12 @@ fun PerfilInfo(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (!imagenPerfil.isNullOrEmpty()) {
-                Image(
-                    painter = rememberAsyncImagePainter(imagenPerfil),
-                    contentDescription = "Imagen de perfil",
-                    modifier = Modifier
-                        .size(ConstanteIcono.IconoGrande * 2)
-                        .clip(CircleShape)
-                        .background(Colores.MarronClaro.copy(alpha = 0.3f))
-                )
-            } else {
-                // Imagen por defecto si no hay URL
-                Image(
-                    painter = painterResource(id = R.drawable.fotoperfil),
-                    contentDescription = "Imagen de perfil por defecto",
-                    modifier = Modifier
-                        .size(ConstanteIcono.IconoGrande * 2)
-                        .clip(CircleShape)
-                        .background(Colores.MarronClaro.copy(alpha = 0.3f))
-                )
-            }
+            //Imagen del usuario
+            ImagenPerfil(imagenPerfil)
 
             Spacer(modifier = Modifier.width(16.dp))
 
+            //otro datos, nombre, correo, etc
             Column(modifier = Modifier.weight(1f)) {
                 nombreUsuario?.let {
                     Text(
@@ -311,6 +308,36 @@ fun PerfilInfo(
     }
 }
 
+/**
+ * Imagen de perfil del usuario
+ */
+@Composable
+private fun ImagenPerfil(imagenPerfil: String?) {
+    if (!imagenPerfil.isNullOrEmpty()) {
+        Image(
+            painter = rememberAsyncImagePainter(imagenPerfil),
+            contentDescription = "Imagen de perfil",
+            modifier = Modifier
+                .size(84.dp)
+                .clip(CircleShape)
+                .background(Colores.MarronClaro.copy(alpha = 0.3f))
+        )
+    } else {
+        // Imagen por defecto si no hay URL
+        Image(
+            painter = painterResource(id = R.drawable.fotoperfil),
+            contentDescription = "Imagen de perfil por defecto",
+            modifier = Modifier
+                .size(ConstanteIcono.IconoGrande * 2)
+                .clip(CircleShape)
+                .background(Colores.MarronClaro.copy(alpha = 0.3f))
+        )
+    }
+}
+
+/**
+ * Divisor horizontal con texto en el centro
+ */
 @Composable
 fun Divisor(texto: String) {
     Row(
@@ -342,6 +369,9 @@ fun Divisor(texto: String) {
     }
 }
 
+/**
+ * Botón para acceder a la creación de una nueva receta desde el perfil.
+ */
 @Composable
 fun BotonCrearReceta(vm: VMPerfil, navController: NavHostController) {
     val idUsuario by vm.idUsuario.collectAsState()
@@ -384,12 +414,15 @@ fun BotonCrearReceta(vm: VMPerfil, navController: NavHostController) {
                 fontSize = ConstanteTexto.TextoNormal,
                 fontWeight = FontWeight.Medium,
                 fontFamily = FamilyQuicksand.quicksand,
-                color = Color.Black
+                color = Colores.Negro
             )
         }
     }
 }
 
+/**
+ * Lista de las recetas creadas por el usuario, si las hay
+ */
 @Composable
 fun ListaRecetasPerfil(
     vm: VMPerfil,
@@ -411,6 +444,9 @@ fun ListaRecetasPerfil(
     }
 }
 
+/**
+ * Dialog para el borrado de las recetas
+ */
 @Composable
 fun ConfirmarBorradoDialog(
     onConfirmar: () -> Unit,

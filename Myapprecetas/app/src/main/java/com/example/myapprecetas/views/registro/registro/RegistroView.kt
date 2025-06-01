@@ -24,8 +24,9 @@ import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
 import com.example.myapprecetas.vm.VMRegistro
 
-val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
-
+/**
+ * Vista principal del registro
+ */
 @Composable
 fun RegistroView(vm: VMRegistro, navController: NavHostController) {
     Box(
@@ -38,6 +39,9 @@ fun RegistroView(vm: VMRegistro, navController: NavHostController) {
     }
 }
 
+/**
+ * Componentes de la pantalla de registro
+ */
 @Composable
 fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
     val nombre by vm.nombre.collectAsState()
@@ -55,21 +59,20 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Cabecera fija (no desplazable)
+            // Cabecera fija
             HeaderAtras("Registro", navController)
 
-            // Contenedor desplazable para el resto de los campos
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 50.dp, bottom = 120.dp) // Aseguramos más espacio abajo para el botón
-                    .verticalScroll(scrollState), // Hacer solo esta columna desplazable
-                verticalArrangement = Arrangement.spacedBy(15.dp) // Espaciado entre campos
+                    .padding(top = 50.dp, bottom = 120.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
-                // Mensaje de error justo encima de los campos de texto
+                // Mensaje de error
                 MensajeError(error)
 
-                // Campos de entrada
+                // Campo de username
                 CampoTextoRegistro(
                     value = nombre,
                     onTextChanged = { vm.onNombreChange(it) },
@@ -78,6 +81,7 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
                     tipo = KeyboardType.Text
                 )
 
+                //Campo de email
                 CampoTextoRegistro(
                     value = email,
                     onTextChanged = { vm.onEmailChange(it) },
@@ -86,6 +90,7 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
                     tipo = KeyboardType.Email
                 )
 
+                //Campo de contraseña
                 CampoTextoRegistro(
                     value = password,
                     onTextChanged = { vm.onPasswordChange(it) },
@@ -94,7 +99,7 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
                     tipo = KeyboardType.Password,
                     visualTransformation = PasswordVisualTransformation()
                 )
-
+                //Campo repetir contraseña
                 CampoTextoRegistro(
                     value = repetirPassword,
                     onTextChanged = { vm.onRepetirPasswordChange(it) },
@@ -105,11 +110,12 @@ fun RegistroScreen(vm: VMRegistro, navController: NavHostController) {
                     visualTransformation = PasswordVisualTransformation()
                 )
 
-                // Texto de enlace para login justo encima del botón
-                Spacer(modifier = Modifier.height(15.dp)) // Espacio antes del enlace
+
+                Spacer(modifier = Modifier.height(15.dp))
                 TextoCuenta(navController)
             }
         }
+        //Botón apra registrarse
         BotonRegistro(
             modifier = Modifier
                 .imePadding()

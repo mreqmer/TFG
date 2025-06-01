@@ -18,6 +18,7 @@ class VMRecetaCategoria @Inject constructor(
     private val endpoints: Endpoints
 ) : ViewModel() {
 
+    //region Atributos y propiedades
     private var _categoria = MutableStateFlow<String?>(null)
 
     private var _cargando = MutableStateFlow<Boolean>(false)
@@ -32,11 +33,20 @@ class VMRecetaCategoria @Inject constructor(
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
+    //endregion
 
-
+    //region constructor
     init {
     }
 
+    //endregion
+
+    //region Actualiza
+    /**
+     * Establece la categoría seleccionada
+     *
+     * @param categoria Categoría seleccionada por el usuario.
+     */
     fun setCategoria(categoria: String) {
         if (_categoria.value != categoria) {
             _categoria.value = categoria
@@ -44,10 +54,11 @@ class VMRecetaCategoria @Inject constructor(
         }
     }
 
-    fun textoBienvenida(): String{
-        return if(_categoria.value.isNullOrEmpty()) "" else _categoria.value!!
-    }
 
+
+    /**
+     * Llama a la función de carga y marca el estado de refresco.
+     */
     fun onRefresh() {
         viewModelScope.launch {
             _isRefreshing.value = true
@@ -55,7 +66,13 @@ class VMRecetaCategoria @Inject constructor(
             _isRefreshing.value = false
         }
     }
+    //endregion
 
+    //region Llamadas API
+    /**
+     * Carga la lista de recetas filtradas por categoría
+     * También actualiza el estado local de likes.
+     */
     fun cargaRecetasFiltro() {
         val uid = currentUser.value?.uid ?: ""
         _cargando.value = true
@@ -77,6 +94,11 @@ class VMRecetaCategoria @Inject constructor(
         }
     }
 
+    /**
+     * Alterna el estado del like de una receta específica.
+     *
+     * @param idReceta ID de la receta a la que se quiere dar o quitar like.
+     */
     fun toggleLike(idReceta: Int) {
         if (_likeInProgress.value) return
 
@@ -113,5 +135,17 @@ class VMRecetaCategoria @Inject constructor(
             }
         }
     }
+    //endregion
+
+    //region Funciones
+    /**
+     * Retorna el texto de bienvenida con la categoría actual.
+     *
+     * @return Texto con la categoría seleccionada o cadena vacía si no hay ninguna.
+     */
+    fun textoBienvenida(): String{
+        return if(_categoria.value.isNullOrEmpty()) "" else _categoria.value!!
+    }
+    //endregion
 
 }

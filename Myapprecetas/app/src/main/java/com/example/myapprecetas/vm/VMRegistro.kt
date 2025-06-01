@@ -18,27 +18,31 @@ class VMRegistro@Inject constructor(
 ) : ViewModel() {
 
 
-    // Estados privados
+    //region Estados
     private val _nombre = MutableStateFlow("")
+    val nombre: StateFlow<String> = _nombre
+
     private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
+
     private val _password = MutableStateFlow("")
+    val password: StateFlow<String> = _password
+
     private val _repetirPassword = MutableStateFlow("")
+    val repetirPassword: StateFlow<String> = _repetirPassword
+
     private val _errorMostrado = MutableStateFlow("")
+    val errorMostrado: StateFlow<String> = _errorMostrado
+
     private val _cargando = MutableStateFlow(false)
+    val cargando: StateFlow<Boolean> = _cargando
+
     private val _registroSuccess = MutableStateFlow(false)
 
-    // Estados públicos
-    val nombre: StateFlow<String> = _nombre
-    val email: StateFlow<String> = _email
-    val password: StateFlow<String> = _password
-    val repetirPassword: StateFlow<String> = _repetirPassword
-    val errorMostrado: StateFlow<String> = _errorMostrado
-    val cargando: StateFlow<Boolean> = _cargando
-    val registroSuccess: StateFlow<Boolean> = _registroSuccess
-
     val error: StateFlow<String?> = authRepository.error
+    //endregion
 
-    // Funciones para actualizar
+    //region Actualiza
     fun onNombreChange(newNombre: String) {
         _nombre.value = newNombre
     }
@@ -55,6 +59,14 @@ class VMRegistro@Inject constructor(
         _repetirPassword.value = newRepetirPassword
     }
 
+    //endregion
+
+    //region Funciones
+
+    /**
+     * Registra al usuario, muestra un error si sale mal
+     * @param onSuccess callback para cuando sale bien
+     */
     fun register(onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
@@ -101,11 +113,18 @@ class VMRegistro@Inject constructor(
         }
     }
 
+    /**
+     * Comprueba el email
+     * @param email correo a validar
+     */
     private fun isEmailValid(email: String): Boolean {
         val emailPattern = "^[A-Za-z0-9+_.-]+@(.+)$"
         return email.matches(Regex(emailPattern))
     }
 
+    /**
+     * Obiene un error y lo traduce a Español
+     */
     private fun traducirErrorFirebase() {
         val errorMessage = error.value
         _errorMostrado.value = when (errorMessage) {
@@ -123,4 +142,5 @@ class VMRegistro@Inject constructor(
             else -> "Error al autenticar: ${errorMessage ?: "Desconocido"}"
         }
     }
+    //endregion
 }

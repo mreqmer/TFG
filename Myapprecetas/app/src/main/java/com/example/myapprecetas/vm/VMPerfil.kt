@@ -23,26 +23,36 @@ class VMPerfil @Inject constructor(
     private val repository: IngredienteRepository
 ) : ViewModel() {
 
-    private val _listaRecetas = MutableStateFlow<List<DTORecetaSimplificada>>(emptyList())
-    private val _idUsuario = MutableStateFlow<Int>(0)
-    private val _nombreUsuario = MutableStateFlow<String?>("Usuario")
-    private var _cargando = MutableStateFlow<Boolean>(false)
-    private var _cargandoUsuario = MutableStateFlow<Boolean>(false)
-    private var _email = MutableStateFlow<String?>("")
-    private val _imagenPerfil = MutableStateFlow<String?>(null)
-    private val _fechaCreacion = MutableStateFlow<String?>("")
-    private val _fechaString = MutableStateFlow<String?>("")
 
+    //region Atributos y propiedades
+
+    private val _listaRecetas = MutableStateFlow<List<DTORecetaSimplificada>>(emptyList())
     val listaRecetas: StateFlow<List<DTORecetaSimplificada>> = _listaRecetas
+
+    private val _idUsuario = MutableStateFlow(0)
     val idUsuario: StateFlow<Int?> = _idUsuario
+
+    private val _nombreUsuario = MutableStateFlow<String?>("Usuario")
     val nombreUsuario: StateFlow<String?> = _nombreUsuario
-    var cargando: StateFlow<Boolean> = _cargando
+
+    private val _cargando = MutableStateFlow(false)
+    val cargando: StateFlow<Boolean> = _cargando
+
+    private val _cargandoUsuario = MutableStateFlow(false)
+    private val _email = MutableStateFlow<String?>("")
     val email: StateFlow<String?> = _email
+
+    private val _imagenPerfil = MutableStateFlow<String?>(null)
     val imagenPerfil: StateFlow<String?> = _imagenPerfil
+
+    private val _fechaString = MutableStateFlow<String?>("")
     val fechaString: StateFlow<String?> = _fechaString
 
+//endregion
 
-    init{
+    //region Init
+
+    init {
         _nombreUsuario.value = AuthManager.currentUser.value?.displayName ?: "Usuario"
         _email.value = AuthManager.currentUser.value?.email ?: ""
         _imagenPerfil.value = (AuthManager.currentUser.value?.photoUrl ?: "").toString()
@@ -50,16 +60,37 @@ class VMPerfil @Inject constructor(
         formatearFecha()
     }
 
+    //endregion
+
+    //region Funciones de actualización
+
+    /**
+     * Borra los ingredientes almacenados en el repositorio.
+     */
     fun clearIngredientes() {
         repository.clearIngredientes()
     }
 
-    fun eliminarRecetaLocal(idReceta: Int) {
-        val nuevaLista = _listaRecetas.value.filterNot { it.idReceta == idReceta }
-        _listaRecetas.value = nuevaLista
+    //endregion
 
+    //region Funciones
+    /**
+     * Formatea la fecha de creación del usuario y la guarda como texto.
+     */
+    private fun formatearFecha() {
+        val fechaCreacion = AuthManager.currentUser.value?.metadata?.creationTimestamp
+        val date = fechaCreacion?.let { Date(it) }
+        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale("es", "ES"))
+        _fechaString.value = "Miembro desde: ${date?.let { dateFormat.format(it) }}"
     }
 
+    //endregion
+
+    //region Llamadas API
+
+    /**
+     * Carga los datos del usuario
+     */
     private fun cargaUsuario() {
         val uid = AuthManager.currentUser.value?.uid ?: return
 
@@ -69,10 +100,8 @@ class VMPerfil @Inject constructor(
                 val response = endpoints.getUsuarioUID(uid)
                 if (response.isSuccessful) {
                     response.body()?.let { usuario ->
-                        // Aquí actualizas los campos con el usuario obtenido
                         _idUsuario.value = usuario.idUsuario
                         cargaRecetas()
-
                         Log.i(":::OKAY", "Usuario cargado: $usuario")
                     } ?: run {
                         Log.i("RESPUESTA VACIA", "No se encontró usuario para UID $uid")
@@ -88,6 +117,9 @@ class VMPerfil @Inject constructor(
         }
     }
 
+    /**
+     * Carga las recetas asociadas al ID de usuario.
+     */
     private fun cargaRecetas() {
         viewModelScope.launch {
             _cargando.value = true
@@ -97,49 +129,44 @@ class VMPerfil @Inject constructor(
                     response.body()?.let {
                         _listaRecetas.value = it
                         Log.i("OKAY", response.body().toString())
-                        _cargando.value = false
                     } ?: run {
                         Log.i("RESPUESTA VACIA", response.body().toString())
-                        _cargando.value = false
                     }
                 } else {
                     Log.i("ERROR SERVIDOR", response.body().toString())
-                    _cargando.value = false
                 }
             } catch (e: Exception) {
                 Log.i("EXCEPTION", e.toString())
+            } finally {
                 _cargando.value = false
             }
         }
     }
 
-    fun formatearFecha() {
-        val fechaCreacion = AuthManager.currentUser.value?.metadata?.creationTimestamp
-        val date = fechaCreacion?.let { Date(it) }
-        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale("es", "ES"))
-        _fechaString.value = "Miembro desde: ${dateFormat.format(date)}"
-    }
-
-    fun borrarReceta(idReceta: Int){
+    /**
+     * Borra una receta del backend y la elimina de la lista local si el borrado fue exitoso.
+     * @param idReceta ID de la receta a eliminar
+     */
+    fun borrarReceta(idReceta: Int) {
         val uid = AuthManager.currentUser.value?.uid ?: return
 
         viewModelScope.launch {
             try {
                 val response = endpoints.borrarReceta(uid, idReceta)
                 if (response.isSuccessful) {
-                    Log.d(":::Correcto",  _listaRecetas.value.toString())
+                    Log.d(":::Correcto", _listaRecetas.value.toString())
                     _listaRecetas.update { recetas -> recetas.filter { it.idReceta != idReceta } }
-                    Log.d(":::Correcto",  "Borrado correctamente")
-                    Log.d(":::Correcto",  _listaRecetas.value.toString())
+                    Log.d(":::Correcto", "Borrado correctamente")
+                    Log.d(":::Correcto", _listaRecetas.value.toString())
                 } else {
                     val errorMessage = response.errorBody()?.string()
                     Log.d(":::Error", "Mensaje: $errorMessage")
                 }
             } catch (e: Exception) {
-                Log.d(":::Error",  "Excepción: ${e.localizedMessage}")
+                Log.d(":::Error", "Excepción: ${e.localizedMessage}")
             }
         }
     }
 
-
+    //endregion
 }

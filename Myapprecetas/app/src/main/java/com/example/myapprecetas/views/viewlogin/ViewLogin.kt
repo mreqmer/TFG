@@ -17,11 +17,10 @@ import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
 import com.example.myapprecetas.vm.VMLogin
 
-/*TODO GORDO
- El recuperar contraseña no va, pero no me quiero matar de momento
+
+/**
+ * Vista de login
  */
-
-
 @Composable
 fun ViewLogin(vm: VMLogin, navController: NavHostController) {
     Box {
@@ -29,6 +28,9 @@ fun ViewLogin(vm: VMLogin, navController: NavHostController) {
     }
 }
 
+/**
+ * Pantalla con los componentes dle login
+ */
 @Composable
 fun LoginScreen(vm: VMLogin, navController: NavHostController) {
     val user by vm.user.collectAsState()

@@ -42,8 +42,15 @@ import com.example.myapprecetas.R
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
+import com.example.myapprecetas.ui.theme.fuenteTexto
 import com.example.myapprecetas.vm.VMListadoReceta
 
+/**
+ * Contenido del Drawer lateral para filtrar recetas.
+ *
+ * @param vm ViewModel que maneja los filtros y datos de recetas.
+ * @param insets PaddingValues para respetar las áreas seguras (ej. barra de navegación).
+ */
 @Composable
 fun DrawerContent(
     vm: VMListadoReceta,
@@ -56,6 +63,7 @@ fun DrawerContent(
     val filtroTiempo by vm.filtroSeleccionadoTiempo.collectAsState()
     val filtroDificultad by vm.filtroSeleccionadoDificultad.collectAsState()
 
+    // Contenedor principal del drawer
     ModalDrawerSheet(
         drawerContainerColor = Color.White,
         modifier = Modifier
@@ -68,6 +76,8 @@ fun DrawerContent(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+
+            // Columna con scroll que contiene los filtros
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -82,10 +92,13 @@ fun DrawerContent(
                 )
                 Spacer(Modifier.height(16.dp))
 
-                ReestableceFiltro({ vm.reestableceFiltro() })
+                // Botón para restablecer filtros
+                ReestableceFiltro { vm.reestableceFiltro() }
 
+                // Filtro para ingredientes
                 FiltroIngrediente(vm)
 
+                // Filtros con chips para Tiempo, Dificultad y Categoría
                 FiltroFlowRow(
                     titulo = "Tiempo",
                     items = vm.tiempos,
@@ -110,6 +123,7 @@ fun DrawerContent(
 
             Spacer(Modifier.height(12.dp))
 
+            // Botón para aplicar los filtros y lanzar la búsqueda
             Button(
                 onClick = { vm.buscarRecetas() },
                 modifier = Modifier
@@ -132,7 +146,14 @@ fun DrawerContent(
     }
 }
 
-
+/**
+ * Composable que muestra un filtro con chips en fila para selección única.
+ *
+ * @param titulo Título del filtro.
+ * @param items Lista de opciones para seleccionar (pueden ser nulas).
+ * @param seleccion Elemento actualmente seleccionado.
+ * @param onSeleccionChange Actualiza la selección.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FiltroFlowRow(
@@ -142,6 +163,7 @@ fun FiltroFlowRow(
     onSeleccionChange: (String?) -> Unit,
 
 ) {
+    // Título del filtro
     Text(
         titulo,
         fontFamily = fuenteTexto,
@@ -155,6 +177,7 @@ fun FiltroFlowRow(
 
     Spacer(Modifier.height(8.dp))
 
+    // Recorre los items y crea un chip para cada uno
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
@@ -192,6 +215,11 @@ fun FiltroFlowRow(
     Spacer(Modifier.height(16.dp))
 }
 
+/**
+ * Composable que muestra un filtro específico para seleccionar ingredientes.
+ *
+ * @param vm ViewModel que maneja la búsqueda y selección de ingredientes.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FiltroIngrediente(vm: VMListadoReceta) {
@@ -207,7 +235,7 @@ fun FiltroIngrediente(vm: VMListadoReceta) {
         color = Colores.Negro
     )
     Spacer(Modifier.height(8.dp))
-
+    // Campo de texto para buscar ingredientes
     OutlinedTextField(
         value = textoBusqueda,
         onValueChange = {
@@ -221,6 +249,7 @@ fun FiltroIngrediente(vm: VMListadoReceta) {
 
     Spacer(Modifier.height(8.dp))
 
+    // Muestra los primeros 5 ingredientes filtrados para agregar
     listadoIngredientes.take(5).forEach { ingrediente ->
         Button(
             onClick = {
@@ -246,6 +275,7 @@ fun FiltroIngrediente(vm: VMListadoReceta) {
 
     Spacer(Modifier.height(12.dp))
 
+    // Chips con los ingredientes seleccionados, con opción para eliminarlos
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
@@ -278,6 +308,12 @@ fun FiltroIngrediente(vm: VMListadoReceta) {
     }
 }
 
+
+/**
+ * Composable que muestra un chip para restablecer todos los filtros.
+ *
+ * @param onClick Callback que se ejecuta al pulsar el chip.
+ */
 @Composable
 fun ReestableceFiltro(onClick: () -> Unit) {
     AssistChip(
@@ -292,7 +328,7 @@ fun ReestableceFiltro(onClick: () -> Unit) {
         },
         leadingIcon = {
             Icon(
-                painter = painterResource(R.drawable.cerrar), // Usa un icono de reinicio si tienes
+                painter = painterResource(R.drawable.cerrar),
                 contentDescription = "Restablecer filtros",
                 modifier = Modifier.size(ConstanteIcono.IconoPequeno)
             )

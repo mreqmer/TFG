@@ -25,13 +25,14 @@ import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.vm.VMCreacionReceta
 
-// Campo de búsqueda de ingredientes
+/**
+ * Campo de búsqueda de ingredientes
+  */
 @Composable
 fun BusquedaIngredientes(
     vm: VMCreacionReceta,
     busqueda: String,
     focusRequester: FocusRequester,
-    focusManager: FocusManager
 ) {
     OutlinedTextField(
         value = busqueda,
@@ -55,7 +56,9 @@ fun BusquedaIngredientes(
     )
 }
 
-// Lista de resultados de búsqueda
+/**
+ * Lista de resultados de búsqueda
+  */
 @Composable
 fun ListaResultados(
     ingredientes: List<Ingrediente>,
@@ -63,13 +66,16 @@ fun ListaResultados(
     focusManager: FocusManager
 ) {
     LazyColumn {
+        //resultados de la búsqueda
         items(ingredientes) { ingrediente ->
             ItemListaResultados(ingrediente, vm, focusManager)
         }
     }
 }
 
-// Cartas individuales de los ingredientes de la búsqueda
+/**
+ * Cartas individuales de los ingredientes de la búsqueda
+ */
 @Composable
 private fun ItemListaResultados(
     ingrediente: Ingrediente,
@@ -105,7 +111,9 @@ private fun ItemListaResultados(
     }
 }
 
-// Sección de ingredientes seleccionados, si no hay muestra mensaje
+/**
+ * Sección de ingredientes seleccionados, si no hay muestra mensaje
+ */
 @Composable
 fun IngredientesSeleccionados(
     ingredientesSeleccionados: List<Ingrediente>,
@@ -122,7 +130,7 @@ fun IngredientesSeleccionados(
             modifier = Modifier.padding(vertical = 8.dp),
             fontFamily = FamilyQuicksand.quicksand,
         )
-
+        //Si encuentra louestra, si no mensaje
         if (ingredientesSeleccionados.isEmpty()) {
             TextosSinIngredientes()
         } else {
@@ -137,7 +145,9 @@ fun IngredientesSeleccionados(
     }
 }
 
-// Lista con los ingredientes seleccionados
+/*
+* Lista con los ingredientes seleccionados
+ */
 @Composable
 private fun ListaIngredientesSeleccionados(
     ingredientes: List<Ingrediente>,
@@ -164,7 +174,9 @@ private fun ListaIngredientesSeleccionados(
     }
 }
 
-// Tarjeta con el ingrediente seleccionado
+/**
+ * Tarjeta con el ingrediente seleccionado
+  */
 @Composable
 private fun ItemIngredienteSeleccionado(
     ingrediente: Ingrediente,
@@ -201,6 +213,7 @@ private fun ItemIngredienteSeleccionado(
                 vm = vm
             )
 
+            //notas adicionales para los ingredientes
             if (enEdicion) {
                 CampoNotas(ingrediente, vm)
             } else if (ingrediente.notas.isNotEmpty()) {
@@ -210,6 +223,9 @@ private fun ItemIngredienteSeleccionado(
     }
 }
 
+/**
+ * Contenedor del ingrediente, con los botones de editar y eliminar
+ */
 @Composable
 private fun IngredienteHeader(
     ingrediente: Ingrediente,
@@ -240,7 +256,9 @@ private fun IngredienteHeader(
     }
 }
 
-// Campo para editar la cantidad del ingrediente
+/**
+ * Edita la cantidad de un ingrediente
+ */
 @Composable
 private fun EditaCantidad(ingrediente: Ingrediente, vm: VMCreacionReceta) {
     OutlinedTextField(
@@ -254,7 +272,9 @@ private fun EditaCantidad(ingrediente: Ingrediente, vm: VMCreacionReceta) {
     )
 }
 
-// Muestra cantidad y medida de cada ingrediente
+/**
+ * Muestra cantidad y medida de cada ingrediente
+ */
 @Composable
 private fun CantidadIngrediente(ingrediente: Ingrediente) {
     Text(
@@ -264,7 +284,9 @@ private fun CantidadIngrediente(ingrediente: Ingrediente) {
     )
 }
 
-// ButtonIcon de los botones editar/eliminar
+/**
+ * ButtonIcon de los botones editar/eliminar
+ */
 @Composable
 private fun IconosIngredientes(onEdit: () -> Unit, onDelete: () -> Unit) {
     Row {
@@ -283,7 +305,9 @@ private fun IconosIngredientes(onEdit: () -> Unit, onDelete: () -> Unit) {
     }
 }
 
-//Campo editable notas del ingrediente
+/**
+ * Campo editable notas del ingrediente
+ */
 @Composable
 private fun CampoNotas(ingrediente: Ingrediente, vm: VMCreacionReceta) {
     OutlinedTextField(
@@ -297,7 +321,9 @@ private fun CampoNotas(ingrediente: Ingrediente, vm: VMCreacionReceta) {
     )
 }
 
-//Notas del ingrediente, si tiene
+/**
+ * Notas del ingrediente, si tiene
+ */
 @Composable
 private fun IngredeinteNotas(notas: String) {
     Text(
@@ -308,7 +334,9 @@ private fun IngredeinteNotas(notas: String) {
     )
 }
 
-//ButtonIcon para guardar los campos de un ingrediente
+/**
+ * ButtonIcon para guardar los campos de un ingrediente
+ */
 @Composable
 private fun IconoGuardarEdit(onSave: () -> Unit) {
     IconButton(onClick = onSave) {
@@ -319,7 +347,9 @@ private fun IconoGuardarEdit(onSave: () -> Unit) {
     }
 }
 
-//Botón para guardar los ingrediente añadidos y volver para seguir editando receta
+/**
+ * Botón para guardar los ingrediente añadidos y volver para seguir editando receta
+ */
 @Composable
 fun BotonGuardar(vm: VMCreacionReceta, navController: NavHostController, ingredientes: List<Ingrediente>) {
     Button(
@@ -345,7 +375,9 @@ fun BotonGuardar(vm: VMCreacionReceta, navController: NavHostController, ingredi
     }
 }
 
-//Texto para cuando se está buscando ingredientes
+/**
+ * Texto para cuando se está buscando ingredientes
+ */
 @Composable
 fun TextoCarga() {
     Text(
@@ -355,7 +387,9 @@ fun TextoCarga() {
     )
 }
 
-//Texto para cuando no hay ingredientes
+/**
+ * Texto para cuando no hay ingredientes
+ */
 @Composable
 private fun TextosSinIngredientes() {
     Text(

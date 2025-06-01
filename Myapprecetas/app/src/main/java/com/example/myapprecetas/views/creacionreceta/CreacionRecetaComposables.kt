@@ -1,7 +1,6 @@
 package com.example.myapprecetas.views.creacionreceta
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -51,9 +50,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,22 +63,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
-import com.example.myapprecetas.objetos.ClsIngrediente
-import com.example.myapprecetas.objetos.dto.Categoria
 import com.example.myapprecetas.objetos.dto.Ingrediente
 import com.example.myapprecetas.objetos.dto.constantesobjetos.ConstantesObjetos
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
-import com.example.myapprecetas.ui.theme.Typography
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
-import com.example.myapprecetas.views.detallesreceta.IngredienteItem
 import com.example.myapprecetas.vm.VMCreacionReceta
 
-//Titulo de cada seccion de la vista
+/**
+ * Título de cada sección en la interfaz
+ */
 @Composable
 fun SeccionTitulo(texto: String) {
     Text(
@@ -95,7 +88,9 @@ fun SeccionTitulo(texto: String) {
     )
 }
 
-//Campo para introducir texto con un tamaño máximo
+/**
+ * Campo de entrada de texto con longitud y tamaño definidos
+ */
 @Composable
 fun InputField(
     value: String,
@@ -132,7 +127,7 @@ fun InputField(
             ),
             maxLines = maxLines,
         )
-
+         //Carácteres restantes
         TextoCaracteresRestantes(
             caracteresRestantes,
             maxLength
@@ -140,7 +135,9 @@ fun InputField(
     }
 }
 
-//Botón que navega a la vista AddIngrediente
+/**
+ * Botón que navega a la vista para añadir un nuevo ingrediente
+ */
 @Composable
 fun BotonAddIngrediente(onClick: () -> Unit) {
     OutlinedButton(
@@ -161,18 +158,20 @@ fun BotonAddIngrediente(onClick: () -> Unit) {
             painter = painterResource(R.drawable.mas),
             contentDescription = "Añadir ingrediente")
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = "Añadir ingrediente",fontFamily = FamilyQuicksand.quicksand,)
+        Text(text = "Añadir ingrediente",fontFamily = FamilyQuicksand.quicksand)
     }
 }
 
-//Aquí aparecen los ingredientes que se usan en la receta
+/**
+ *  Muestra la lista de ingredientes seleccionados en la receta
+ */
 @Composable
 fun ListaIngredientesSeleccionados(
     ingredientesSeleccionados: List<Ingrediente>,
     onEliminarIngrediente: (Ingrediente) -> Unit,
 ) {
     if (ingredientesSeleccionados.isEmpty()) {
-        Text("No hay ingredientes seleccionados.", fontFamily = FamilyQuicksand.quicksand,)
+        Text("No hay ingredientes seleccionados.", fontFamily = FamilyQuicksand.quicksand)
     } else {
         Box(
             modifier = Modifier
@@ -187,6 +186,7 @@ fun ListaIngredientesSeleccionados(
                     .padding(bottom = 8.dp)
             ) {
                 items(ingredientesSeleccionados) { ingrediente ->
+                    //Lista de ingredientes
                     IngredienteItem(
                         ingrediente = ingrediente,
                         onEliminarIngrediente = onEliminarIngrediente
@@ -197,7 +197,9 @@ fun ListaIngredientesSeleccionados(
     }
 }
 
-//Cada Item con su card correspondiente (ingrediente)
+/**
+ * Muestra un solo ingrediente dentro de una card
+ */
 @Composable
 fun IngredienteItem(
     ingrediente: Ingrediente,
@@ -266,7 +268,9 @@ fun IngredienteItem(
     }
 }
 
-//Cada Item paso de la lista
+/**
+ * Campo para escribir un paso con opción para eliminarlo
+ */
 @Composable
 fun PasoItem(index: Int, paso: String, onValueChange: (String) -> Unit, onDelete: () -> Unit) {
     Row(
@@ -335,7 +339,10 @@ fun PasoItem(index: Int, paso: String, onValueChange: (String) -> Unit, onDelete
     }
 }
 
-//Boton para añadir un nuevo paso
+/**
+ * Boton para añadir un nuevo paso
+ */
+
 @Composable
 fun AddPaso(onClick: () -> Unit) {
     Row(
@@ -363,7 +370,9 @@ fun AddPaso(onClick: () -> Unit) {
     }
 }
 
-//Campo para introducir el tiempo de preparacion
+/**
+ * Campo para introducir el tiempo de preparacion
+ */
 @Composable
 fun TiempoPreparacionField(
     value: Int,
@@ -428,6 +437,9 @@ fun TiempoPreparacionField(
     }
 }
 
+/**
+ * Chips para seleccionar la dificultad de la receta
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DificultadChips(
@@ -438,7 +450,7 @@ fun DificultadChips(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
     ) {
-        ConstantesObjetos.Recetas_Dificultad.values().forEach { dificultad ->
+        ConstantesObjetos.Recetas_Dificultad.entries.forEach { dificultad ->
             AssistChip(
                 onClick = { onDificultadSeleccionada(dificultad.label) },
                 label = {
@@ -460,6 +472,9 @@ fun DificultadChips(
     }
 }
 
+/**
+ * Selector de categorías con chips para seleccionar hasta 5
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CategoriasSelector(vm: VMCreacionReceta) {
@@ -497,8 +512,9 @@ fun CategoriasSelector(vm: VMCreacionReceta) {
     }
 }
 
-//Botón para guardar y crear una nueva receta
-//TODO Funciona, pero no se va de pantalla
+/**
+ * Botón para guardar y crear una nueva receta
+ */
 @Composable
 fun BtnGuardarReceta(
     isLoading: Boolean,
@@ -531,6 +547,9 @@ fun BtnGuardarReceta(
     }
 }
 
+/**
+ * Selecciona una foto para subirla
+ */
 @Composable
 fun FotoSelector(
     imagenUri: Uri?,
@@ -593,7 +612,9 @@ fun FotoSelector(
     }
 }
 
-//Muestra los carácteres restantes para introducir texto
+/**
+ * Muestra los carácteres restantes para introducir texto
+ */
 @Composable
 fun TextoCaracteresRestantes(
     caracteresRestantes: Int,

@@ -16,10 +16,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +28,9 @@ import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.R
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 
+/**
+ * Imagen de fondo
+ */
 @Composable
 fun BackgroundImage() {
     Image(
@@ -40,27 +41,12 @@ fun BackgroundImage() {
     )
 }
 
-@Composable
-fun LogoInicioPlceholder() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "RECETAS",
-            fontSize = ConstanteTexto.TextoLogo,
-            fontFamily = FamilyQuicksand.quicksand,
-            fontWeight = FontWeight.Bold,
-            color = Colores.Negro,
-            modifier = Modifier
-                .alpha(0.9f)
-                .padding(bottom = 200.dp)
-        )
-    }
-}
 
+/**
+ * Logo de la app
+ */
 @Composable
-fun LogoInicio(modifier: Modifier = Modifier) { // Añade parámetro modifier
+fun LogoInicio(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier, // Usa el modifier recibido
         contentAlignment = Alignment.Center
@@ -74,6 +60,9 @@ fun LogoInicio(modifier: Modifier = Modifier) { // Añade parámetro modifier
     }
 }
 
+/**
+ * Pantalla de inicio
+ */
 @Composable
 fun InicioScreen(navController: NavHostController) {
     Column(
@@ -87,6 +76,9 @@ fun InicioScreen(navController: NavHostController) {
     }
 }
 
+/**
+ * Botones de iniciar sesión y regsitrarse
+ */
 @Composable
 fun Botones(navController: NavHostController) {
     Button(
@@ -98,7 +90,7 @@ fun Botones(navController: NavHostController) {
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Colores.VerdeOscuro,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            contentColor = Colores.Blanco
         )
     ) {
         Text(
@@ -118,7 +110,7 @@ fun Botones(navController: NavHostController) {
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Colores.MarronOscuro,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            contentColor = Colores.Blanco
         )
     ) {
         Text(

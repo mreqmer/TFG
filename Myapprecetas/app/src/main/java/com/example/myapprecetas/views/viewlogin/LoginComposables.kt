@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -60,18 +58,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.R
 import com.example.myapprecetas.ui.theme.Colores
-import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
+import com.example.myapprecetas.ui.theme.fuenteTexto
 import com.example.myapprecetas.vm.VMLogin
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
 
-// Variable para controlar la fuente desde un solo lugar
-private val currentFont = FamilyQuicksand.quicksand // Cambia aquí la fuente si necesitas probar otra
-
+/**
+ * Mensaje de error
+ */
 @Composable
 fun MensajeError(mensajeError: String?, cargando: Boolean) {
     val mensaje = if (cargando) "" else mensajeError
@@ -79,10 +77,13 @@ fun MensajeError(mensajeError: String?, cargando: Boolean) {
         modifier = Modifier.padding(start = 2.dp),
         color = Colores.RojoError,
         text = mensaje ?: "",
-        fontFamily = currentFont
+        fontFamily = fuenteTexto
     )
 }
 
+/**
+ * Campo de entrada para el correo electrónico
+ */
 @Composable
 fun EmailField(email: String, onTextChanged: (String) -> Unit) {
     OutlinedTextField(
@@ -91,7 +92,7 @@ fun EmailField(email: String, onTextChanged: (String) -> Unit) {
         placeholder = {
             Text(
                 text = "Correo electrónico",
-                fontFamily = currentFont
+                fontFamily = fuenteTexto
             )
         },
         modifier = Modifier
@@ -103,7 +104,7 @@ fun EmailField(email: String, onTextChanged: (String) -> Unit) {
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Next
         ),
-        textStyle = TextStyle(color = Color.Black, fontFamily = currentFont),
+        textStyle = TextStyle(color = Colores.Negro, fontFamily = fuenteTexto),
         leadingIcon = {
             Icon(
                 painter = painterResource(R.drawable.usero),
@@ -115,6 +116,9 @@ fun EmailField(email: String, onTextChanged: (String) -> Unit) {
     )
 }
 
+/**
+ * Campo de entrada para la contraseña con ícono para mostrar/ocultar
+ */
 @Composable
 fun PasswordField(
     vm: VMLogin,
@@ -130,7 +134,7 @@ fun PasswordField(
         placeholder = {
             Text(
                 text = "Password",
-                fontFamily = currentFont
+                fontFamily = fuenteTexto
             )
         },
         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -142,7 +146,7 @@ fun PasswordField(
             .fillMaxWidth()
             .border(2.dp, Colores.Gris, MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
-        textStyle = TextStyle(color = Color.Black, fontFamily = currentFont),
+        textStyle = TextStyle(color = Colores.Negro, fontFamily = fuenteTexto),
         maxLines = 1,
         leadingIcon = {
             Icon(
@@ -165,6 +169,9 @@ fun PasswordField(
     )
 }
 
+/**
+ * Enlace para mostrar el diálogo de recuperación de contraseña
+ */
 @Composable
 fun PasswordOlvidada(vm: VMLogin) {
     var mostrarDialog by remember { mutableStateOf(false) }
@@ -180,7 +187,7 @@ fun PasswordOlvidada(vm: VMLogin) {
             fontWeight = FontWeight.SemiBold,
             textDecoration = TextDecoration.Underline,
             modifier = Modifier.clickable { mostrarDialog = true},
-            fontFamily = currentFont
+            fontFamily = fuenteTexto
         )
     }
 
@@ -194,6 +201,9 @@ fun PasswordOlvidada(vm: VMLogin) {
     }
 }
 
+/**
+ * Diálogo que permite al usuario introducir su correo para restablecer su contraseña
+ */
 @Composable
 fun DialogoRestablecerPassword(
     onDismiss: () -> Unit,
@@ -225,7 +235,7 @@ fun DialogoRestablecerPassword(
         title = {
             Text(
                 text = "Recuperar contraseña",
-                fontFamily = currentFont,
+                fontFamily = fuenteTexto,
                 fontWeight = FontWeight.Bold,
                 color = Colores.Negro
             )
@@ -234,7 +244,7 @@ fun DialogoRestablecerPassword(
             Column {
                 Text(
                     text = "Revisa tu correo electrónico para reestablecer tu contraseña",
-                    fontFamily = currentFont,
+                    fontFamily = fuenteTexto,
                     fontWeight = FontWeight.SemiBold,
                     color = Colores.Negro
                 )
@@ -246,7 +256,7 @@ fun DialogoRestablecerPassword(
                         label = {
                             Text(
                                 text = "Correo electrónico",
-                                fontFamily = currentFont,
+                                fontFamily = fuenteTexto,
                                 color = Colores.Negro
                             )
                         },
@@ -260,7 +270,7 @@ fun DialogoRestablecerPassword(
                         color = Colores.RojoError,
                         fontSize = ConstanteTexto.TextoPequeno,
                         fontWeight = FontWeight.SemiBold,
-                        fontFamily = currentFont,
+                        fontFamily = fuenteTexto,
                         modifier = Modifier
                             .padding(start = 16.dp, top = 4.dp)
                             .heightIn(min = 20.dp)
@@ -276,7 +286,7 @@ fun DialogoRestablecerPassword(
             ) {
                 Text(
                     "Aceptar",
-                    fontFamily = currentFont,
+                    fontFamily = fuenteTexto,
                     fontWeight = FontWeight.Bold,
                     color = Colores.VerdeOscuro,
                     fontSize = ConstanteTexto.TextoNormal
@@ -287,7 +297,7 @@ fun DialogoRestablecerPassword(
             TextButton(onClick = onDismiss) {
                 Text(
                     "Cancelar",
-                    fontFamily = currentFont,
+                    fontFamily = fuenteTexto,
                     fontWeight = FontWeight.Bold,
                     color = Colores.RojoError,
                     fontSize = ConstanteTexto.TextoNormal
@@ -299,7 +309,9 @@ fun DialogoRestablecerPassword(
 }
 
 
-
+/**
+ * Texto Divisor
+ */
 @Composable
 fun TextOtherOptions() {
     Row(
@@ -317,7 +329,7 @@ fun TextOtherOptions() {
             fontSize = ConstanteTexto.TextoNormal,
             modifier = Modifier.padding(horizontal = 8.dp),
             color = Colores.Gris,
-            fontFamily = currentFont
+            fontFamily = fuenteTexto
         )
         HorizontalDivider(
             modifier = Modifier.width(40.dp),
@@ -327,6 +339,9 @@ fun TextOtherOptions() {
     }
 }
 
+/**
+ * Botones para iniciar sesión con otros sistemas como Google
+ */
 @Composable
 fun LoginOtherOptions(vm: VMLogin, navController: NavHostController) {
     val context = LocalContext.current
@@ -392,14 +407,18 @@ fun LoginOtherOptions(vm: VMLogin, navController: NavHostController) {
                     fontSize = ConstanteTexto.TextoSemigrande,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.align(Alignment.Center),
-                    color = Color.Black.copy(alpha = 0.7f),
-                    fontFamily = currentFont
+                    color = Colores.Negro.copy(alpha = 0.7f),
+                    fontFamily = fuenteTexto
                 )
             }
         }
     }
 }
 
+
+/**
+ * Botón principal de login, muestra un loader si está cargando
+ */
 @Composable
 fun BtnLogin(
     vm: VMLogin,
@@ -431,7 +450,7 @@ fun BtnLogin(
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Colores.VerdeOscuro,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            contentColor = Colores.Blanco
         )
     ) {
         if (cargando) {
@@ -440,7 +459,7 @@ fun BtnLogin(
             Text(
                 text = "Iniciar sesión",
                 fontSize = ConstanteTexto.TextoSemigrande,
-                fontFamily = currentFont,
+                fontFamily = fuenteTexto,
                 fontWeight = FontWeight.SemiBold
             )
         }

@@ -13,14 +13,15 @@ import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
 
-// Vista principal para añadir ingredientes a una receta
+/*
+ *Vista principal para añadir ingredientes a una receta
+ */
 @Composable
 fun AddIngredienteView(vm: VMCreacionReceta, navController: NavHostController) {
-    // Scaffold base con estructura de pantalla
     Scaffold(
         containerColor = Colores.Blanco,
         topBar = {
-            // Header personalizado con botón de retroceso
+            // Header con botón de retroceso
             HeaderAtras(texto = "Crear Receta", navController = navController)
         },
         content = { innerPadding ->
@@ -30,14 +31,16 @@ fun AddIngredienteView(vm: VMCreacionReceta, navController: NavHostController) {
     )
 }
 
-// Contenido principal de la pantalla de añadir ingredientes
+/*
+ *Contenido principal de la pantalla de añadir ingredientes
+ */
 @Composable
 private fun AddIngredienteScreen(
     vm: VMCreacionReceta,
     innerPadding: PaddingValues,
     navController: NavHostController
 ) {
-    // Estadis vm
+    // Estados vm
     val ingredientesBusqueda by vm.listadoIngredientes.collectAsState()
     val ingredientesSeleccionados by vm.ingredientesSeleccionados.collectAsState()
     val cargandoIngredientes by vm.cargandoIngredientes.collectAsState()
@@ -60,7 +63,6 @@ private fun AddIngredienteScreen(
             vm = vm,
             busqueda = busqueda,
             focusRequester = focusRequester,
-            focusManager = focusManager
         )
 
         // Muestra estado de carga o resultados

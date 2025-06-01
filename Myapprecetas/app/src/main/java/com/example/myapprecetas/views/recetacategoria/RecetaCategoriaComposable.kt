@@ -19,21 +19,17 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,16 +40,18 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.R
 import com.example.myapprecetas.objetos.dto.DTORecetaUsuarioLike
 import com.example.myapprecetas.ui.theme.Colores
-import com.example.myapprecetas.ui.theme.FamilyQuicksand
-import com.example.myapprecetas.ui.theme.common.BotonAtras
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
-import com.example.myapprecetas.views.listadoreceta.SearchBar
+import com.example.myapprecetas.ui.theme.fuenteTexto
 import com.example.myapprecetas.vm.VMRecetaCategoria
 
-val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
 
+
+
+/**
+ * Muestra una lista de recetas filtradas por categoría.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListadoRecetas(
@@ -80,7 +78,7 @@ fun ListadoRecetas(
             }
         }
 
-        // Lista de recetas
+        // Lista de recetas, si no hay muestra mensaje
 
         if(listaReceta.isEmpty()){
             item {
@@ -105,79 +103,25 @@ fun ListadoRecetas(
     }
 }
 
-
-@Composable
-fun HeaderBienvenida(text: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 18.dp, bottom = 40.dp)
-    ) {
-        Text(
-            text = text,
-            fontSize = ConstanteTexto.TextoExtraGrande,
-            fontFamily = fuenteTexto,
-            fontWeight = FontWeight.ExtraBold,
-            modifier = Modifier.align(Alignment.Center)
-        )
-    }
-}
-
+/**
+ * muestra la tarjeta con los datos de una receta individual.
+ */
 @Composable
 fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, vm: VMRecetaCategoria) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
-            .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .border(1.dp, Colores.Gris.copy(alpha = 0.9f), RoundedCornerShape(12.dp))
+            .background(Colores.Blanco)
             .clickable { navController.navigate("detalles_receta/${receta.idReceta}") }
             .padding(top = 12.dp, bottom = 2.dp)
             .padding(start = 12.dp, end = 12.dp)
             .height(130.dp)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = receta.fotoReceta,
-                        placeholder = painterResource(R.drawable.ic_launcher_background),
-                        error = painterResource(R.drawable.ic_launcher_background)
-                    ),
-                    contentDescription = "Imagen de ${receta.nombreReceta}",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(120.dp)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(4.dp)
-                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(R.drawable.temporizador2),
-                            contentDescription = "Tiempo",
-
-                            modifier = Modifier.size(ConstanteIcono.IconoMuyPequeno)
-                        )
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Text(
-                            text = "${receta.tiempoPreparacion}'",
-                            fontSize = 12.sp,
-                            fontFamily = fuenteTexto,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-                    }
-                }
-            }
+            //Imagen de la recetas con un temporizador
+            ImagenTiempo(receta)
 
             Spacer(modifier = Modifier.width(10.dp))
 
@@ -195,10 +139,10 @@ fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, v
                     overflow = TextOverflow.Ellipsis
                 )
 
-
                 Text(
                     text = receta.descripcion,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = fuenteTexto),
+                    fontSize = ConstanteTexto.TextoPequeno,
+                    fontFamily = fuenteTexto,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -211,7 +155,7 @@ fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, v
                     Text(
                         text = "Por ${receta.nombreUsuario}",
                         fontSize = ConstanteTexto.TextoMuyPequeno,
-                        color = Color.Gray,
+                        color = Colores.Gris.copy(alpha = 0.9f),
                         fontFamily = fuenteTexto,
                         modifier = Modifier.align(Alignment.CenterStart),
                         maxLines = 1,
@@ -219,7 +163,7 @@ fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, v
                     )
 
                     val iconoCorazon = if (receta.tieneLike) R.drawable.heart else R.drawable.corazonvacio2
-
+//Icono favoritos
                     Icon(
                         painter = painterResource(iconoCorazon),
                         contentDescription = if (receta.tieneLike) "Quitar de favoritos" else "Añadir a favoritos",
@@ -238,6 +182,57 @@ fun ItemReceta(receta: DTORecetaUsuarioLike, navController: NavHostController, v
     }
 }
 
+
+/**
+ * Imagen de la receta con el tiempo de cocinarla
+ *
+ */
+@Composable
+private fun ImagenTiempo(receta: DTORecetaUsuarioLike) {
+    Box(
+        modifier = Modifier
+            .size(120.dp)
+            .clip(RoundedCornerShape(8.dp))
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(
+                model = receta.fotoReceta,
+                placeholder = painterResource(R.drawable.ic_launcher_background),
+                error = painterResource(R.drawable.ic_launcher_background)
+            ),
+            contentDescription = "Imagen de ${receta.nombreReceta}",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(120.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(4.dp)
+                .background(Colores.Blanco.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
+                .padding(horizontal = 4.dp, vertical = 2.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painterResource(R.drawable.temporizador2),
+                    contentDescription = "Tiempo",
+
+                    modifier = Modifier.size(ConstanteIcono.IconoMuyPequeno)
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Text(
+                    text = "${receta.tiempoPreparacion}'",
+                    fontSize = 12.sp,
+                    fontFamily = fuenteTexto,
+                    fontWeight = FontWeight.Bold,
+                    color = Colores.Negro
+                )
+            }
+        }
+    }
+}
+
+//Mensaje cuando no se encuentran recetas
 @Composable
 fun MensajeSinRecetasLista() {
     Column(
@@ -250,7 +245,7 @@ fun MensajeSinRecetasLista() {
             fontSize = ConstanteTexto.TextoGrande,
             fontWeight = FontWeight.SemiBold,
             fontFamily = fuenteTexto,
-            color = Color.Gray,
+            color = Colores.Gris.copy(alpha = 0.9f),
             textAlign = TextAlign.Center
         )
 
@@ -259,7 +254,7 @@ fun MensajeSinRecetasLista() {
         Icon(
             painter = painterResource(R.drawable.potchupchup),
             contentDescription = "logo",
-            tint = Color.Gray,
+            tint = Colores.Gris.copy(alpha = 0.9f),
             modifier = Modifier.size(150.dp)
         )
     }

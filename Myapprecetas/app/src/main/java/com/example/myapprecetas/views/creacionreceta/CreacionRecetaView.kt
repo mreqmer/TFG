@@ -1,6 +1,5 @@
 package com.example.myapprecetas.views.creacionreceta
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +15,9 @@ import com.example.myapprecetas.ui.theme.common.HeaderAtras
 import com.example.myapprecetas.vm.VMCreacionReceta
 import kotlinx.coroutines.launch
 
+/*
+* Vista principal de creación de receta
+ */
 @Composable
 fun CrearRecetaView(vm: VMCreacionReceta, navController: NavHostController) {
     Scaffold(
@@ -28,6 +30,9 @@ fun CrearRecetaView(vm: VMCreacionReceta, navController: NavHostController) {
     }
 }
 
+/**
+ * Contenido principal del formulario para crear una receta
+ */
 @Composable
 fun CreacionRecetaScreen(
     vm: VMCreacionReceta,
@@ -37,21 +42,19 @@ fun CreacionRecetaScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+    // Carga las listas necesarias
     vm.obtieneTodo()
 
-    // estados del ViewModel
     val titulo by vm.nombreReceta.collectAsState()
     val descripcion by vm.descripcion.collectAsState()
     val tiempoPreparacion by vm.tiempoPreparacion.collectAsState()
     val dificultadSeleccionada by vm.dificultad.collectAsState()
     val ingredientesSeleccionados by vm.ingredientesSeleccionados.collectAsState()
-    val categorias by vm.categorias.collectAsState()
-    val categoriasSeleccionadas by vm.categoriasSeleccionadas.collectAsState()
     val pasos by vm.pasos.collectAsState()
     val imagenUri by vm.imagenUri.collectAsState()
     val cargando by vm.cargando.collectAsState()
-    val cargandoImagen by vm.cargandoImagen.collectAsState()
 
+    // Lista desplazable con todo el contenido del formulario
     LazyColumn(
         modifier = Modifier
             .padding(innerPadding)
@@ -61,7 +64,7 @@ fun CreacionRecetaScreen(
     ) {
         item {
             Spacer(modifier = Modifier.height(32.dp))
-
+            // Campo: Título de la receta
             SeccionTitulo("Título")
             InputField(
                 value = titulo,
@@ -73,7 +76,7 @@ fun CreacionRecetaScreen(
             )
 
             Spacer(modifier = Modifier.height(14.dp))
-
+            // Campo: Descripción de la receta
             SeccionTitulo("Descripción")
             InputField(
                 value = descripcion,
@@ -85,7 +88,7 @@ fun CreacionRecetaScreen(
             )
 
             Spacer(modifier = Modifier.height(14.dp))
-
+            // Campo: Imagen de la receta
             SeccionTitulo("Foto")
             FotoSelector(
                 imagenUri = imagenUri,
@@ -93,14 +96,14 @@ fun CreacionRecetaScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
+            // Sección: Ingredientes
             SeccionTitulo("Ingredientes")
             BotonAddIngrediente(
                 onClick = { navController.navigate("addIngrediente") }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
+            // Lista de ingredientes ya seleccionados
             ListaIngredientesSeleccionados(
                 ingredientesSeleccionados = ingredientesSeleccionados,
                 onEliminarIngrediente = { ingrediente ->
@@ -110,7 +113,7 @@ fun CreacionRecetaScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
+            // Sección: Pasos de preparación
             SeccionTitulo("Pasos")
             pasos.forEachIndexed { index, paso ->
                 PasoItem(
@@ -128,13 +131,13 @@ fun CreacionRecetaScreen(
                     }
                 )
             }
-
+            // Botón para añadir nuevo paso
             AddPaso(
                 onClick = { vm.addPaso() }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
+            // Campo: Tiempo de preparación
             SeccionTitulo("Tiempo de preparación")
             TiempoPreparacionField(
                 value = tiempoPreparacion.toIntOrNull() ?: 10,
@@ -142,7 +145,7 @@ fun CreacionRecetaScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
+            // Selector de dificultad
             SeccionTitulo("Dificultad")
             DificultadChips(
                 dificultadSeleccionada = dificultadSeleccionada,
@@ -150,19 +153,18 @@ fun CreacionRecetaScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
+            // Selector de categorías
             SeccionTitulo("Categorías")
 
             CategoriasSelector(vm = vm)
 
             Spacer(modifier = Modifier.height(32.dp))
-            //TODO borrar
-            var cosa by remember { mutableStateOf("") }
+            // Botón para guardar la receta
             BtnGuardarReceta(
                 isLoading = cargando,
                 onClick = {
                     coroutineScope.launch {
-                        val recetaCreada = vm.crearRecetaPrueba()
+                        val recetaCreada = vm.crearReceta()
                         if (recetaCreada) {
                             navController.navigate("perfil")
                         } else {
@@ -172,13 +174,7 @@ fun CreacionRecetaScreen(
                     }
                 }
             )
-
-            Text(text = cosa)
-
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
-
-
-

@@ -38,14 +38,15 @@ import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
+import com.example.myapprecetas.ui.theme.fuenteTexto
 import com.example.myapprecetas.vm.VMSelectorRegistro
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
-// Variable centralizada para la fuente
-val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
-
+/**
+ * Compenente principal de la vista
+ */
 @Composable
 fun SelectorRegistroView(vm: VMSelectorRegistro, navController: NavHostController) {
     Column(
@@ -76,6 +77,9 @@ fun SelectorRegistroView(vm: VMSelectorRegistro, navController: NavHostControlle
     }
 }
 
+/**
+ *Header de los métodos de registro
+ */
 @Composable
 private fun HeaderMetodoRegistro() {
     Column(
@@ -113,9 +117,11 @@ private fun HeaderMetodoRegistro() {
     }
 }
 
+/**
+ * Los diferentes métodos de autenticacion
+ */
 @Composable
 private fun MetodosAutenticacion(navController: NavHostController, vm: VMSelectorRegistro) {
-    // Guardamos el contexto en una variable para mayor claridad
     val context = LocalContext.current
 
     // Launcher para iniciar la actividad de Google Sign-In
@@ -128,7 +134,6 @@ private fun MetodosAutenticacion(navController: NavHostController, vm: VMSelecto
                 val task = GoogleSignIn.getSignedInAccountFromIntent(data)
                 val account = task.getResult(ApiException::class.java)
                 account.idToken?.let { idToken ->
-                    // Pasar el idToken al ViewModel para manejar el inicio de sesión o registro
                     vm.signInWithGoogle(idToken)
                 }
             } catch (e: ApiException) {
@@ -142,13 +147,14 @@ private fun MetodosAutenticacion(navController: NavHostController, vm: VMSelecto
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
+        //botón de inicio con gmail
         AuthButton(
             icon = R.drawable.mail,
             text = "Continuar con Email",
             containerColor = Colores.VerdeClaro,
             onClick = { navController.navigate("registro") },
         )
-
+        //Botón de inicio con google
         AuthButton(
             icon = R.drawable.google,
             text = "Continuar con Google",
@@ -167,30 +173,10 @@ private fun MetodosAutenticacion(navController: NavHostController, vm: VMSelecto
     }
 }
 
-
-//@Composable
-//private fun MetodosAutenticacion(navController: NavHostController) {
-//    Column(
-//        verticalArrangement = Arrangement.spacedBy(16.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        modifier = Modifier.fillMaxWidth()
-//    ) {
-//        AuthButton(
-//            icon = R.drawable.mail,
-//            text = "Continuar con Email",
-//            containerColor = Colores.VerdeClaro,
-//            onClick = { navController.navigate("registro") },
-//        )
-//
-//        AuthButton(
-//            icon = R.drawable.google,
-//            text = "Continuar con Google",
-//            containerColor = Colores.Blanco,
-//            onClick = { /* TODO */ },
-//        )
-//    }
-//}
-
+/**
+ * Diferentes botones de los métodos de autenticación
+ *
+ */
 @Composable
 private fun AuthButton(
     icon: Int,

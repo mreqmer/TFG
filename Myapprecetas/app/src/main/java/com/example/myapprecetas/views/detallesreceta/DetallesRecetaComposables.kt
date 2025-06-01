@@ -1,7 +1,5 @@
 package com.example.myapprecetas.views.detallesreceta
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,9 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
@@ -32,86 +28,37 @@ import com.example.myapprecetas.objetos.dto.DTORecetaDetalladaLike
 import com.example.myapprecetas.objetos.dto.Ingrediente
 import com.example.myapprecetas.objetos.dto.Paso
 import com.example.myapprecetas.ui.theme.Colores
-import com.example.myapprecetas.ui.theme.FamilyQuicksand
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
-import com.example.myapprecetas.ui.theme.common.BotonAtras
+import com.example.myapprecetas.ui.theme.fuenteTexto
 import com.example.myapprecetas.vm.VMDetallesReceta
 
-val fuenteTexto = FamilyQuicksand.quicksand
 
-
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Muestra la imagen principal de la receta con Coil y un placeholder en caso de error
+ */
 @Composable
-fun DetallesRecetaScreen(
-    vm: VMDetallesReceta,
-    receta: DTORecetaDetalladaLike?,
-    porciones: Int,
-    navController: NavHostController,
+fun ImagenReceta(
+    receta: DTORecetaDetalladaLike,
+    imageHeight: Dp
 ) {
-
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val state = scrollBehavior.state
-    val initialImageHeight = 240.dp
-    val minImageHeight = 0.dp
-    val targetHeight = (initialImageHeight * (1 - state.collapsedFraction)).coerceAtLeast(minImageHeight)
-    val imageHeight by animateDpAsState(targetValue = targetHeight, animationSpec = tween(300), label = "")
-
-    receta?.let { data ->
-//        Image(
-//            painter = painterResource(id = R.drawable.ic_launcher_background),
-//            contentDescription = "Imagen de la receta",
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(imageHeight),
-//            contentScale = ContentScale.Crop
-//        )
-
-        Image(
-            painter = rememberAsyncImagePainter(
-                model = receta.fotoReceta,
-                placeholder = painterResource(R.drawable.ic_launcher_background),
-                error = painterResource(R.drawable.ic_launcher_background)
-            ),
-            contentDescription = "Imagen de ${receta.nombreReceta}",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(imageHeight)
-        )
-
-        Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                LargeTopAppBar(
-                    title = {},
-                    scrollBehavior = scrollBehavior,
-                    colors = TopAppBarDefaults.largeTopAppBarColors(
-                        containerColor = Color.Transparent,
-                        scrolledContainerColor = Color.Transparent
-                    ),
-                    navigationIcon = {
-                        BotonAtras(ConstanteIcono.IconoNormal, navController) {
-                            navController.navigate("lista_recetas") {
-                                launchSingleTop = true
-                                popUpTo("lista_recetas") { inclusive = true }
-                            }
-                        }
-                    }
-                )
-            },
-            containerColor = Color.Transparent
-        ) { innerPadding ->
-            DetallesRecetaContenido(vm, innerPadding,data,imageHeight, porciones, navController
-            )
-        }
-    } ?: run {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No se ha podido cargar la receta.", fontFamily = fuenteTexto, fontSize = 16.sp)
-        }
-    }
+    Image(
+        painter = rememberAsyncImagePainter(
+            model = receta.fotoReceta,
+            placeholder = painterResource(R.drawable.ic_launcher_background),
+            error = painterResource(R.drawable.ic_launcher_background)
+        ),
+        contentDescription = "Imagen de ${receta.nombreReceta}",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(imageHeight)
+    )
 }
 
+/**
+ * Contenido principal de la pantalla de detalles de receta
+ */
 @Composable
 fun DetallesRecetaContenido(
     vm: VMDetallesReceta,
@@ -128,23 +75,39 @@ fun DetallesRecetaContenido(
             .background(Color.Transparent),
         contentPadding = PaddingValues(top = imageHeight / 2.5f)
     ) {
+        // Cabecera con nombre de receta, usuario, tiempo, dificultad y like
         item { CabeceraReceta(data) { vm.toggleLike() } }
-        item { SelectorRaciones(porciones, { vm.AumentaPorciones() }, {vm.DisminuyePorciones()}) }
+
+        // Selector para cambiar el número de porciones
+        item { SelectorRaciones(porciones, { vm.aumentaPorciones() }, { vm.disminuyePorciones() }) }
+
+        // Sección de ingredientes
         item { TituloSeccion("Ingredientes") }
-        items(data.ingredientes) { IngredienteItem(it) }
+        items(data.ingredientes) { ingrediente ->
+            IngredienteItem(ingrediente) // Item de ingrediente
+        }
+
+        // Sección de pasos
         item { TituloSeccion("Pasos") }
-        items(data.pasos) { PasoItem(it) }
+        items(data.pasos) { paso ->
+            PasoItem(paso) // Item de paso
+        }
+
+        // Chips de categorías
         item { CategoriaChips(data.categorias, navController) }
     }
 }
 
+/**
+  * Cabecera que muestra nombre, usuario, descripción, like, tiempo y dificultad
+ */
 @Composable
 fun CabeceraReceta(data: DTORecetaDetalladaLike, onToggleLike: () -> Unit) {
     Column(Modifier.padding(horizontal = 16.dp)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min) // para que el box tenga altura mínima según contenido
+                .height(IntrinsicSize.Min)
         ) {
             Text(
                 data.nombreReceta,
@@ -153,7 +116,7 @@ fun CabeceraReceta(data: DTORecetaDetalladaLike, onToggleLike: () -> Unit) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
-                    .padding(end = 30.dp) // alineado a la izquierda verticalmente centrado
+                    .padding(end = 30.dp)
             )
             Icon(
                 painter = painterResource(
@@ -199,6 +162,9 @@ fun CabeceraReceta(data: DTORecetaDetalladaLike, onToggleLike: () -> Unit) {
     }
 }
 
+/**
+ * Componente reutilizable que muestra un ícono con un texto
+ */
 @Composable
 fun IconoTexto(iconRes: Int, text: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -216,6 +182,9 @@ fun IconoTexto(iconRes: Int, text: String) {
     }
 }
 
+/**
+ *  Selector para incrementar o disminuir el número de porciones
+ */
 @Composable
 fun SelectorRaciones(
     porciones: Int,
@@ -236,7 +205,7 @@ fun SelectorRaciones(
                 .background(Colores.VerdeOscuro.copy(alpha = 0.5f))
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            //TODO Cambiar por iconos el + y el -
+            // Botón para disminuir porciones
             Text(
                 "-",
                 fontFamily = fuenteTexto,
@@ -261,6 +230,7 @@ fun SelectorRaciones(
                 fontSize = ConstanteTexto.TextoNormal,
                 fontWeight = FontWeight.SemiBold
             )
+            // Botón para aumentar porciones
             Text(
                 "+",
 
@@ -280,6 +250,9 @@ fun SelectorRaciones(
     }
 }
 
+/**
+ *  Item individual de ingrediente con nombre, cantidad y notas
+ */
 @Composable
 fun IngredienteItem(ingrediente: Ingrediente) {
     Column(
@@ -320,6 +293,9 @@ fun IngredienteItem(ingrediente: Ingrediente) {
     }
 }
 
+/**
+ *  Item individual de paso con orden y descripción
+ */
 @Composable
 fun PasoItem(paso: Paso) {
     Column(
@@ -346,6 +322,9 @@ fun PasoItem(paso: Paso) {
     }
 }
 
+/**
+ *  Título de sección para dividir bloques de contenido
+ */
 @Composable
 fun TituloSeccion(titulo: String) {
     Column(
@@ -365,6 +344,9 @@ fun TituloSeccion(titulo: String) {
     }
 }
 
+/**
+ * Chips interactivos que representan las categorías de la receta
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CategoriaChips(categorias: List<Categoria>, navController: NavHostController) {

@@ -18,27 +18,47 @@ class VMDetallesReceta @Inject constructor(
     private val endpoints: Endpoints
 ) : ViewModel() {
 
+    //region Atributos y propiedades
+
     private var _recetaDetalles = MutableStateFlow<DTORecetaDetalladaLike?>(null)
     var recetaDetalles: StateFlow<DTORecetaDetalladaLike?> = _recetaDetalles
 
-    private var _cargando = MutableStateFlow<Boolean>(false)
+    private var _cargando = MutableStateFlow(false)
     var cargando: StateFlow<Boolean> = _cargando
 
     private var _porciones = MutableStateFlow(2)
     val porciones: StateFlow<Int> = _porciones
 
-    private val _likeInProgress = MutableStateFlow<Boolean>(false)
+    private val _likeInProgress = MutableStateFlow(false)
 
     private var _idReceta: Int? = null
+
+    //endregion
+
+    //region Init
 
     init {
     }
 
+    //endregion
+
+    //region Actualización
+
+    /**
+     * Asigna el ID de la receta y lanza la carga de detalles desde la API.
+     */
     fun setRecetaId(idReceta: Int) {
         _idReceta = idReceta
         cargaRecetas()
     }
 
+    //endregion
+
+    //region Llamadas a la API
+
+    /**
+     * Llama a la API para obtener los detalles de la receta junto con el estado de "like".
+     */
     private fun cargaRecetas() {
         val uid = currentUser.value?.uid ?: run {
             Log.i("UID NULO", "El UID del usuario es nulo, no se puede realizar la carga.")
@@ -73,6 +93,9 @@ class VMDetallesReceta @Inject constructor(
         }
     }
 
+    /**
+     * Llama a la API para alternar el estado de "like" de la receta.
+     */
     fun toggleLike() {
         if (_likeInProgress.value || _recetaDetalles.value == null) return
 
@@ -109,72 +132,14 @@ class VMDetallesReceta @Inject constructor(
             }
         }
     }
+    //endregion
 
-//    private fun cargaRecetas() {
-//        // Verificamos si _idReceta es null antes de hacer la solicitud
-//        _idReceta?.let { id ->
-//            viewModelScope.launch {
-//                _cargando.value = true
-//                try {
-//                    val response = endpoints.getRecetaPorId(id)
-//                    if (response.isSuccessful) {
-//                        response.body()?.let {
-//                            _recetaDetalles.value = it
-//                            Log.i("OKAY", response.body().toString())
-//                        } ?: run {
-//                            Log.i("RESPUESTA VACIA", response.body().toString())
-//                        }
-//                    } else {
-//                        Log.i("ERROR SERVIDOR", response.body().toString())
-//                    }
-//                } catch (e: Exception) {
-//                    Log.i("EXCEPTION", e.toString())
-//                } finally {
-//                    _cargando.value = false
-//                }
-//            }
-//        } ?: run {
-//            Log.i("ID RECETA NULO", "El ID de la receta es nulo, no se puede realizar la carga.")
-//        }
-//    }
+    //region Funciones auxiliares
 
-//    fun toggleLike(idReceta: Int) {
-//        if (_likeInProgress.value) return
-//
-//        val uid = currentUser.value?.uid ?: return
-//
-//        viewModelScope.launch {
-//            _likeInProgress.value = true
-//            try {
-//                val likeDto = DTOToggleLike(idReceta, uid)
-//                val response = endpoints.toggleLike(likeDto)
-//
-//                if (response.isSuccessful) {
-//                    val respuesta = response.body()
-//                    if (respuesta != null && respuesta.success) {
-//                        // Actualizar el estado del like en el objeto de receta
-//                        _recetaDetalles.value = _recetaDetalles.value?.let { recetaDetallada ->
-//                            recetaDetallada.copy(
-//                                esFavorito = respuesta.likeActivo
-//                            )
-//                        }
-//
-//                        Log.i("ToggleLike", "Like actualizado a: ${respuesta.likeActivo}")
-//                    } else {
-//                        Log.e("ToggleLike", "Respuesta nula o success = false")
-//                    }
-//                } else {
-//                    Log.e("ToggleLike", "Error servidor: ${response.code()} ${response.message()}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("ToggleLike", "Excepción: ${e.message}")
-//            } finally {
-//                _likeInProgress.value = false
-//            }
-//        }
-//    }
-
-    fun AumentaPorciones() {
+    /**
+     * Aumenta el número de porciones y ajusta las cantidades de ingredientes
+     */
+    fun aumentaPorciones() {
         ajustarCantidadesIngredientes(true)
         _porciones.value = when (_porciones.value) {
             2 -> 4
@@ -185,7 +150,10 @@ class VMDetallesReceta @Inject constructor(
 
     }
 
-    fun DisminuyePorciones() {
+    /**
+     * Disminuye el número de porciones y ajusta las cantidades de ingredientes
+     */
+    fun disminuyePorciones() {
         ajustarCantidadesIngredientes(false)
         _porciones.value = when (_porciones.value) {
             8 -> 4
@@ -195,8 +163,11 @@ class VMDetallesReceta @Inject constructor(
         }
     }
 
-    fun ajustarCantidadesIngredientes(aumento: Boolean) {
-
+    /**
+     * Modifica las cantidades de los ingredientes dependiendo si se aumenta o disminuye porciones.
+     * Solo permite duplicar o dividir por 2 hasta los límites definidos (2 y 8 porciones).
+     */
+    private fun ajustarCantidadesIngredientes(aumento: Boolean) {
         _recetaDetalles.value?.let { recetaDetallada ->
             val ingredientesActualizados = recetaDetallada.ingredientes.map { ingrediente ->
                 ingrediente.copy(
@@ -214,4 +185,5 @@ class VMDetallesReceta @Inject constructor(
             _recetaDetalles.value = recetaDetallada.copy(ingredientes = ingredientesActualizados)
         }
     }
+    //endregion
 }
