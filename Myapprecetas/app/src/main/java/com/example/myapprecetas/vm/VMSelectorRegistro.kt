@@ -3,12 +3,8 @@ package com.example.myapprecetas.vm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapprecetas.api.Endpoints
-import com.example.myapprecetas.objetos.dto.creacion.DTOInsertUsuario
 import com.example.myapprecetas.repositories.AuthRepository
-import com.example.myapprecetas.userauth.AuthManager.currentUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,7 +13,6 @@ import javax.inject.Inject
 @HiltViewModel
 class VMSelectorRegistro@Inject constructor(
     private val authRepository: AuthRepository,
-    private val apiService: Endpoints
 ) : ViewModel()  {
 
     private val _cargando = MutableStateFlow(false)
@@ -25,6 +20,9 @@ class VMSelectorRegistro@Inject constructor(
 
     private val _loginSuccess = MutableStateFlow(false)
 
+    /**
+     * Hace el sign in con google
+     */
     fun signInWithGoogle(idToken: String) {
         viewModelScope.launch {
             try {

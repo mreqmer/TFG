@@ -1,7 +1,6 @@
 package com.example.myapprecetas.api
 
 import com.example.myapprecetas.objetos.dto.Categoria
-import com.example.myapprecetas.objetos.dto.DTORecetaDetallada
 import com.example.myapprecetas.objetos.dto.DTORecetaDetalladaLike
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.objetos.dto.DTORecetaUsuarioLike

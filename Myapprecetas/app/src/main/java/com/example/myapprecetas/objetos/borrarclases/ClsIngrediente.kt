@@ -1,4 +1,4 @@
-package com.example.myapprecetas.objetos
+package com.example.myapprecetas.objetos.borrarclases
 
 data class ClsIngrediente (
     val idIngrediente: Int,

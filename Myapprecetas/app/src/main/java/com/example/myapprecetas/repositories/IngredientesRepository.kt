@@ -2,7 +2,6 @@ package com.example.myapprecetas.repositories
 
 import com.example.myapprecetas.objetos.dto.Ingrediente
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,7 +10,6 @@ class IngredienteRepository @Inject constructor() {
 
     // StateFlow para almacenar los ingredientes seleccionados
     private val _ingredientesSeleccionados = MutableStateFlow<List<Ingrediente>>(emptyList())
-    val ingredientesSeleccionados: StateFlow<List<Ingrediente>> = _ingredientesSeleccionados
 
     // Añadir ingrediente a la lista
     fun addIngrediente(ingrediente: Ingrediente) {

@@ -12,7 +12,7 @@ import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class FirebaseAuth @Inject constructor(
-    private val auth: FirebaseAuth // Inyectado por Hilt
+    private val auth: FirebaseAuth
 ) {
     /**
      * Inicia sesión con email y contraseña.
