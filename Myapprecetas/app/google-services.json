@@ -12,7 +12,28 @@
           "package_name": "com.example.myapprecetas"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "181983126111-g6bqlq46o5tkn5eij0eukad6sd4vanln.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapprecetas",
+            "certificate_hash": "60a8dcd8c7d0686b5cd3f7a3d715aee610e0c0b5"
+          }
+        },
+        {
+          "client_id": "181983126111-i85tpa4ac6j2t1l5cp4u5vms1q25ckbr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapprecetas",
+            "certificate_hash": "4205f45ea36fa1301505036e9cb17e19c4a26170"
+          }
+        },
+        {
+          "client_id": "181983126111-1jlv71ep88fv50pbkisj9el1ak734kje.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDqM3TQdWfeBkCRzj0IzYqfqfgd3MqL_Gc"
@@ -20,7 +41,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "181983126111-1jlv71ep88fv50pbkisj9el1ak734kje.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

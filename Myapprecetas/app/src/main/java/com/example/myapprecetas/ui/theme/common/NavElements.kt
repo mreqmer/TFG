@@ -13,7 +13,7 @@ sealed class BottomNavItem(val route: String, val label: String, val icon: Int, 
         "lista_favoritos",
         "Favoritas",
         R.drawable.corazonvacio2,
-        R.drawable.corazonvacio2
+        R.drawable.corazonvacio
     )
     object Construccion : BottomNavItem(
         "perfil",

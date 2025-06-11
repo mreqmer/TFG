@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
             "lista_favoritos",
             "perfil",
         )
-
+        //Rutas que tendrán la botonera del sistema transparente
         private val RUTAS_BOTTOM_TRANSPARENTE = setOf(
             "inicio",
             "login",
@@ -73,10 +73,10 @@ class MainActivity : ComponentActivity() {
 
             // Comprueba si se necesita scaffold
             val isScaffoldNeeded = currentRoute in RUTAS_CON_SCAFFOLD
-
+            // Comprueba si se necesita la botonera transparente
             val isTransparentNeeded = currentRoute in RUTAS_BOTTOM_TRANSPARENTE
 
-            // Dependiendo de la pantalla la botonera de navegación cambia el color
+            // Dependiendo de la pantalla la botonera de navegación cambia el color o transparente o negro
             window.navigationBarColor = if (isTransparentNeeded) Color.Transparent.hashCode() else Color.Black.hashCode()
 
             MyapprecetasTheme {

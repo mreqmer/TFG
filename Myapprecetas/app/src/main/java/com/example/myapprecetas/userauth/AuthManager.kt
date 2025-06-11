@@ -53,9 +53,4 @@ object AuthManager {
         }
     }
 
-//    /**
-//     * Verifica si hay un usuario autenticado.
-//     * @return true si el usuario está autenticado, false en caso contrario.
-//     */
-//    fun isLoggedIn(): Boolean = _currentUser.value != null
 }

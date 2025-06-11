@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -23,6 +21,9 @@ import com.example.myapprecetas.userauth.AuthManager
 import com.example.myapprecetas.vm.VMConstrucciondos
 import kotlinx.coroutines.launch
 
+/**
+ * PAGINA DE PRUEBAS, IGNORAR
+ */
 @Composable
 fun PaginaEnConstrucciondosConBotonAtras(
     viewModel: VMConstrucciondos,

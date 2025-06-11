@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,7 +14,9 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -30,26 +33,38 @@ import com.example.myapprecetas.vm.VMCreacionReceta
   */
 @Composable
 fun BusquedaIngredientes(
-    vm: VMCreacionReceta,
     busqueda: String,
     focusRequester: FocusRequester,
+    onBusquedaChange: (String) -> Unit,
+    onLimpiarBusqueda: () -> Unit
 ) {
     OutlinedTextField(
         value = busqueda,
-        onValueChange = { vm.actualizarBusqueda(it) },
+        onValueChange = { onBusquedaChange(it) },
+        textStyle = TextStyle(
+            fontFamily = FamilyQuicksand.quicksand,
+            fontSize = ConstanteTexto.TextoNormal,
+            fontWeight = FontWeight.SemiBold
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp)
             .focusRequester(focusRequester),
-        label = { Text("Buscar ingredientes...") },
+        label = { Text(
+            text = "Buscar ingredientes...",
+            fontFamily = FamilyQuicksand.quicksand,
+            fontSize = ConstanteTexto.TextoPequeno,
+            fontWeight = FontWeight.SemiBold
+        ) },
         singleLine = true,
         trailingIcon = {
             if (busqueda.isNotEmpty()) {
-                IconButton(onClick = { vm.limpiarBusqueda() }) {
+                IconButton(onClick = onLimpiarBusqueda) {
                     Icon(
                         painter = painterResource(R.drawable.cerrar),
                         contentDescription = "Limpiar búsqueda",
-                        modifier = Modifier.size(ConstanteIcono.IconoNormal))
+                        modifier = Modifier.size(ConstanteIcono.IconoNormal)
+                    )
                 }
             }
         }
@@ -167,6 +182,7 @@ private fun ListaIngredientesSeleccionados(
                     vm.deleteIngredienteSeleccionado(ingrediente.idIngrediente)
                     vm.removeIngrediente(ingrediente.idIngrediente)
                 },
+
                 vm = vm
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -210,12 +226,19 @@ private fun ItemIngredienteSeleccionado(
                 onEdit = onEdit,
                 onSave = onSave,
                 onDelete = onDelete,
-                vm = vm
+                onCantidadChange = { nuevaCantidad ->
+                    vm.actualizarCantidadIngrediente(ingrediente.idIngrediente, nuevaCantidad)
+                }
             )
 
             //notas adicionales para los ingredientes
             if (enEdicion) {
-                CampoNotas(ingrediente, vm)
+                CampoNotas(
+                    ingrediente = ingrediente,
+                    onNotasChange = { nuevaNota ->
+                        vm.actualizarNotaIngrediente(ingrediente.idIngrediente, nuevaNota)
+                    }
+                )
             } else if (ingrediente.notas.isNotEmpty()) {
                 IngredeinteNotas(ingrediente.notas)
             }
@@ -233,7 +256,7 @@ private fun IngredienteHeader(
     onEdit: () -> Unit,
     onSave: () -> Unit,
     onDelete: () -> Unit,
-    vm: VMCreacionReceta
+    onCantidadChange: (nuevaCantidad: Int) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
@@ -247,7 +270,10 @@ private fun IngredienteHeader(
         )
 
         if (enEdicion) {
-            EditaCantidad(ingrediente, vm)
+            EditaCantidad(
+                ingrediente = ingrediente,
+                onCantidadChange = onCantidadChange
+            )
             IconoGuardarEdit(onSave = onSave)
         } else {
             CantidadIngrediente(ingrediente)
@@ -260,13 +286,21 @@ private fun IngredienteHeader(
  * Edita la cantidad de un ingrediente
  */
 @Composable
-private fun EditaCantidad(ingrediente: Ingrediente, vm: VMCreacionReceta) {
+private fun EditaCantidad(ingrediente: Ingrediente, onCantidadChange: (Int) -> Unit) {
     OutlinedTextField(
         value = ingrediente.cantidad.toString(),
         onValueChange = { nuevaCantidad ->
             val cantidadInt = nuevaCantidad.toIntOrNull() ?: ingrediente.cantidad
-            vm.actualizarCantidadIngrediente(ingrediente.idIngrediente, cantidadInt)
+            onCantidadChange(cantidadInt)
         },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+        ),
+        textStyle = TextStyle(
+            fontFamily = FamilyQuicksand.quicksand,
+            fontSize = ConstanteTexto.TextoNormal,
+            fontWeight = FontWeight.SemiBold
+        ),
         modifier = Modifier.width(80.dp),
         singleLine = true
     )
@@ -309,11 +343,23 @@ private fun IconosIngredientes(onEdit: () -> Unit, onDelete: () -> Unit) {
  * Campo editable notas del ingrediente
  */
 @Composable
-private fun CampoNotas(ingrediente: Ingrediente, vm: VMCreacionReceta) {
+private fun CampoNotas(ingrediente: Ingrediente, onNotasChange: (String) -> Unit) {
     OutlinedTextField(
         value = ingrediente.notas,
-        onValueChange = { vm.actualizarNotaIngrediente(ingrediente.idIngrediente, it) },
-        label = { Text("Notas") },
+        onValueChange = { onNotasChange(it) },
+        label = {
+            Text(
+                text = "Notas",
+                fontFamily = FamilyQuicksand.quicksand,
+                fontSize = ConstanteTexto.TextoPequeno,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        textStyle = TextStyle(
+            fontFamily = FamilyQuicksand.quicksand,
+            fontSize = ConstanteTexto.TextoNormal,
+            fontWeight = FontWeight.SemiBold
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 8.dp, end = 8.dp),
@@ -351,10 +397,10 @@ private fun IconoGuardarEdit(onSave: () -> Unit) {
  * Botón para guardar los ingrediente añadidos y volver para seguir editando receta
  */
 @Composable
-fun BotonGuardar(vm: VMCreacionReceta, navController: NavHostController, ingredientes: List<Ingrediente>) {
+fun BotonGuardar( onGuardar: () -> Unit, navController: NavHostController) {
     Button(
         onClick = {
-            vm.actualizarIngredientesOriginales(ingredientes)
+            onGuardar()
             navController.popBackStack()
         },
         colors = ButtonDefaults.buttonColors(

@@ -60,9 +60,10 @@ private fun AddIngredienteScreen(
     ) {
         // Campo de búsqueda de ingredientes
         BusquedaIngredientes(
-            vm = vm,
             busqueda = busqueda,
             focusRequester = focusRequester,
+            onBusquedaChange = { vm.actualizarBusqueda(it) },
+            onLimpiarBusqueda = { vm.limpiarBusqueda() }
         )
 
         // Muestra estado de carga o resultados
@@ -82,7 +83,7 @@ private fun AddIngredienteScreen(
         )
 
         // Botón final para guardar cambios
-        BotonGuardar(vm, navController, ingredientesSeleccionados)
+        BotonGuardar({ vm.actualizarIngredientesOriginales(ingredientesSeleccionados) }, navController)
     }
 }
 

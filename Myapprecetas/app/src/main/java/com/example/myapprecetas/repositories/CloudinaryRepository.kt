@@ -27,6 +27,14 @@ class CloudinaryRepository @Inject constructor(
         }
     }
 
+    /**
+     * Sube una imagen a Cloudinary a partir de una URI.
+     *
+     * @param imageUri URI de la imagen local que se desea subir.
+     * @param onLoading Callback llamado cuando empieza la subida.
+     * @param onSuccess Callback llamado cuando la subida es exitosa, devuelve la URL segura y el `publicId`.
+     * @param onError Callback llamado en caso de error, con una descripción del error.
+     */
     fun uploadImage(
         imageUri: Uri,
         onLoading: () -> Unit,
@@ -74,6 +82,13 @@ class CloudinaryRepository @Inject constructor(
             .dispatch()
     }
 
+    /**
+     * Elimina una imagen de Cloudinary usando su `publicId`.
+     *
+     * @param publicId ID público de la imagen en Cloudinary.
+     * @param onSuccess Callback llamado si la eliminación fue exitosa.
+     * @param onError Callback llamado si ocurre un error, con una descripción del mismo.
+     */
     suspend fun deleteImage(
         publicId: String,
         onSuccess: () -> Unit,

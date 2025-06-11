@@ -56,6 +56,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -394,6 +395,11 @@ fun TiempoPreparacionField(
                     onValueChange(it.coerceIn(valorMinimo, valorMaximo))
                 }
             },
+            textStyle = TextStyle(
+                fontFamily = FamilyQuicksand.quicksand,
+                fontSize = ConstanteTexto.TextoNormal,
+                fontWeight = FontWeight.SemiBold
+            ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done),
@@ -456,7 +462,10 @@ fun DificultadChips(
                 label = {
                     Text(
                         text = dificultad.label,
-                        color = if (dificultad.label == dificultadSeleccionada) Colores.Blanco else Colores.Negro
+                        color = if (dificultad.label == dificultadSeleccionada) Colores.Blanco else Colores.Negro,
+                        fontFamily = FamilyQuicksand.quicksand,
+                        fontSize = ConstanteTexto.TextoPequeno,
+                        fontWeight = FontWeight.SemiBold
                     )
                 },
                 colors = AssistChipDefaults.assistChipColors(
@@ -482,11 +491,18 @@ fun CategoriasSelector(vm: VMCreacionReceta) {
     val seleccionadas by vm.categoriasSeleccionadas.collectAsState()
 
     Column {
-        Text("Categorías (${seleccionadas.size}/5)",
-            style = MaterialTheme.typography.titleSmall)
+        Text(
+            text ="Categorías (${seleccionadas.size}/5)",
+            fontFamily = FamilyQuicksand.quicksand,
+            fontSize = ConstanteTexto.TextoPequeno,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
 
         FlowRow(
 
+            horizontalArrangement = Arrangement.Center,
             verticalArrangement = Arrangement.Center
         ) {
             categorias.forEach { categoria ->
@@ -494,7 +510,14 @@ fun CategoriasSelector(vm: VMCreacionReceta) {
 
                 AssistChip(
                     onClick = { vm.toggleCategoria(categoria) },
-                    label = { Text(categoria.nombreCategoria) },
+                    label = {
+                        Text(
+                        categoria.nombreCategoria,
+                        fontFamily = FamilyQuicksand.quicksand,
+                        fontSize = ConstanteTexto.TextoPequeno,
+                        fontWeight = FontWeight.SemiBold
+                        )
+                    },
                     colors = AssistChipDefaults.assistChipColors(
                         containerColor = if (estaSeleccionada)
                             Colores.VerdeOscuro.copy(alpha = 0.9f)
@@ -540,8 +563,9 @@ fun BtnGuardarReceta(
         } else {
             Text(
                 text = "Guardar receta",
+                fontFamily = FamilyQuicksand.quicksand,
                 fontSize = ConstanteTexto.TextoSemigrande,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }

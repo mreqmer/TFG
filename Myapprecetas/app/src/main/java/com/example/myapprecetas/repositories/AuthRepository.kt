@@ -76,6 +76,12 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    /**
+     * registro con email y contraseña
+     * @param email correo del usuario que se registra
+     * @param password contraseña del usuario que se registra
+     * @param displayName nombre de usuario del usuario que se registra
+     */
     suspend fun register(email: String, password: String, displayName: String): Boolean {
         return suspendCoroutine { continuation ->
             authWrapper.registerWithEmail(email, password, displayName) { success, errorMessage ->
@@ -120,28 +126,10 @@ class AuthRepository @Inject constructor(
         }
     }
 
-
-    suspend fun deleteCurrentUser(): Boolean {
-        val user = authWrapper.getCurrentUser()
-
-        return if (user != null) {
-            suspendCoroutine { continuation ->
-                user.delete()
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            continuation.resume(true)
-                        } else {
-                            setError(task.exception?.localizedMessage ?: "Error al eliminar el usuario")
-                            continuation.resume(false)
-                        }
-                    }
-            }
-        } else {
-            setError("No hay usuario autenticado para eliminar")
-            false
-        }
-    }
-
+    /**
+     * @param email correo para la recuperación de la contraseña
+     * @return booleano de confirmación sobre si la operación fue existosa
+     */
     suspend fun sendPasswordReset(email: String): Boolean {
         return try {
             authWrapper.sendPasswordResetEmail(email)
@@ -163,6 +151,10 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    /**
+     * @param displayName nuevo nombre de usuario del usuario actual
+     * @return booleano de confirmación
+     */
     suspend fun updateDisplayName(displayName: String): Boolean {
         val user = authWrapper.getCurrentUser()
 
@@ -187,6 +179,4 @@ class AuthRepository @Inject constructor(
             false
         }
     }
-
-//    fun getCurrentUser(): FirebaseUser? = authWrapper.getCurrentUser()
 }

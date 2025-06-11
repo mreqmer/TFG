@@ -242,7 +242,13 @@ fun FiltroIngrediente(vm: VMListadoReceta) {
             textoBusqueda = it
             vm.buscarIngredientes(it)
         },
-        label = { Text("Buscar ingrediente") },
+        label = {
+            Text(
+                text = "Buscar ingrediente",
+                fontFamily = fuenteTexto,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = ConstanteTexto.TextoPequeno,
+            ) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true
     )

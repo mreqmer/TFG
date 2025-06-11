@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapprecetas.api.Endpoints
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
+import com.example.myapprecetas.repositories.CloudinaryRepository
 import com.example.myapprecetas.repositories.IngredienteRepository
 import com.example.myapprecetas.userauth.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,8 @@ import java.util.Date
 @HiltViewModel
 class VMPerfil @Inject constructor(
     private val endpoints: Endpoints,
-    private val repository: IngredienteRepository
+    private val repository: IngredienteRepository,
+    private val repo: CloudinaryRepository,
 ) : ViewModel() {
 
 
@@ -47,6 +49,9 @@ class VMPerfil @Inject constructor(
 
     private val _fechaString = MutableStateFlow<String?>("")
     val fechaString: StateFlow<String?> = _fechaString
+
+    private val _cargandoBorrado = MutableStateFlow<Boolean>(false)
+    val cargandoBorrado: StateFlow<Boolean> = _cargandoBorrado
 
 //endregion
 
@@ -143,29 +148,77 @@ class VMPerfil @Inject constructor(
         }
     }
 
-    /**
-     * Borra una receta del backend y la elimina de la lista local si el borrado fue exitoso.
-     * @param idReceta ID de la receta a eliminar
-     */
-    fun borrarReceta(idReceta: Int) {
+//    /**
+//     * Borra una receta del backend y la elimina de la lista local si el borrado fue exitoso.
+//     * @param idReceta ID de la receta a eliminar
+//     */
+//    fun borrarReceta(idReceta: Int) {
+//        val uid = AuthManager.currentUser.value?.uid ?: return
+//
+//        viewModelScope.launch {
+//            try {
+//                val response = endpoints.borrarReceta(uid, idReceta)
+//                if (response.isSuccessful) {
+//                    Log.d(":::Correcto", _listaRecetas.value.toString())
+//                    _listaRecetas.update { recetas -> recetas.filter { it.idReceta != idReceta } }
+//                    Log.d(":::Correcto", "Borrado correctamente")
+//                    Log.d(":::Correcto", _listaRecetas.value.toString())
+//                } else {
+//                    val errorMessage = response.errorBody()?.string()
+//                    Log.d(":::Error", "Mensaje: $errorMessage")
+//                }
+//            } catch (e: Exception) {
+//                Log.d(":::Error", "Excepción: ${e.localizedMessage}")
+//            }
+//        }
+//    }
+
+    fun borrarReceta(receta: DTORecetaSimplificada) {
         val uid = AuthManager.currentUser.value?.uid ?: return
 
         viewModelScope.launch {
             try {
-                val response = endpoints.borrarReceta(uid, idReceta)
+                _cargando.value = true
+                val response = endpoints.borrarReceta(uid, receta.idReceta)
                 if (response.isSuccessful) {
-                    Log.d(":::Correcto", _listaRecetas.value.toString())
-                    _listaRecetas.update { recetas -> recetas.filter { it.idReceta != idReceta } }
-                    Log.d(":::Correcto", "Borrado correctamente")
-                    Log.d(":::Correcto", _listaRecetas.value.toString())
+                    val publicId = obtenerPublicIdDeUrl(receta.fotoReceta)
+                    if (publicId != null) {
+                        repo.deleteImage(
+                            publicId,
+                            onSuccess = { Log.d("Cloudinary", "Imagen de receta eliminada") },
+                            onError = { err -> Log.e("Cloudinary", "Error eliminando imagen: $err") }
+                        )
+                    }
+                    _listaRecetas.update { recetas -> recetas.filter { it.idReceta != receta.idReceta } }
+                    Log.d(":::Correcto", "Receta y foto borradas correctamente")
+
                 } else {
-                    val errorMessage = response.errorBody()?.string()
-                    Log.d(":::Error", "Mensaje: $errorMessage")
+
+                    Log.d(":::Error", "Mensaje: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
                 Log.d(":::Error", "Excepción: ${e.localizedMessage}")
+            }finally {
+                _cargando.value = false
             }
         }
+    }
+
+    private fun obtenerPublicIdDeUrl(url: String?): String? {
+        if (url == null) return null
+        var publicId: String  = ""
+        try {
+            val partes = url.split("/")
+
+            val ultimoSegmento = partes.lastOrNull() ?: return null
+
+            publicId = ultimoSegmento.substringBeforeLast('.')
+
+
+        } catch (e: Exception) {
+            Log.e(":::ERROR", "Error obteniendo publicID cambios: ${e.localizedMessage}")
+        }
+        return publicId
     }
 
     //endregion

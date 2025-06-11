@@ -23,7 +23,9 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
 
-
+/**
+ * PAGINA DE PRUEBAS, IGNORAR
+ */
 @Composable
 fun EditarPerfilDemoView(
     navController: NavHostController,

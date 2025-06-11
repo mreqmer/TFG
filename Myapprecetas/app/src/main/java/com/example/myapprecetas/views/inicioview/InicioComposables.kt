@@ -34,7 +34,7 @@ import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 @Composable
 fun BackgroundImage() {
     Image(
-        painter = painterResource(id = R.drawable.otraprueba),
+        painter = painterResource(id = R.drawable.fondoinicio),
         contentDescription = null,
         modifier = Modifier.fillMaxSize(),
         contentScale = ContentScale.Crop

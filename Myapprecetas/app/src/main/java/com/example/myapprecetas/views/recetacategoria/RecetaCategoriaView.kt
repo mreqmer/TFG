@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.CargandoElementos
-import com.example.myapprecetas.views.favoritas.MensajeSinRecetas
 import com.example.myapprecetas.vm.VMRecetaCategoria
 import eu.bambooapps.material3.pullrefresh.PullRefreshIndicator
 import eu.bambooapps.material3.pullrefresh.PullRefreshIndicatorDefaults

@@ -3,6 +3,7 @@ package com.example.myapprecetas.views.editarperfi
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,8 +23,24 @@ import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.HeaderAtras
 import com.example.myapprecetas.vm.VMEditarPerfil
 
+/***
+ * Vista para editar el usuario
+ */
 @Composable
 fun EditarPerfilView(
+    vm: VMEditarPerfil,
+    navController: NavHostController,
+) {
+    Box {
+        EditarPerfilScreen(vm, navController)
+    }
+}
+
+/**
+ * Componentes principales de la vista de editar perfil
+ */
+@Composable
+fun EditarPerfilScreen(
     vm: VMEditarPerfil,
     navController: NavHostController,
 ) {
@@ -31,6 +48,10 @@ fun EditarPerfilView(
     val nombreUsuario by vm.nombreUsuario.collectAsState()
     val imagenUri by vm.imagenUri.collectAsState()
     val editandoNombre by vm.editandoNombre.collectAsState()
+    val cargando by vm.guardandoCambios.collectAsState(false)
+    val guardadoExitoso by vm.guardadoExitoso.collectAsState()
+    val errorGuardado by vm.errorGuardado.collectAsState()
+
 
 
     val launcherImagen = rememberLauncherForActivityResult(
@@ -68,15 +89,23 @@ fun EditarPerfilView(
 
         Spacer(modifier = Modifier.height(50.dp))
 
-        BotonGuardar {
-
-            vm.guardarCambios()
-        }
+        BotonGuardar(
+            navController = navController,
+            cargando = cargando,
+            guardadoExitoso = guardadoExitoso,
+            errorGuardado = errorGuardado,
+            onGuardarClick = { vm.guardarCambios() }
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        TextButton({navController.navigate("perfil")}) {
+        TextButton(
+            {navController.navigate("perfil")},
+            enabled = !cargando,
+            ) {
             Text("Cancelar", color = Color.Gray)
         }
     }
 }
+
+

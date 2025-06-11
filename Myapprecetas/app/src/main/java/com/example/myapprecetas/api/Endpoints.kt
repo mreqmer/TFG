@@ -5,6 +5,7 @@ import com.example.myapprecetas.objetos.dto.DTORecetaDetalladaLike
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.objetos.dto.DTORecetaUsuarioLike
 import com.example.myapprecetas.objetos.dto.DTOToggleLike
+import com.example.myapprecetas.objetos.dto.DTOUpdateUsuario
 import com.example.myapprecetas.objetos.dto.DTOUsuario
 import com.example.myapprecetas.objetos.dto.Ingrediente
 import com.example.myapprecetas.objetos.dto.RecetaUsuarioLikeResponse
@@ -19,6 +20,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import com.example.myapprecetas.objetos.dto.creacion.RecetaResponse
 import retrofit2.http.DELETE
+import retrofit2.http.PUT
 
 interface Endpoints {
 
@@ -135,6 +137,14 @@ interface Endpoints {
     @POST("Usuarios/Nuevo")
     suspend fun postNuevoUsuario(
         @Body usuarioInsert: DTOInsertUsuario
+    ): Response<Usuario>
+
+    /**
+     * Actualiza a un usuario en la base de datos
+     */
+    @PUT("Usuarios/Update")
+    suspend fun updateUsuario(
+        @Body usuarioUpdate: DTOUpdateUsuario
     ): Response<Usuario>
 
     //endregion

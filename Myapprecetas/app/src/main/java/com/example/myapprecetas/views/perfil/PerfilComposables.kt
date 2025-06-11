@@ -48,6 +48,7 @@ import com.example.myapprecetas.R
 import com.example.myapprecetas.objetos.dto.DTORecetaSimplificada
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.FamilyQuicksand
+import com.example.myapprecetas.ui.theme.common.CargandoElementos
 import com.example.myapprecetas.ui.theme.common.ConstanteIcono
 import com.example.myapprecetas.ui.theme.common.ConstanteTexto
 import com.example.myapprecetas.ui.theme.fuenteTexto
@@ -59,7 +60,7 @@ import com.example.myapprecetas.vm.VMPerfil
  * como editar perfil o cerrar sesión.
  */
 @Composable
-fun TopBarPerfil(vm: VMPerfil, navController: NavHostController) {
+fun TopBarPerfil(navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -129,7 +130,7 @@ fun AccionesPerfil( navController: NavHostController) {
  * Muestra un ítem individual de receta con imagen, título, descripción y opción de eliminar
  */
 @Composable
-fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, onConfirmar: (Int) -> Unit ,) {
+fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController,onConfirmar: (DTORecetaSimplificada) -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
 
     Box(
@@ -242,7 +243,7 @@ fun ItemReceta(receta: DTORecetaSimplificada, navController: NavHostController, 
         if (showDialog) {
             ConfirmarBorradoDialog(
                 onConfirmar = {
-                    onConfirmar(receta.idReceta)
+                    onConfirmar(receta)
                     showDialog = false
                 },
                     onCancelar = {
@@ -317,6 +318,7 @@ private fun ImagenPerfil(imagenPerfil: String?) {
         Image(
             painter = rememberAsyncImagePainter(imagenPerfil),
             contentDescription = "Imagen de perfil",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(84.dp)
                 .clip(CircleShape)
@@ -429,17 +431,31 @@ fun ListaRecetasPerfil(
     navController: NavHostController,
 ) {
     val listaRecetas by vm.listaRecetas.collectAsState()
-    LazyColumn(
+    val cargando by vm.cargando.collectAsState()
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentAlignment = Alignment.Center
     ) {
-        items(
-            items = listaRecetas,
-            key = { receta -> receta.idReceta }
-        ) { receta ->
-            ItemReceta(receta = receta, navController,  onConfirmar = { idReceta -> vm.borrarReceta(idReceta) } )
+        if (cargando) {
+            // Mostrar círculo de carga solo mientras carga
+            CargandoElementos()
+        } else {
+            // Mostrar lista de recetas
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(
+                    items = listaRecetas,
+                    key = { receta -> receta.idReceta }
+                ) { receta ->
+                    ItemReceta(
+                        receta = receta,
+                        navController,
+                        onConfirmar = { vm.borrarReceta(it) })
+                }
+            }
         }
     }
 }

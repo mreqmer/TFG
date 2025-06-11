@@ -262,7 +262,9 @@ class VMListadoReceta @Inject constructor(
         val usuarioDTO = DTOInsertUsuario(
             firebaseUID = currentUser.value?.uid ?: "",
             correoElectronico = currentUser.value?.email ?: "",
-            nombreUsuario = currentUser.value?.displayName ?: ""
+            nombreUsuario = currentUser.value?.displayName ?: "",
+            fotoPerfil = currentUser.value?.photoUrl?.toString()
+            ?: "https://res.cloudinary.com/dckzmg9c1/image/upload/v1747491439/fotoperfil_cfajca.png"
         )
         viewModelScope.launch {
             _cargando.value = true

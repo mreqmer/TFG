@@ -21,7 +21,7 @@ fun PerfilView(vm: VMPerfil, navController: NavHostController) {
     Scaffold(
         containerColor = Colores.Blanco,
         topBar = {
-            TopBarPerfil(vm = vm, navController = navController)
+            TopBarPerfil(navController = navController)
         }
     ) { innerPadding ->
         PerfilScreen(

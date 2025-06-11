@@ -5,8 +5,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.example.myapprecetas.R
 
-
-
 val fuenteTexto: FontFamily = FamilyQuicksand.quicksand
 
 object FamilyQuicksand{
@@ -18,11 +16,3 @@ object FamilyQuicksand{
         Font(R.font.quicksandlight, FontWeight.Light),
     )
 }
-
-//object FamilyBaloo {
-//    val baloo = FontFamily(
-//        Font(R.font.balooregular, FontWeight.Normal), // Regular
-//        Font(R.font.baloo_bold, FontWeight.Bold),    // Bold
-//        Font(R.font.baloo_italic, FontWeight.Normal) // Italic
-//    )
-//}

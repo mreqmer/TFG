@@ -5,16 +5,20 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapprecetas.ui.theme.Colores
 import com.example.myapprecetas.ui.theme.common.CargandoElementos
+import com.example.myapprecetas.ui.theme.common.MensajeSinRecetas
 import com.example.myapprecetas.vm.VMFavoritas
 import eu.bambooapps.material3.pullrefresh.PullRefreshIndicator
 import eu.bambooapps.material3.pullrefresh.PullRefreshIndicatorDefaults
@@ -74,7 +78,13 @@ fun FavoritasScreen(
             CargandoElementos()
         } else if(listaReceta.isEmpty()){
             // Muestra mensaje si no hay recetas favoritas
-            MensajeSinRecetas()
+            MensajeSinRecetas(
+                texto = "No hay recetas favoritas. ¡Añade alguna!",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .widthIn(max = 250.dp)
+                    .padding(horizontal = 16.dp)
+            )
         }else{
             // Muestra la lista de recetas favoritas
             ListadoRecetas(

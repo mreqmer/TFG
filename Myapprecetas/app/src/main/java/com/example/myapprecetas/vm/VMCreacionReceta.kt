@@ -43,7 +43,7 @@ class VMCreacionReceta @Inject constructor(
 
     private val _publicId = MutableStateFlow<String?>("")
 
-    private val _tiempoPreparacion = MutableStateFlow("")
+    private val _tiempoPreparacion = MutableStateFlow("10")
     val tiempoPreparacion: StateFlow<String> = _tiempoPreparacion
 
     private val _dificultad = MutableStateFlow("")
